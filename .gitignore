@@ -1,0 +1,13 @@
+node_modules/
+**/node_modules/
+dist/
+**/dist/
+.env
+*.env.local
+.DS_Store
+*.log
+audio/*.mp3
+seeds/audio-review-failures.txt
+.pnpm-store/
+tmp/
+client/dist/

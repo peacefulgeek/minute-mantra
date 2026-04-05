@@ -1,0 +1,24 @@
+{
+  "name": "minute-mantra",
+  "version": "1.0.0",
+  "description": "Minute Mantra PWA — One mantra. One minute. Every morning.",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter server dev\" \"pnpm --filter client dev\"",
+    "build": "pnpm --filter client build && pnpm --filter server build",
+    "start": "NODE_ENV=production node server/dist/index.js",
+    "seed": "node seeds/seed.js",
+    "generate-vapid": "node scripts/generate-vapid.js"
+  },
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
