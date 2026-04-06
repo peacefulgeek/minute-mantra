@@ -271,7 +271,7 @@ router.post('/reseed-mantras', async (req, res) => {
             m.original_script, m.transliteration, m.english_translation,
             m.tradition, m.intention || null, m.phonetic_guide || null,
             m.context_note || null, m.go_deeper_teaser || null,
-            m.audio_filename || `mantra-${String(m.day_of_year).padStart(3,'0')}.mp3`,
+            m.audio_filename != null ? m.audio_filename : null,
             m.day_of_year,
           ]
         );
@@ -285,7 +285,7 @@ router.post('/reseed-mantras', async (req, res) => {
             m.day_of_year, m.original_script, m.transliteration, m.english_translation,
             m.tradition, m.intention || null, m.phonetic_guide || null,
             m.context_note || null, m.go_deeper_teaser || null,
-            m.audio_filename || `mantra-${String(m.day_of_year).padStart(3,'0')}.mp3`,
+            m.audio_filename != null ? m.audio_filename : null,
           ]
         );
         inserted++;
