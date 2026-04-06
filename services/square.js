@@ -9,9 +9,10 @@ function getClient() {
   });
 }
 
-const PLAN_IDS = {
-  monthly: process.env.SQUARE_MONTHLY_PLAN_ID,
-  annual: process.env.SQUARE_ANNUAL_PLAN_ID,
+// Square subscriptions require planVariationId, not planId
+const VARIATION_IDS = {
+  monthly: process.env.SQUARE_MONTHLY_VARIATION_ID,
+  annual: process.env.SQUARE_ANNUAL_VARIATION_ID,
 };
 
 async function createSubscription(user, plan, paymentNonce) {
@@ -36,14 +37,14 @@ async function createSubscription(user, plan, paymentNonce) {
   });
   const cardId = cardResult.card.id;
 
-  // Create subscription
-  const planId = PLAN_IDS[plan];
-  if (!planId) throw new Error(`No plan ID configured for ${plan}`);
+  // Create subscription using plan variation ID
+  const planVariationId = VARIATION_IDS[plan];
+  if (!planVariationId) throw new Error(`No variation ID configured for plan: ${plan}`);
 
   const { result: subResult } = await client.subscriptionsApi.createSubscription({
     idempotencyKey: `sub-${user.id}-${Date.now()}`,
     locationId: process.env.SQUARE_LOCATION_ID,
-    planVariationId: planId,
+    planVariationId,
     customerId,
     cardId,
     startDate: new Date().toISOString().split('T')[0],
@@ -58,11 +59,11 @@ async function createSubscription(user, plan, paymentNonce) {
 
 async function changeSubscription(subscriptionId, newPlan) {
   const client = getClient();
-  const planId = PLAN_IDS[newPlan];
-  if (!planId) throw new Error(`No plan ID configured for ${newPlan}`);
+  const planVariationId = VARIATION_IDS[newPlan];
+  if (!planVariationId) throw new Error(`No variation ID configured for plan: ${newPlan}`);
 
   await client.subscriptionsApi.swapPlan(subscriptionId, {
-    newPlanVariationId: planId,
+    newPlanVariationId: planVariationId,
   });
 }
 
