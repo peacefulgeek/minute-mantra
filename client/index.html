@@ -3,34 +3,127 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#b8860b" />
-  <meta name="description" content="Learn a new mantra each morning. Chant for one minute. Transform your day." />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Mantra" />
+  <!-- ═══════════════════════════════════════════════
+       PRIMARY SEO
+  ═══════════════════════════════════════════════ -->
+  <title>Minute Mantra — One Mantra. One Minute. Every Morning.</title>
+  <meta name="description" content="Minute Mantra delivers one sacred mantra each morning from Vedic, Buddhist, Sikh, and Universal traditions. Chant for 60 seconds with animated sacred geometry timers, audio pronunciation, and streak tracking. Free 5-day trial." />
+  <meta name="keywords" content="mantra app, daily mantra, morning meditation, vedic mantra, buddhist mantra, sikh mantra, sacred chanting, om meditation, spiritual practice, mindfulness app, mantra timer, sacred geometry, mala counter, morning mantra" />
+  <meta name="author" content="Paul Wagner" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <link rel="canonical" href="https://minutemantra.com/" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="Minute Mantra" />
-  <meta property="og:description" content="One mantra. One minute. Every morning." />
-  <meta property="og:image" content="https://minute-mantra.b-cdn.net/images/og-image.png" />
-  <meta property="og:url" content="https://minutemantra.com" />
+  <!-- ═══════════════════════════════════════════════
+       OPEN GRAPH
+  ═══════════════════════════════════════════════ -->
+  <meta property="og:site_name" content="Minute Mantra" />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://minutemantra.com/" />
+  <meta property="og:title" content="Minute Mantra — One Mantra. One Minute. Every Morning." />
+  <meta property="og:description" content="365 sacred mantras from Vedic, Buddhist, Sikh, and Universal traditions. One per morning. Chant for 60 seconds. Transform your day. Free 5-day trial." />
+  <meta property="og:image" content="https://d2xsxph8kpxj0f.cloudfront.net/310519663269738349/mpxaAjPvhSECczR9i7vCDX/mm-favicon-om-n8fEyZnEMEXuk3Q6BGaYRj.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Minute Mantra — sacred mantra app with Om symbol in warm gold" />
+  <meta property="og:locale" content="en_US" />
 
-  <!-- Twitter -->
+  <!-- ═══════════════════════════════════════════════
+       TWITTER / X CARDS
+  ═══════════════════════════════════════════════ -->
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Minute Mantra" />
-  <meta name="twitter:description" content="One mantra. One minute. Every morning." />
-  <meta name="twitter:image" content="https://minute-mantra.b-cdn.net/images/og-image.png" />
+  <meta name="twitter:site" content="@minutemantra" />
+  <meta name="twitter:creator" content="@paulwagner" />
+  <meta name="twitter:title" content="Minute Mantra — One Mantra. One Minute. Every Morning." />
+  <meta name="twitter:description" content="365 sacred mantras from Vedic, Buddhist, Sikh, and Universal traditions. One per morning. Chant for 60 seconds. Transform your day." />
+  <meta name="twitter:image" content="https://d2xsxph8kpxj0f.cloudfront.net/310519663269738349/mpxaAjPvhSECczR9i7vCDX/mm-favicon-om-n8fEyZnEMEXuk3Q6BGaYRj.png" />
+  <meta name="twitter:image:alt" content="Minute Mantra — sacred mantra practice app" />
 
-  <!-- Apple touch icons -->
-  <link rel="apple-touch-icon" href="https://minute-mantra.b-cdn.net/icons/icon-192.png" />
+  <!-- ═══════════════════════════════════════════════
+       PWA / MOBILE
+  ═══════════════════════════════════════════════ -->
+  <meta name="theme-color" content="#c8860a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Minute Mantra" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="application-name" content="Minute Mantra" />
+  <meta name="msapplication-TileColor" content="#c8860a" />
+  <meta name="msapplication-TileImage" content="/icon-192.png" />
+  <link rel="manifest" href="/manifest.json" />
 
-  <!-- Fonts -->
+  <!-- ═══════════════════════════════════════════════
+       FAVICON & ICONS
+  ═══════════════════════════════════════════════ -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="/icon-512.png" />
+
+  <!-- ═══════════════════════════════════════════════
+       JSON-LD STRUCTURED DATA
+  ═══════════════════════════════════════════════ -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://minutemantra.com/#website",
+        "url": "https://minutemantra.com/",
+        "name": "Minute Mantra",
+        "description": "Daily sacred mantra practice app — one mantra, one minute, every morning.",
+        "publisher": { "@id": "https://minutemantra.com/#organization" }
+      },
+      {
+        "@type": "Organization",
+        "@id": "https://minutemantra.com/#organization",
+        "name": "Minute Mantra",
+        "url": "https://minutemantra.com/",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://d2xsxph8kpxj0f.cloudfront.net/310519663269738349/mpxaAjPvhSECczR9i7vCDX/mm-favicon-om-n8fEyZnEMEXuk3Q6BGaYRj.png",
+          "width": 512,
+          "height": 512
+        },
+        "founder": { "@type": "Person", "name": "Paul Wagner", "url": "https://paulwagner.com" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "Minute Mantra",
+        "description": "A daily sacred mantra practice app delivering one mantra each morning from Vedic, Buddhist, Sikh, and Universal traditions. Features animated sacred geometry timers, audio pronunciation, streak tracking, and a 108-bead mala counter.",
+        "applicationCategory": "LifestyleApplication",
+        "applicationSubCategory": "Meditation",
+        "operatingSystem": "Web, iOS, Android",
+        "url": "https://minutemantra.com/",
+        "offers": [
+          { "@type": "Offer", "name": "Free Trial", "price": "0", "priceCurrency": "USD", "description": "5-day free trial" },
+          { "@type": "Offer", "name": "Monthly", "price": "1.97", "priceCurrency": "USD", "description": "Monthly subscription" },
+          { "@type": "Offer", "name": "Annual", "price": "16.95", "priceCurrency": "USD", "description": "Annual subscription — save 28%" }
+        ],
+        "author": { "@id": "https://minutemantra.com/#organization" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "What is Minute Mantra?", "acceptedAnswer": { "@type": "Answer", "text": "Minute Mantra is a daily sacred mantra practice app. Each morning you receive one mantra drawn from Vedic, Buddhist, Sikh, or Universal traditions. You chant it for 60 seconds using an animated sacred geometry timer, then go about your day transformed." } },
+          { "@type": "Question", "name": "Do I need to be religious to use Minute Mantra?", "acceptedAnswer": { "@type": "Answer", "text": "Not at all. Mantras are vibrational sound tools that work regardless of belief system. The Universal tradition category includes mantras accessible to everyone." } },
+          { "@type": "Question", "name": "How much does Minute Mantra cost?", "acceptedAnswer": { "@type": "Answer", "text": "Minute Mantra offers a free 5-day trial with full access. After that, plans start at $1.97/month or $16.95/year (save 28%)." } },
+          { "@type": "Question", "name": "What traditions are the mantras from?", "acceptedAnswer": { "@type": "Answer", "text": "Minute Mantra includes mantras from 8 traditions: Vedic Shaivite, Vedic Vaishnava, Vedic Shakta, Vedic Ganapatya, Vedic Saura (Solar), Buddhist, Sikh/Gurbani, and Universal. The library contains 365+ mantras curated by Paul Wagner." } },
+          { "@type": "Question", "name": "Can I install Minute Mantra on my phone?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — Minute Mantra is a Progressive Web App (PWA). On iPhone, open minutemantra.com in Safari, tap Share, then Add to Home Screen. On Android, tap the browser menu and select Install App." } },
+          { "@type": "Question", "name": "How does magic link login work?", "acceptedAnswer": { "@type": "Answer", "text": "There is no password. Enter your email and we send a secure magic link. Click it to sign in instantly. No account setup required." } }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- ═══════════════════════════════════════════════
+       FONTS
+  ═══════════════════════════════════════════════ -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=Noto+Sans+Devanagari:wght@400;500&family=Noto+Sans+Gurmukhi:wght@400;500&display=swap" rel="stylesheet" />
-
-  <title>Minute Mantra</title>
 </head>
 <body>
   <div id="root"></div>

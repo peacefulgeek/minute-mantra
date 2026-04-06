@@ -1,0 +1,70 @@
+# Minute Mantra
+
+> One mantra. One minute. Every morning.
+
+Minute Mantra is a daily sacred mantra practice Progressive Web App (PWA) created by Paul Wagner. It delivers one sacred mantra each morning drawn from eight ancient traditions. Users chant for 60 seconds using animated sacred geometry timers, then go about their day.
+
+## What It Is
+
+Minute Mantra is a subscription-based spiritual practice app available at https://minutemantra.com. It is a PWA — installable on iPhone and Android directly from the browser with no app store required.
+
+The core practice: each morning, the app surfaces one mantra. The user reads the mantra, listens to the audio pronunciation, then chants it for 60 seconds while watching an animated sacred geometry figure slowly draw itself. That's it. One minute. Every morning.
+
+## The Mantra Library
+
+The library contains 365+ mantras curated by Paul Wagner, organized across 8 traditions:
+
+- **Vedic / Shaivite** — mantras of Shiva, the destroyer and transformer
+- **Vedic / Vaishnava** — mantras of Vishnu and his avatars (Krishna, Rama)
+- **Vedic / Shakta** — mantras of the Divine Feminine (Durga, Lakshmi, Saraswati)
+- **Vedic / Ganapatya** — mantras of Ganesha, remover of obstacles
+- **Vedic / Saura (Solar)** — mantras of Surya, the sun
+- **Buddhist** — mantras including Om Mani Padme Hum and others from Tibetan and Mahayana traditions
+- **Sikh / Gurbani** — sacred verses from the Guru Granth Sahib
+- **Universal** — non-denominational mantras accessible to all practitioners
+
+Each mantra includes: Sanskrit/Gurmukhi text, transliteration, English meaning, tradition context, and audio pronunciation.
+
+## Features
+
+- **Daily mantra delivery** — one new mantra each morning, rotating through the full library
+- **Sacred geometry timers** — four animated figures: Seed of Life, Flower of Life, Lotus, Sri Yantra. Each draws itself over 60 seconds as the user chants
+- **Audio pronunciation** — native-quality audio for correct pronunciation of Sanskrit and Gurmukhi
+- **Streak tracking** — daily practice streaks to build consistency
+- **Mala counter** — digital 108-bead mala for extended repetition practice
+- **Mantra library** — browse and favorite mantras from all 8 traditions
+- **Morning email** — optional daily mantra delivered to your inbox each morning
+- **PWA install** — works offline, installs like a native app
+
+## Pricing
+
+- **Free Trial** — 5 days, full access, no credit card required
+- **Monthly** — $1.97/month
+- **Annual** — $16.95/year (save 28% vs monthly)
+
+Payments processed via Square. No passwords — login via magic link sent to email.
+
+## Creator
+
+Paul Wagner is a spiritual teacher, author, and founder of Blended Soul. He has studied Vedic, Buddhist, and Sikh traditions for over 20 years. Minute Mantra is his distillation of daily mantra practice into the simplest possible form: one mantra, one minute, every morning.
+
+Website: https://paulwagner.com
+
+## Technical
+
+- Progressive Web App (React, Node.js, MySQL)
+- Deployed at https://minutemantra.com
+- Installable on iOS (Safari → Share → Add to Home Screen) and Android (browser menu → Install App)
+- Works offline after first load
+
+## Contact
+
+For support or inquiries: mantra@minutemantra.com
+
+## Links
+
+- [Home](https://minutemantra.com/)
+- [Enter / Login](https://minutemantra.com/enter)
+- [About](https://minutemantra.com/about)
+- [Privacy Policy](https://minutemantra.com/privacy)
+- [Terms of Service](https://minutemantra.com/terms)
