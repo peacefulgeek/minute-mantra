@@ -248,4 +248,54 @@ router.delete('/delete-user/:userId', async (req, res) => {
   }
 });
 
+// POST /api/admin/reseed-mantras — Update all mantras in DB from seed data
+router.post('/reseed-mantras', async (req, res) => {
+  try {
+    const part1 = require('../seeds/mantras-part1');
+    const part2 = require('../seeds/mantras-part2');
+    const part3 = require('../seeds/mantras-part3');
+    const part4 = require('../seeds/mantras-part4');
+    const ALL = [...part1, ...part2, ...part3, ...part4];
+
+    let updated = 0, inserted = 0;
+    for (const m of ALL) {
+      const existing = await queryOne('SELECT id FROM mantras WHERE day_of_year = ?', [m.day_of_year]);
+      if (existing) {
+        await query(
+          `UPDATE mantras SET
+            original_script = ?, transliteration = ?, english_translation = ?,
+            tradition = ?, intention = ?, phonetic_guide = ?,
+            context_note = ?, go_deeper_teaser = ?, audio_filename = ?
+          WHERE day_of_year = ?`,
+          [
+            m.original_script, m.transliteration, m.english_translation,
+            m.tradition, m.intention || null, m.phonetic_guide || null,
+            m.context_note || null, m.go_deeper_teaser || null,
+            m.audio_filename || `mantra-${String(m.day_of_year).padStart(3,'0')}.mp3`,
+            m.day_of_year,
+          ]
+        );
+        updated++;
+      } else {
+        await query(
+          `INSERT INTO mantras (day_of_year, original_script, transliteration, english_translation,
+            tradition, intention, phonetic_guide, context_note, go_deeper_teaser, audio_filename)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            m.day_of_year, m.original_script, m.transliteration, m.english_translation,
+            m.tradition, m.intention || null, m.phonetic_guide || null,
+            m.context_note || null, m.go_deeper_teaser || null,
+            m.audio_filename || `mantra-${String(m.day_of_year).padStart(3,'0')}.mp3`,
+          ]
+        );
+        inserted++;
+      }
+    }
+    res.json({ ok: true, updated, inserted, total: ALL.length });
+  } catch (err) {
+    console.error('Reseed mantras error:', err);
+    res.status(500).json({ error: 'Failed to reseed mantras', detail: err.message });
+  }
+});
+
 module.exports = router;
