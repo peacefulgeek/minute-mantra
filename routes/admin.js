@@ -251,6 +251,12 @@ router.delete('/delete-user/:userId', async (req, res) => {
 // POST /api/admin/reseed-mantras — Update all mantras in DB from seed data
 router.post('/reseed-mantras', async (req, res) => {
   try {
+    // Clear require cache to get fresh data
+    const path = require('path');
+    for (let i = 1; i <= 4; i++) {
+      const mod = path.resolve(__dirname, `../seeds/mantras-part${i}.js`);
+      delete require.cache[mod];
+    }
     const part1 = require('../seeds/mantras-part1');
     const part2 = require('../seeds/mantras-part2');
     const part3 = require('../seeds/mantras-part3');
