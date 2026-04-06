@@ -29,10 +29,10 @@ const LANDING_PATH = '/';
 
 function LoadingScreen() {
   return (
-    <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#0d0d1a' }}>
+    <div className="fixed inset-0 flex items-center justify-center" style={{ background: 'linear-gradient(160deg, #fdf8f0 0%, #fef3e2 50%, #fdf0e0 100%)' }}>
       <div className="text-center">
-        <div className="text-4xl mb-4" style={{ color: '#b8860b' }}>ॐ</div>
-        <p className="text-white/40 text-sm tracking-widest" style={{ fontFamily: 'system-ui, sans-serif' }}>
+        <div className="text-5xl mb-4" style={{ color: '#c8860a', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>ॐ</div>
+        <p className="text-sm tracking-widest" style={{ color: '#a07850', fontFamily: 'system-ui, sans-serif' }}>
           MINUTE MANTRA
         </p>
       </div>
