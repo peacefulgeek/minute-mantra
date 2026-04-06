@@ -35,7 +35,7 @@ export default function AppHeader() {
     <header
       className="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-5 py-3"
       style={{
-        background: 'rgba(13,13,26,0.92)',
+        background: 'rgba(253,248,240,0.92)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
         borderBottom: '1px solid rgba(184,134,11,0.12)',
@@ -44,8 +44,8 @@ export default function AppHeader() {
       {/* Logo */}
       <Link to="/" className="flex items-center gap-2 no-underline">
         <span className="text-xl" style={{ color: '#b8860b' }}>ॐ</span>
-        <span className="text-white/70 tracking-widest text-xs font-light hidden sm:block"
-          style={{ fontFamily: 'Georgia, serif', letterSpacing: '0.15em' }}>
+        <span className="tracking-widest text-xs font-light hidden sm:block"
+          style={{ fontFamily: 'Georgia, serif', letterSpacing: '0.15em', color: '#7a6050' }}>
           MINUTE MANTRA
         </span>
       </Link>
@@ -61,7 +61,7 @@ export default function AppHeader() {
             className="px-5 py-2 rounded-full text-xs tracking-widest font-medium"
             style={{
               background: 'linear-gradient(135deg, #b8860b, #d4a017)',
-              color: '#1a1a2e',
+              color: '#5a3e28',
               fontFamily: 'system-ui, sans-serif',
               boxShadow: '0 0 16px rgba(184,134,11,0.25)',
             }}
@@ -77,8 +77,8 @@ export default function AppHeader() {
               onClick={() => setMenuOpen(o => !o)}
               className="flex flex-col justify-center items-center w-9 h-9 rounded-full gap-1.5"
               style={{
-                background: menuOpen ? 'rgba(184,134,11,0.15)' : 'rgba(255,255,255,0.06)',
-                border: `1px solid ${menuOpen ? 'rgba(184,134,11,0.4)' : 'rgba(255,255,255,0.1)'}`,
+                background: menuOpen ? 'rgba(184,134,11,0.15)' : 'rgba(160,120,80,0.08)',
+                border: `1px solid ${menuOpen ? 'rgba(184,134,11,0.4)' : 'rgba(160,120,80,0.2)'}`,
                 transition: 'all 0.2s',
               }}
               aria-label="Menu"
@@ -87,19 +87,19 @@ export default function AppHeader() {
                 animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
                 transition={{ duration: 0.2 }}
                 className="block w-4 h-px rounded-full"
-                style={{ background: menuOpen ? '#b8860b' : 'rgba(255,255,255,0.7)' }}
+                style={{ background: menuOpen ? '#b8860b' : 'rgba(120,90,60,0.6)' }}
               />
               <motion.span
                 animate={menuOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
                 transition={{ duration: 0.15 }}
                 className="block w-4 h-px rounded-full"
-                style={{ background: menuOpen ? '#b8860b' : 'rgba(255,255,255,0.7)' }}
+                style={{ background: menuOpen ? '#b8860b' : 'rgba(120,90,60,0.6)' }}
               />
               <motion.span
                 animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
                 transition={{ duration: 0.2 }}
                 className="block w-4 h-px rounded-full"
-                style={{ background: menuOpen ? '#b8860b' : 'rgba(255,255,255,0.7)' }}
+                style={{ background: menuOpen ? '#b8860b' : 'rgba(120,90,60,0.6)' }}
               />
             </motion.button>
 
@@ -114,16 +114,16 @@ export default function AppHeader() {
                   className="absolute right-0 mt-2 rounded-2xl overflow-hidden"
                   style={{
                     width: 220,
-                    background: 'rgba(18,18,36,0.98)',
+                    background: 'rgba(253,248,240,0.98)',
                     border: '1px solid rgba(184,134,11,0.2)',
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04)',
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.08), 0 0 0 1px rgba(184,134,11,0.1)',
                     backdropFilter: 'blur(20px)',
                   }}
                 >
                   {/* User info */}
-                  <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                    <p className="text-xs text-white/30 mb-0.5" style={{ fontFamily: 'system-ui, sans-serif' }}>Signed in as</p>
-                    <p className="text-sm text-white/70 truncate" style={{ fontFamily: 'system-ui, sans-serif' }}>{user.email}</p>
+                  <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(184,134,11,0.1)' }}>
+                    <p className="text-xs mb-0.5" style={{ fontFamily: 'system-ui, sans-serif', color: '#a07850' }}>Signed in as</p>
+                    <p className="text-sm truncate" style={{ fontFamily: 'system-ui, sans-serif', color: '#5a3e28' }}>{user.email}</p>
                     {user.subscription_tier === 'premium' && (
                       <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs" style={{ background: 'rgba(184,134,11,0.2)', color: '#b8860b', fontFamily: 'system-ui, sans-serif' }}>
                         Premium
@@ -138,7 +138,7 @@ export default function AppHeader() {
                     <MenuItem to="/favorites" icon="♡" label="Favorites" />
                     <MenuItem to="/library" icon="📚" label="Mantra Library" />
 
-                    <div className="mx-3 my-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                    <div className="mx-3 my-1 h-px" style={{ background: 'rgba(184,134,11,0.1)' }} />
 
                     <MenuItem to="/settings" icon="⚙" label="Settings" />
                     <MenuItem to="/settings/profile" icon="👤" label="Profile" />
@@ -152,17 +152,17 @@ export default function AppHeader() {
                       </>
                     )}
 
-                    <div className="mx-3 my-1 h-px" style={{ background: 'rgba(255,255,255,0.06)' }} />
+                    <div className="mx-3 my-1 h-px" style={{ background: 'rgba(184,134,11,0.1)' }} />
 
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors"
                       style={{ fontFamily: 'system-ui, sans-serif' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.04)'}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(184,134,11,0.06)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
                       <span className="text-sm opacity-50">↩</span>
-                      <span className="text-sm text-white/50">Sign out</span>
+                      <span className="text-sm" style={{ color: '#a07850' }}>Sign out</span>
                     </button>
                   </nav>
                 </motion.div>
@@ -187,11 +187,11 @@ function MenuItem({ to, icon, label, gold }) {
         background: isActive ? 'rgba(184,134,11,0.1)' : 'transparent',
         fontFamily: 'system-ui, sans-serif',
       }}
-      onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+      onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(184,134,11,0.06)'; }}
       onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
     >
       <span className="text-sm w-5 text-center opacity-60">{icon}</span>
-      <span className="text-sm" style={{ color: gold ? '#b8860b' : isActive ? '#f0ebe3' : 'rgba(255,255,255,0.6)' }}>
+      <span className="text-sm" style={{ color: gold ? '#b8860b' : isActive ? '#5a3e28' : '#7a6050' }}>
         {label}
       </span>
       {isActive && (
