@@ -76,8 +76,9 @@ router.post('/magic-link', authLimiter, async (req, res) => {
 
     res.json({ ok: true, message: 'Magic link sent' });
   } catch (err) {
-    console.error('Magic link error:', err);
-    res.status(500).json({ error: 'Failed to send magic link' });
+    console.error('Magic link error:', err.message, err.stack);
+    console.error('Magic link error details:', JSON.stringify({ code: err.code, command: err.command, responseCode: err.responseCode }));
+    res.status(500).json({ error: 'Failed to send magic link', detail: err.message });
   }
 });
 
@@ -166,6 +167,51 @@ router.get('/me', requireAuth, async (req, res) => {
     console.error('Get me error:', err);
     res.status(500).json({ error: 'Server error' });
   }
+});
+
+// GET /api/auth/diag — temporary diagnostic endpoint (remove after debugging)
+router.get('/diag', async (req, res) => {
+  const checks = {};
+  
+  // Check DB
+  try {
+    const result = await queryOne('SELECT 1 as ok');
+    checks.db = result ? 'ok' : 'no result';
+  } catch (e) {
+    checks.db = 'FAIL: ' + e.message;
+  }
+  
+  // Check SMTP config
+  checks.smtp_host = process.env.SMTP_HOST ? 'set' : 'MISSING';
+  checks.smtp_port = process.env.SMTP_PORT || 'default 587';
+  checks.smtp_user = process.env.SMTP_USER ? 'set' : 'MISSING';
+  checks.smtp_pass = process.env.SMTP_PASS ? 'set' : 'MISSING';
+  checks.smtp_from = process.env.SMTP_FROM_ADDRESS || 'default mantra@minutemantra.com';
+  
+  // Check DB schema - magic_link columns
+  try {
+    const cols = await query("SHOW COLUMNS FROM users LIKE 'magic_link%'");
+    checks.magic_link_columns = cols.map(c => c.Field);
+  } catch (e) {
+    checks.magic_link_columns = 'FAIL: ' + e.message;
+  }
+  
+  // Try SMTP connection
+  try {
+    const nodemailer = require('nodemailer');
+    const t = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT) || 587,
+      secure: false,
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+    });
+    await t.verify();
+    checks.smtp_connection = 'ok';
+  } catch (e) {
+    checks.smtp_connection = 'FAIL: ' + e.message;
+  }
+  
+  res.json(checks);
 });
 
 module.exports = router;
