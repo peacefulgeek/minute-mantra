@@ -8,16 +8,12 @@
     "node": ">=18.0.0"
   },
   "scripts": {
-    "dev": "concurrently \"pnpm --filter server dev\" \"pnpm --filter client dev\"",
-    "build": "pnpm --filter client build && pnpm --filter server build",
-    "start": "NODE_ENV=production node server/dist/index.js",
+    "build": "cd client && pnpm install && pnpm build",
+    "start": "NODE_ENV=production node server/index.js",
+    "dev": "concurrently \"cd server && node index.js\" \"cd client && pnpm dev\"",
     "seed": "node seeds/seed.js",
     "generate-vapid": "node scripts/generate-vapid.js"
   },
-  "workspaces": [
-    "client",
-    "server"
-  ],
   "devDependencies": {
     "concurrently": "^8.2.2"
   }
