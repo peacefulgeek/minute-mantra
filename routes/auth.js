@@ -171,7 +171,7 @@ router.get('/me', requireAuth, async (req, res) => {
 
 // GET /api/auth/diag — temporary diagnostic endpoint (remove after debugging)
 router.get('/diag', async (req, res) => {
-  const checks = {};
+  const checks = { version: 'v3-http-api' };
   
   // Check DB
   try {
@@ -181,12 +181,11 @@ router.get('/diag', async (req, res) => {
     checks.db = 'FAIL: ' + e.message;
   }
   
-  // Check SMTP config
-  checks.smtp_host = process.env.SMTP_HOST ? 'set' : 'MISSING';
-  checks.smtp_port = process.env.SMTP_PORT || 'default 587';
-  checks.smtp_user = process.env.SMTP_USER ? 'set' : 'MISSING';
-  checks.smtp_pass = process.env.SMTP_PASS ? 'set' : 'MISSING';
-  checks.smtp_from = process.env.SMTP_FROM_ADDRESS || 'default mantra@minutemantra.com';
+  // Check SMTP2GO HTTP API config
+  checks.smtp_api_key = process.env.SMTP_API ? 'set (' + process.env.SMTP_API.substring(0, 10) + '...)' : 'MISSING';
+  checks.smtp_from = process.env.SMTP_FROM_ADDRESS || 'default';
+  checks.smtp_from_name = process.env.SMTP_FROM_NAME || 'default';
+  checks.email_mode = 'SMTP2GO HTTP API (no nodemailer)';
   
   // Check DB schema - magic_link columns
   try {
@@ -196,19 +195,26 @@ router.get('/diag', async (req, res) => {
     checks.magic_link_columns = 'FAIL: ' + e.message;
   }
   
-  // Try SMTP connection
-  try {
-    const nodemailer = require('nodemailer');
-    const t = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT) || 587,
-      secure: false,
-      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
-    });
-    await t.verify();
-    checks.smtp_connection = 'ok';
-  } catch (e) {
-    checks.smtp_connection = 'FAIL: ' + e.message;
+  // Test SMTP2GO HTTP API connectivity
+  if (process.env.SMTP_API) {
+    try {
+      const testResp = await fetch('https://api.smtp2go.com/v3/email/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          api_key: process.env.SMTP_API,
+          to: ['paul@creativelab.tv'],
+          sender: `${process.env.SMTP_FROM_NAME || 'Minute Mantra'} <${process.env.SMTP_FROM_ADDRESS || 'paul@paulwagner.one'}>`,
+          subject: 'MM Diag Test ' + new Date().toISOString(),
+          html_body: '<p>Diag test from minutemantra.com server</p>',
+          text_body: 'Diag test',
+        }),
+      });
+      const testResult = await testResp.json();
+      checks.smtp2go_api_test = testResult;
+    } catch (e) {
+      checks.smtp2go_api_test = 'FAIL: ' + e.message;
+    }
   }
   
   res.json(checks);
