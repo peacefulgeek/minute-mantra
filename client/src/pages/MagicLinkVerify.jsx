@@ -40,24 +40,47 @@ export default function MagicLinkVerify() {
   }, []);
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6"
-      style={{ background: 'linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 100%)', fontFamily: 'Georgia, serif' }}>
+    <div className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden"
+      style={{ background: 'linear-gradient(160deg, #fdf8f0 0%, #fef3e2 50%, #fdf0e0 100%)', fontFamily: "'DM Sans', system-ui, sans-serif" }}>
+
+      {/* Soft radial glow */}
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(ellipse 60% 60% at 50% 40%, rgba(200,134,10,0.08) 0%, transparent 70%)' }} />
+
+      {/* Sacred geometry background — Flower of Life */}
+      <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
+        <svg viewBox="0 0 500 500" className="w-full max-w-3xl">
+          <circle cx="250" cy="250" r="80" fill="none" stroke="#c8860a" strokeWidth="1.5" />
+          {[0,60,120,180,240,300].map((deg,i) => {
+            const rad = deg * Math.PI / 180;
+            return <circle key={i} cx={250 + 80*Math.cos(rad)} cy={250 + 80*Math.sin(rad)} r="80" fill="none" stroke="#c8860a" strokeWidth="1.5" />;
+          })}
+          {[0,60,120,180,240,300].map((deg,i) => {
+            const rad = deg * Math.PI / 180;
+            return <circle key={`o${i}`} cx={250 + 160*Math.cos(rad)} cy={250 + 160*Math.sin(rad)} r="80" fill="none" stroke="#c8860a" strokeWidth="1" />;
+          })}
+          <circle cx="250" cy="250" r="240" fill="none" stroke="#c8860a" strokeWidth="1" />
+        </svg>
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center max-w-sm"
+        transition={{ duration: 0.6 }}
+        className="text-center max-w-sm relative z-10"
       >
         {status === 'verifying' && (
           <>
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-              className="text-4xl mb-6"
-              style={{ color: '#b8860b' }}
+              style={{ fontSize: 48, marginBottom: 24, color: '#c8860a', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
             >
               ✦
             </motion.div>
-            <h2 className="text-xl font-light text-white/70">Entering your practice...</h2>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, fontWeight: 400, color: '#3d2b1f', marginBottom: 8 }}>
+              Entering your practice...
+            </h2>
+            <p style={{ color: '#a07850', fontSize: 13, letterSpacing: '0.06em' }}>One moment of stillness</p>
           </>
         )}
 
@@ -67,28 +90,54 @@ export default function MagicLinkVerify() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 200 }}
-              className="text-5xl mb-6"
+              style={{ fontSize: 56, marginBottom: 20, color: '#c8860a', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
             >
               ॐ
             </motion.div>
-            <h2 className="text-xl font-light text-white/80">Welcome.</h2>
-            <p className="text-white/40 text-sm mt-2" style={{ fontFamily: 'system-ui, sans-serif' }}>Taking you to your practice...</p>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 26, fontWeight: 400, color: '#3d2b1f', marginBottom: 8 }}>
+              Welcome.
+            </h2>
+            <p style={{ color: '#a07850', fontSize: 14, letterSpacing: '0.06em' }}>
+              Taking you to your practice...
+            </p>
           </>
         )}
 
         {status === 'error' && (
-          <>
-            <div className="text-4xl mb-6">🙏</div>
-            <h2 className="text-xl font-light text-white/80 mb-4">This link has expired</h2>
-            <p className="text-white/50 text-sm mb-8" style={{ fontFamily: 'system-ui, sans-serif' }}>{errorMsg}</p>
-            <button
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            style={{
+              background: 'rgba(255,255,255,0.75)',
+              backdropFilter: 'blur(16px)',
+              border: '1px solid rgba(200,134,10,0.18)',
+              borderRadius: 24,
+              padding: '48px 36px',
+              textAlign: 'center',
+              boxShadow: '0 8px 40px rgba(200,134,10,0.08), 0 2px 12px rgba(61,43,31,0.06)',
+            }}
+          >
+            <div style={{ fontSize: 48, marginBottom: 20 }}>🪷</div>
+            <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 24, fontWeight: 400, color: '#3d2b1f', marginBottom: 12 }}>
+              This link has expired
+            </h2>
+            <p style={{ color: '#7a5c3e', fontSize: 14, lineHeight: 1.7, marginBottom: 24 }}>{errorMsg}</p>
+            <motion.button
               onClick={() => navigate('/enter')}
-              className="px-8 py-3 rounded-full text-sm tracking-widest"
-              style={{ background: 'linear-gradient(135deg, #b8860b, #d4a017)', color: '#1a1a2e' }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              style={{
+                padding: '15px 32px', borderRadius: 50, border: 'none',
+                background: 'linear-gradient(135deg, #c8860a 0%, #e0a020 100%)',
+                color: '#fff8ee', fontSize: 13, fontWeight: 600, letterSpacing: '0.15em',
+                cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
+                boxShadow: '0 4px 20px rgba(200,134,10,0.3)',
+              }}
             >
               REQUEST NEW LINK
-            </button>
-          </>
+            </motion.button>
+          </motion.div>
         )}
       </motion.div>
     </div>

@@ -71,7 +71,7 @@ function AppLayout() {
   const showBottomNav = user && !isStandalone && !isAdmin && !isLanding;
 
   return (
-    <div className="flex flex-col min-h-screen" style={{ background: '#0d0d1a' }}>
+    <div className="flex flex-col min-h-screen" style={{ background: '#fdf8f0' }}>
       {showHeader && <AppHeader />}
 
       <main
