@@ -73,4 +73,43 @@ async function cancelSubscription(subscriptionId) {
   return result.subscription;
 }
 
-module.exports = { createSubscription, changeSubscription, cancelSubscription };
+async function createCheckoutLink(user, plan) {
+  const client = getClient();
+  const appUrl = process.env.APP_URL || 'https://minutemantra.com';
+
+  const planVariationId = VARIATION_IDS[plan];
+  if (!planVariationId) throw new Error(`No variation ID configured for plan: ${plan}`);
+
+  const price = plan === 'annual' ? 1695 : 197; // cents
+  const planLabel = plan === 'annual' ? 'Annual Premium ($16.95/yr)' : 'Monthly Premium ($1.97/mo)';
+
+  const { result } = await client.checkoutApi.createPaymentLink({
+    idempotencyKey: `checkout-${user.id}-${plan}-${Date.now()}`,
+    order: {
+      locationId: process.env.SQUARE_LOCATION_ID,
+      lineItems: [{
+        name: `Minute Mantra ${planLabel}`,
+        quantity: '1',
+        basePriceMoney: {
+          amount: BigInt(price),
+          currency: 'USD',
+        },
+      }],
+      referenceId: `user-${user.id}-${plan}`,
+    },
+    checkoutOptions: {
+      redirectUrl: `${appUrl}/settings?checkout=success&plan=${plan}`,
+      askForShippingAddress: false,
+    },
+    prePopulatedData: {
+      buyerEmail: user.email,
+    },
+  });
+
+  return {
+    checkoutUrl: result.paymentLink.url,
+    orderId: result.paymentLink.orderId,
+  };
+}
+
+module.exports = { createSubscription, changeSubscription, cancelSubscription, createCheckoutLink };

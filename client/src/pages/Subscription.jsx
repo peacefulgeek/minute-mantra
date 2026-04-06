@@ -1,11 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Check } from '@phosphor-icons/react';
 import { useAuth } from '../contexts/AuthContext';
-
-const SQUARE_APP_ID = import.meta.env.VITE_SQUARE_APP_ID || '';
-const SQUARE_LOCATION_ID = import.meta.env.VITE_SQUARE_LOCATION_ID || '';
-const SQUARE_ENV = import.meta.env.VITE_SQUARE_ENVIRONMENT || 'sandbox';
 
 const FREE_FEATURES = [
   'Daily mantra + context card',
@@ -33,65 +29,22 @@ export default function Subscription() {
   const [plan, setPlan] = useState('annual');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [squareLoaded, setSquareLoaded] = useState(false);
-  const [card, setCard] = useState(null);
-  const [payments, setPayments] = useState(null);
-
-  useEffect(() => {
-    if (!isPremium) loadSquare();
-  }, [isPremium]);
-
-  async function loadSquare() {
-    if (window.Square) {
-      await initSquare();
-      return;
-    }
-    const script = document.createElement('script');
-    script.src = SQUARE_ENV === 'production'
-      ? 'https://web.squarecdn.com/v1/square.js'
-      : 'https://sandbox.web.squarecdn.com/v1/square.js';
-    script.onload = async () => {
-      await initSquare();
-    };
-    document.head.appendChild(script);
-  }
-
-  async function initSquare() {
-    try {
-      const p = await window.Square.payments(SQUARE_APP_ID, SQUARE_LOCATION_ID);
-      setPayments(p);
-      const c = await p.card();
-      await c.attach('#card-container');
-      setCard(c);
-      setSquareLoaded(true);
-    } catch (e) {
-      setError('Payment form failed to load. Please refresh and try again.');
-    }
-  }
 
   async function handleSubscribe() {
-    if (!card || !payments) return;
     setLoading(true);
     setError('');
     try {
-      const result = await card.tokenize();
-      if (result.status !== 'OK') {
-        setError(result.errors?.[0]?.message || 'Card tokenization failed');
-        setLoading(false);
-        return;
-      }
-
-      const res = await fetch('/api/subscriptions/create', {
+      const res = await fetch('/api/subscriptions/checkout-link', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ plan, payment_nonce: result.token }),
+        body: JSON.stringify({ plan }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Subscription failed');
+      if (!res.ok) throw new Error(data.error || 'Failed to create checkout');
 
-      await refetch();
-      navigate('/settings');
+      // Open Square checkout in a new tab
+      window.open(data.checkoutUrl, '_blank');
     } catch (e) {
       setError(e.message);
     }
@@ -159,7 +112,7 @@ export default function Subscription() {
           )}
         </div>
       ) : (
-        /* Upgrade view */
+        /* Upgrade view — opens Square checkout in new tab */
         <div>
           <p className="font-serif text-lg mb-6 text-center" style={{ color: 'var(--text-primary)' }}>
             Upgrade to Premium
@@ -209,38 +162,26 @@ export default function Subscription() {
             ))}
           </div>
 
-          {/* Square card form */}
-          <div
-            id="card-container"
-            className="mb-4 rounded-xl overflow-hidden"
-            style={{ minHeight: '90px', border: '1px solid var(--border-color)' }}
-          />
-
-          {!squareLoaded && !error && (
-            <div className="text-center mb-4">
-              <div className="skeleton h-16 rounded-xl" />
-            </div>
-          )}
-
           {error && (
             <p className="text-sm text-center mb-4" style={{ color: '#FF3B30' }}>{error}</p>
           )}
 
           <button
             onClick={handleSubscribe}
-            disabled={loading || !squareLoaded}
+            disabled={loading}
             className="w-full py-4 rounded-xl font-serif text-lg tracking-wide"
             style={{
               background: 'var(--text-accent)',
               color: 'var(--bg-base)',
-              opacity: loading || !squareLoaded ? 0.7 : 1,
+              opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? 'Processing...' : `Subscribe — ${plan === 'annual' ? '$16.95/yr' : '$1.97/mo'}`}
+            {loading ? 'Creating checkout...' : `Subscribe — ${plan === 'annual' ? '$16.95/yr' : '$1.97/mo'}`}
           </button>
 
           <p className="text-xs text-center mt-3 font-sans" style={{ color: 'var(--text-secondary)' }}>
-            Cancel anytime. No partial refunds.
+            Secure checkout powered by Square. Opens in a new tab.
+            <br />Cancel anytime. No partial refunds.
           </p>
         </div>
       )}

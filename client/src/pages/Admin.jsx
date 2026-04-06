@@ -16,6 +16,10 @@ export default function Admin() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [newTier, setNewTier] = useState('free');
+  const [actionLoading, setActionLoading] = useState(null);
 
   const isAdmin = user?.role === 'admin' || user?.email === 'paul@creativelab.tv';
 
@@ -66,6 +70,60 @@ export default function Admin() {
     const res = await fetch('/api/admin/run-cron', { method: 'POST', credentials: 'include' });
     const data = await res.json();
     alert(`Cron ran: ${data.sent || 0} emails sent`);
+  }
+
+  async function addUser() {
+    if (!newEmail) return;
+    setActionLoading('add');
+    try {
+      const res = await fetch('/api/admin/add-user', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: newEmail, tier: newTier, plan: newTier === 'premium' ? 'monthly' : 'none' }),
+      });
+      const data = await res.json();
+      if (data.ok) { setNewEmail(''); setShowAddUser(false); fetchUsers(); }
+      else alert(data.error || 'Failed to add user');
+    } catch (e) { alert('Failed to add user'); }
+    setActionLoading(null);
+  }
+
+  async function upgradeUser(userId, plan = 'monthly') {
+    if (!confirm('Upgrade this user to premium?')) return;
+    setActionLoading(userId);
+    try {
+      await fetch('/api/admin/upgrade-user', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, plan }),
+      });
+      fetchUsers();
+    } catch (e) { alert('Failed to upgrade user'); }
+    setActionLoading(null);
+  }
+
+  async function downgradeUser(userId) {
+    if (!confirm('Downgrade this user to free?')) return;
+    setActionLoading(userId);
+    try {
+      await fetch('/api/admin/downgrade-user', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
+      fetchUsers();
+    } catch (e) { alert('Failed to downgrade user'); }
+    setActionLoading(null);
+  }
+
+  async function deleteUser(userId, email) {
+    if (!confirm(`Delete user ${email}? This cannot be undone.`)) return;
+    setActionLoading(userId);
+    try {
+      await fetch(`/api/admin/delete-user/${userId}`, { method: 'DELETE', credentials: 'include' });
+      fetchUsers();
+    } catch (e) { alert('Failed to delete user'); }
+    setActionLoading(null);
   }
 
   if (!isAdmin) return null;
@@ -177,13 +235,58 @@ export default function Admin() {
                 className="flex-1 px-4 py-2 rounded-lg text-sm text-white/70 placeholder-white/20 outline-none"
                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
               />
+              <button
+                onClick={() => setShowAddUser(!showAddUser)}
+                className="px-4 py-2 rounded-lg text-sm"
+                style={{ background: 'rgba(184,134,11,0.15)', border: '1px solid rgba(184,134,11,0.3)', color: '#b8860b' }}
+              >
+                + Add User
+              </button>
             </div>
+
+            {showAddUser && (
+              <div className="rounded-2xl p-5 mb-5" style={{ background: 'rgba(184,134,11,0.06)', border: '1px solid rgba(184,134,11,0.2)' }}>
+                <h4 className="text-sm text-white/60 mb-3">Add New User</h4>
+                <div className="flex gap-3 items-end">
+                  <div className="flex-1">
+                    <label className="text-xs text-white/30 block mb-1">Email</label>
+                    <input
+                      value={newEmail}
+                      onChange={e => setNewEmail(e.target.value)}
+                      placeholder="user@example.com"
+                      className="w-full px-3 py-2 rounded-lg text-sm text-white/70 placeholder-white/20 outline-none"
+                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs text-white/30 block mb-1">Tier</label>
+                    <select
+                      value={newTier}
+                      onChange={e => setNewTier(e.target.value)}
+                      className="px-3 py-2 rounded-lg text-sm text-white/70 outline-none"
+                      style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    >
+                      <option value="free">Free</option>
+                      <option value="premium">Premium</option>
+                    </select>
+                  </div>
+                  <button
+                    onClick={addUser}
+                    disabled={actionLoading === 'add'}
+                    className="px-5 py-2 rounded-lg text-sm font-medium"
+                    style={{ background: '#b8860b', color: '#0d0d1a' }}
+                  >
+                    {actionLoading === 'add' ? 'Adding...' : 'Add'}
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                    {['Email', 'Plan', 'Status', 'Streak', 'Joined', 'Notifications'].map(h => (
+                    {['Email', 'Plan', 'Status', 'Streak', 'Joined', 'Actions'].map(h => (
                       <th key={h} className="px-4 py-3 text-left text-xs text-white/30 font-normal">{h}</th>
                     ))}
                   </tr>
@@ -206,8 +309,41 @@ export default function Admin() {
                       </td>
                       <td className="px-4 py-3 text-white/50">{u.current_streak || 0}🔥</td>
                       <td className="px-4 py-3 text-white/40 text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
-                      <td className="px-4 py-3 text-white/40 text-xs">
-                        {u.email_notifications_enabled ? '✉️' : ''} {u.push_notifications_enabled ? '🔔' : ''}
+                      <td className="px-4 py-3">
+                        <div className="flex gap-1">
+                          {u.subscription_tier !== 'premium' ? (
+                            <button
+                              onClick={() => upgradeUser(u.id)}
+                              disabled={actionLoading === u.id}
+                              className="px-2 py-1 rounded text-xs"
+                              style={{ background: 'rgba(184,134,11,0.2)', color: '#b8860b' }}
+                              title="Upgrade to Premium"
+                            >
+                              Upgrade
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => downgradeUser(u.id)}
+                              disabled={actionLoading === u.id}
+                              className="px-2 py-1 rounded text-xs"
+                              style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}
+                              title="Downgrade to Free"
+                            >
+                              Downgrade
+                            </button>
+                          )}
+                          {u.email !== 'paul@creativelab.tv' && (
+                            <button
+                              onClick={() => deleteUser(u.id, u.email)}
+                              disabled={actionLoading === u.id}
+                              className="px-2 py-1 rounded text-xs"
+                              style={{ background: 'rgba(220,38,38,0.15)', color: '#ef4444' }}
+                              title="Delete User"
+                            >
+                              Delete
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}

@@ -103,15 +103,15 @@ async function sendPasswordResetEmail(email, token) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reset your Minute Mantra password</title>
 </head>
-<body style="margin:0;padding:0;background-color:#1a1a2e;font-family:Georgia,serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#1a1a2e;">
+<body style="margin:0;padding:0;background-color:#fdf8f0;font-family:Georgia,serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#fdf8f0;">
     <tr><td align="center" style="padding:40px 20px;">
-      <table width="480" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#1a1a2e;border-radius:12px;border:1px solid rgba(184,134,11,0.2);overflow:hidden;">
+      <table width="480" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#fffaf3;border-radius:12px;border:1px solid rgba(184,134,11,0.2);overflow:hidden;">
         <tr><td style="padding:40px;text-align:center;">
           <h2 style="margin:0 0 16px;font-family:Georgia,serif;font-size:22px;color:#b8860b;">Reset Your Password</h2>
-          <p style="margin:0 0 28px;font-size:15px;color:#9a8c7e;line-height:1.6;">Click the link below to reset your password. This link expires in 1 hour.</p>
-          <a href="${resetUrl}" style="display:inline-block;background-color:#b8860b;color:#1a1a2e;text-decoration:none;padding:14px 32px;border-radius:8px;font-family:Georgia,serif;font-size:16px;font-weight:bold;">Reset Password</a>
-          <p style="margin:28px 0 0;font-size:13px;color:#6b5e52;">If you didn't request this, you can safely ignore this email.</p>
+          <p style="margin:0 0 28px;font-size:15px;color:#7a5c3e;line-height:1.6;">Click the link below to reset your password. This link expires in 1 hour.</p>
+          <a href="${resetUrl}" style="display:inline-block;background-color:#b8860b;color:#fffaf3;text-decoration:none;padding:14px 32px;border-radius:8px;font-family:Georgia,serif;font-size:16px;font-weight:bold;">Reset Password</a>
+          <p style="margin:28px 0 0;font-size:13px;color:#9a8c7e;">If you didn't request this, you can safely ignore this email.</p>
         </td></tr>
       </table>
     </td></tr>
@@ -143,16 +143,16 @@ async function sendMagicLinkEmail(email, magicUrl, isNew) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${subject}</title>
 </head>
-<body style="margin:0;padding:0;background-color:#1a1a2e;font-family:Georgia,serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#1a1a2e;">
+<body style="margin:0;padding:0;background-color:#fdf8f0;font-family:Georgia,serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#fdf8f0;">
     <tr><td align="center" style="padding:40px 20px;">
-      <table width="480" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#1a1a2e;border-radius:16px;border:1px solid rgba(184,134,11,0.25);overflow:hidden;">
+      <table width="480" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#fffaf3;border-radius:16px;border:1px solid rgba(184,134,11,0.2);overflow:hidden;">
         <tr><td style="padding:48px 40px;text-align:center;">
           <div style="font-size:48px;margin-bottom:16px;">ॐ</div>
-          <h2 style="margin:0 0 8px;font-family:Georgia,serif;font-size:24px;color:#f0ebe3;font-weight:normal;">${headline}</h2>
-          <p style="margin:0 0 32px;font-size:15px;color:#9a8c7e;line-height:1.7;">${body}</p>
-          <a href="${magicUrl}" style="display:inline-block;background:linear-gradient(135deg,#b8860b,#d4a017);color:#1a1a2e;text-decoration:none;padding:16px 40px;border-radius:50px;font-family:Georgia,serif;font-size:15px;font-weight:bold;letter-spacing:0.1em;">ENTER YOUR PRACTICE</a>
-          <p style="margin:32px 0 0;font-size:12px;color:#5a4e44;">This link expires in 15 minutes and can only be used once.<br>If you didn't request this, you can safely ignore this email.</p>
+          <h2 style="margin:0 0 8px;font-family:Georgia,serif;font-size:24px;color:#5a3e28;font-weight:normal;">${headline}</h2>
+          <p style="margin:0 0 32px;font-size:15px;color:#7a5c3e;line-height:1.7;">${body}</p>
+          <a href="${magicUrl}" style="display:inline-block;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fffaf3;text-decoration:none;padding:16px 40px;border-radius:50px;font-family:Georgia,serif;font-size:15px;font-weight:bold;letter-spacing:0.1em;">ENTER YOUR PRACTICE</a>
+          <p style="margin:32px 0 0;font-size:12px;color:#9a8c7e;">This link expires in 15 minutes and can only be used once.<br>If you didn't request this, you can safely ignore this email.</p>
         </td></tr>
       </table>
     </td></tr>

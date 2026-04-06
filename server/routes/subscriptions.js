@@ -88,4 +88,23 @@ router.post('/cancel', requireAuth, async (req, res) => {
   }
 });
 
+// POST /api/subscriptions/checkout-link
+// Creates a Square checkout link and returns the URL for the frontend to open in a new tab
+router.post('/checkout-link', requireAuth, async (req, res) => {
+  try {
+    const { plan } = req.body;
+    if (!plan || !['monthly', 'annual'].includes(plan)) {
+      return res.status(400).json({ error: 'plan must be monthly or annual' });
+    }
+
+    const user = await queryOne('SELECT * FROM users WHERE id = ?', [req.user.id]);
+    const result = await squareService.createCheckoutLink(user, plan);
+
+    res.json({ checkoutUrl: result.checkoutUrl, orderId: result.orderId });
+  } catch (err) {
+    console.error('Create checkout link error:', err);
+    res.status(500).json({ error: err.message || 'Failed to create checkout link' });
+  }
+});
+
 module.exports = router;
