@@ -44,8 +44,8 @@ router.get('/today', optionalAuth, async (req, res) => {
 
     const result = {
       ...mantra,
-      // Use stored audio_url if available, otherwise build from filename
-      audio_url: mantra.audio_url || buildCdnUrl(mantra.audio_filename),
+      // Always build audio_url from filename for correct CDN path
+      audio_url: buildCdnUrl(mantra.audio_filename),
     };
 
     // Check if favorited by user
@@ -75,7 +75,7 @@ router.get('/favorites', requireAuth, async (req, res) => {
        ORDER BY f.created_at DESC`,
       [req.user.id]
     );
-    const result = mantras.map(m => ({ ...m, audio_url: m.audio_url || buildCdnUrl(m.audio_filename) }));
+    const result = mantras.map(m => ({ ...m, audio_url: buildCdnUrl(m.audio_filename) }));
     res.json({ mantras: result });
   } catch (err) {
     console.error('Get favorites error:', err);
@@ -102,7 +102,7 @@ router.get('/library', requireAuth, async (req, res) => {
     params.push(parseInt(limit), (parseInt(page) - 1) * parseInt(limit));
 
     const mantras = await query(sql, params);
-    const result = mantras.map(m => ({ ...m, audio_url: m.audio_url || buildCdnUrl(m.audio_filename) }));
+    const result = mantras.map(m => ({ ...m, audio_url: buildCdnUrl(m.audio_filename) }));
     res.json({ mantras: result, page: parseInt(page), limit: parseInt(limit) });
   } catch (err) {
     console.error('Get library error:', err);
@@ -116,7 +116,7 @@ router.get('/:id', optionalAuth, async (req, res) => {
     const mantra = await queryOne('SELECT * FROM mantras WHERE id = ?', [req.params.id]);
     if (!mantra) return res.status(404).json({ error: 'Mantra not found' });
 
-    const result = { ...mantra, audio_url: mantra.audio_url || buildCdnUrl(mantra.audio_filename) };
+    const result = { ...mantra, audio_url: buildCdnUrl(mantra.audio_filename) };
 
     if (req.user) {
       const fav = await queryOne(
