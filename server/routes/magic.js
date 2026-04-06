@@ -1,46 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { query, queryOne } = require('../config/db');
-const { requireAuth } = require('../middleware/auth');
 const { sendMagicLinkEmail } = require('../services/email');
-const rateLimit = require('express-rate-limit');
-
-const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 10,
-  message: { error: 'Too many attempts, please try again later' },
-});
 
 const MAGIC_LINK_EXPIRY_MINUTES = 15;
 
-function setAuthCookie(res, token) {
-  res.cookie('mm_token', token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
-}
-
-function issueJwt(user) {
-  return jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-      role: user.email === 'paul@creativelab.tv' ? 'admin' : 'user',
-    },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRY || '7d' }
-  );
-}
-
-// ─── MAGIC LINK ───────────────────────────────────────────────────────────────
-
-// POST /api/auth/magic-link
-router.post('/magic-link', authLimiter, async (req, res) => {
+// POST /api/auth/magic-link — request a magic link
+router.post('/', async (req, res) => {
   try {
     const { email } = req.body;
     if (!email || !email.includes('@')) {
@@ -48,28 +16,35 @@ router.post('/magic-link', authLimiter, async (req, res) => {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
+
+    // Generate a secure random token
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + MAGIC_LINK_EXPIRY_MINUTES * 60 * 1000);
 
+    // Upsert user — create if new, update token if existing
     let user = await queryOne('SELECT id, email, display_name FROM users WHERE email = ?', [normalizedEmail]);
     let isNew = false;
 
     if (!user) {
+      // New user — create account
       isNew = true;
       const result = await query(
         `INSERT INTO users (email, magic_link_token, magic_link_expires_at, created_at, updated_at)
          VALUES (?, ?, ?, NOW(), NOW())`,
         [normalizedEmail, token, expiresAt]
       );
+      // Initialize streak row
       await query('INSERT INTO streaks (user_id) VALUES (?)', [result.insertId]);
       user = { id: result.insertId, email: normalizedEmail };
     } else {
+      // Existing user — update token
       await query(
         'UPDATE users SET magic_link_token = ?, magic_link_expires_at = ?, updated_at = NOW() WHERE id = ?',
         [token, expiresAt, user.id]
       );
     }
 
+    // Send the magic link email
     const appUrl = process.env.APP_URL || 'https://minutemantra.com';
     const magicUrl = `${appUrl}/auth/verify?token=${token}`;
     await sendMagicLinkEmail(normalizedEmail, magicUrl, isNew);
@@ -81,8 +56,8 @@ router.post('/magic-link', authLimiter, async (req, res) => {
   }
 });
 
-// GET /api/auth/magic-link/verify
-router.get('/magic-link/verify', async (req, res) => {
+// GET /api/auth/magic-link/verify — verify token and issue JWT cookie
+router.get('/verify', async (req, res) => {
   try {
     const { token } = req.query;
     if (!token) return res.status(400).json({ error: 'Token required' });
@@ -101,15 +76,29 @@ router.get('/magic-link/verify', async (req, res) => {
       return res.status(401).json({ error: 'This magic link has expired. Please request a new one.' });
     }
 
+    // Determine if this is a new user (no display_name yet = first login)
     const isNew = !user.display_name;
 
+    // Invalidate the token immediately (one-time use)
     await query(
       'UPDATE users SET magic_link_token = NULL, magic_link_expires_at = NULL, updated_at = NOW() WHERE id = ?',
       [user.id]
     );
 
-    const jwtToken = issueJwt(user);
-    setAuthCookie(res, jwtToken);
+    // Issue JWT
+    const jwtPayload = {
+      id: user.id,
+      email: user.email,
+      role: user.email === 'paul@creativelab.tv' ? 'admin' : 'user',
+    };
+    const jwtToken = jwt.sign(jwtPayload, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRY || '7d' });
+
+    res.cookie('mm_token', jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
     res.json({
       ok: true,
@@ -126,45 +115,12 @@ router.get('/magic-link/verify', async (req, res) => {
         newsletter_opted_in: user.newsletter_opted_in,
         timezone: user.timezone,
         notification_time: user.notification_time,
-        role: user.email === 'paul@creativelab.tv' ? 'admin' : 'user',
+        role: jwtPayload.role,
       },
     });
   } catch (err) {
     console.error('Magic link verify error:', err);
     res.status(500).json({ error: 'Verification failed' });
-  }
-});
-
-// ─── LOGOUT ──────────────────────────────────────────────────────────────────
-
-// POST /api/auth/logout
-router.post('/logout', (req, res) => {
-  res.clearCookie('mm_token');
-  res.json({ message: 'Logged out successfully' });
-});
-
-// ─── ME ──────────────────────────────────────────────────────────────────────
-
-// GET /api/auth/me
-router.get('/me', requireAuth, async (req, res) => {
-  try {
-    const user = await queryOne(
-      `SELECT id, email, display_name, timezone, subscription_tier, subscription_status,
-              subscription_plan, email_notifications_enabled, push_notifications_enabled,
-              newsletter_opted_in, notification_time, created_at
-       FROM users WHERE id = ?`,
-      [req.user.id]
-    );
-    if (!user) return res.status(404).json({ error: 'User not found' });
-    res.json({
-      user: {
-        ...user,
-        role: user.email === 'paul@creativelab.tv' ? 'admin' : 'user',
-      },
-    });
-  } catch (err) {
-    console.error('Get me error:', err);
-    res.status(500).json({ error: 'Server error' });
   }
 });
 

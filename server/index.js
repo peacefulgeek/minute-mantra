@@ -5,7 +5,6 @@ const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const path = require('path');
-const cron = require('node-cron');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -43,6 +42,7 @@ app.use('/api/settings', require('./routes/settings'));
 app.use('/api/subscriptions', require('./routes/subscriptions'));
 app.use('/api/webhooks', require('./routes/webhooks'));
 app.use('/api/unsubscribe', require('./routes/unsubscribe'));
+app.use('/api/admin', require('./routes/admin'));
 
 // Health check
 app.get('/api/health', (req, res) => {
