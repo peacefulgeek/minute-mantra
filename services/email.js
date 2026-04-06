@@ -1,22 +1,56 @@
-const nodemailer = require('nodemailer');
+/**
+ * EMAIL MODULE - Using SMTP2GO HTTP API (same pattern as BlendedSoul)
+ * No nodemailer — uses fetch() to call SMTP2GO REST API directly
+ */
 const fs = require('fs');
 const path = require('path');
 
-let transporter;
+function getEmailConfig() {
+  return {
+    apiKey: process.env.SMTP_API || '',
+    from: process.env.SMTP_FROM_ADDRESS || 'paul@paulwagner.one',
+    fromName: process.env.SMTP_FROM_NAME || 'Minute Mantra',
+    appUrl: process.env.APP_URL || 'https://minutemantra.com',
+  };
+}
 
-function getTransporter() {
-  if (!transporter) {
-    transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: parseInt(process.env.SMTP_PORT) || 587,
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+async function sendEmail(to, subject, html, text) {
+  const config = getEmailConfig();
+
+  if (!config.apiKey) {
+    console.error('[Email] SMTP_API not configured');
+    throw new Error('Email API key not configured');
   }
-  return transporter;
+
+  console.log(`[Email] Sending to ${to} via SMTP2GO API...`);
+
+  try {
+    const response = await fetch('https://api.smtp2go.com/v3/email/send', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        api_key: config.apiKey,
+        to: [to],
+        sender: `${config.fromName} <${config.from}>`,
+        subject: subject,
+        html_body: html,
+        text_body: text || subject,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.data?.succeeded > 0) {
+      console.log('[Email] Sent successfully via SMTP2GO API');
+      return true;
+    } else {
+      console.error('[Email] SMTP2GO API error:', JSON.stringify(result));
+      throw new Error(result.data?.error || 'Failed to send email');
+    }
+  } catch (error) {
+    console.error('[Email] Failed to send:', error);
+    throw error;
+  }
 }
 
 // Load and cache the morning email template
@@ -46,14 +80,12 @@ function getMorningEmailHtml(mantra, unsubscribeUrl) {
 
   let html = loadTemplate();
 
-  // Replace {{#if go_deeper_url}} ... {{/if}} blocks
   if (mantra.go_deeper_url) {
     html = html.replace(/\{\{#if go_deeper_url\}\}([\s\S]*?)\{\{\/if\}\}/g, '$1');
   } else {
     html = html.replace(/\{\{#if go_deeper_url\}\}[\s\S]*?\{\{\/if\}\}/g, '');
   }
 
-  // Replace all template variables
   html = html
     .replace(/\{\{transliteration\}\}/g, mantra.transliteration || '')
     .replace(/\{\{original_script\}\}/g, mantra.original_script || '')
@@ -72,31 +104,23 @@ function getMorningEmailHtml(mantra, unsubscribeUrl) {
 }
 
 async function sendMorningEmail(user, mantra) {
-  const t = getTransporter();
   const appUrl = process.env.APP_URL || 'https://minutemantra.com';
   const unsubscribeUrl = `${appUrl}/api/unsubscribe/${user.unsubscribe_token}`;
+  const html = getMorningEmailHtml(mantra, unsubscribeUrl);
 
-  await t.sendMail({
-    from: `"${process.env.SMTP_FROM_NAME || 'Minute Mantra'}" <${process.env.SMTP_FROM_ADDRESS || 'mantra@minutemantra.com'}>`,
-    to: user.email,
-    subject: `Your mantra today: ${mantra.transliteration}`,
-    html: getMorningEmailHtml(mantra, unsubscribeUrl),
-    list: {
-      unsubscribe: { url: unsubscribeUrl, comment: 'Unsubscribe from morning mantras' },
-    },
-  });
+  return sendEmail(
+    user.email,
+    `Your mantra today: ${mantra.transliteration}`,
+    html,
+    `Your mantra today: ${mantra.transliteration}\n\n${mantra.english_translation}`
+  );
 }
 
 async function sendPasswordResetEmail(email, token) {
-  const t = getTransporter();
   const appUrl = process.env.APP_URL || 'https://minutemantra.com';
   const resetUrl = `${appUrl}/reset-password?token=${token}`;
 
-  await t.sendMail({
-    from: `"${process.env.SMTP_FROM_NAME || 'Minute Mantra'}" <${process.env.SMTP_FROM_ADDRESS || 'mantra@minutemantra.com'}>`,
-    to: email,
-    subject: 'Reset your Minute Mantra password',
-    html: `<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -117,12 +141,17 @@ async function sendPasswordResetEmail(email, token) {
     </td></tr>
   </table>
 </body>
-</html>`,
-  });
+</html>`;
+
+  return sendEmail(
+    email,
+    'Reset your Minute Mantra password',
+    html,
+    `Reset your password: ${resetUrl}`
+  );
 }
 
 async function sendMagicLinkEmail(email, magicUrl, isNew) {
-  const t = getTransporter();
   const subject = isNew
     ? 'Welcome to Minute Mantra — enter your practice'
     : 'Your Minute Mantra magic link';
@@ -132,11 +161,7 @@ async function sendMagicLinkEmail(email, magicUrl, isNew) {
     ? 'Your account is ready. Click the link below to begin your daily mantra practice.'
     : 'Click the link below to sign in. This link expires in 15 minutes.';
 
-  await t.sendMail({
-    from: `"${process.env.SMTP_FROM_NAME || 'Minute Mantra'}" <${process.env.SMTP_FROM_ADDRESS || 'mantra@minutemantra.com'}>`,
-    to: email,
-    subject,
-    html: `<!DOCTYPE html>
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -158,8 +183,14 @@ async function sendMagicLinkEmail(email, magicUrl, isNew) {
     </td></tr>
   </table>
 </body>
-</html>`,
-  });
+</html>`;
+
+  return sendEmail(
+    email,
+    subject,
+    html,
+    `${headline}\n\n${body}\n\nClick here: ${magicUrl}`
+  );
 }
 
 module.exports = { sendMorningEmail, sendPasswordResetEmail, sendMagicLinkEmail };
