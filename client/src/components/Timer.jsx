@@ -197,7 +197,7 @@ export default function Timer({ mantra, onComplete }) {
           className="w-full max-w-xs py-4 rounded-2xl font-serif text-lg tracking-wide"
           style={{
             background: 'var(--text-accent)',
-            color: 'var(--bg-base)',
+            color: '#ffffff',
             boxShadow: '0 4px 20px var(--geometry-glow)',
           }}
         >

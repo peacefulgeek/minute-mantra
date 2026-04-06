@@ -169,7 +169,7 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
             className="flex-1 py-3 rounded-xl font-serif text-base tracking-wide"
             style={{
               background: 'var(--text-accent)',
-              color: 'var(--bg-base)',
+              color: '#ffffff',
               boxShadow: '0 2px 12px var(--geometry-glow)',
             }}
           >

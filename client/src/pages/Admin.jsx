@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import AppHeader from '../components/AppHeader';
 
-const TABS = ['Overview', 'Users', 'Subscribers', 'Mantras', 'Revenue', 'Notifications'];
+const TABS = ['Overview', 'Users', 'Mantras', 'Revenue', 'Emails'];
 
 export default function Admin() {
   const { user } = useAuth();
@@ -20,6 +20,7 @@ export default function Admin() {
   const [newEmail, setNewEmail] = useState('');
   const [newTier, setNewTier] = useState('free');
   const [actionLoading, setActionLoading] = useState(null);
+  const [tierFilter, setTierFilter] = useState('all');
 
   const isAdmin = user?.role === 'admin' || user?.email === 'paul@creativelab.tv';
 
@@ -30,9 +31,9 @@ export default function Admin() {
   }, [user]);
 
   useEffect(() => {
-    if (tab === 'Users' || tab === 'Subscribers') fetchUsers();
+    if (tab === 'Users') fetchUsers();
     if (tab === 'Mantras') fetchMantras();
-  }, [tab, page, search]);
+  }, [tab, page, search, tierFilter]);
 
   async function fetchStats() {
     try {
@@ -45,7 +46,7 @@ export default function Admin() {
 
   async function fetchUsers() {
     try {
-      const params = new URLSearchParams({ page, limit: 25, search, tier: tab === 'Subscribers' ? 'premium' : '' });
+      const params = new URLSearchParams({ page, limit: 25, search, tier: tierFilter === 'all' ? '' : tierFilter });
       const res = await fetch(`/api/admin/users?${params}`, { credentials: 'include' });
       const data = await res.json();
       setUsers(data.users || []);
@@ -139,22 +140,7 @@ export default function Admin() {
             <h1 className="text-2xl font-light" style={{ fontFamily: 'Georgia, serif', color: '#f0ebe3' }}>Admin Panel</h1>
             <p className="text-sm text-white/40 mt-1">Minute Mantra · paul@creativelab.tv</p>
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={sendTestNotification}
-              className="px-4 py-2 rounded-lg text-sm"
-              style={{ background: 'rgba(184,134,11,0.15)', border: '1px solid rgba(184,134,11,0.3)', color: '#b8860b' }}
-            >
-              Test Push
-            </button>
-            <button
-              onClick={runMorningCron}
-              className="px-4 py-2 rounded-lg text-sm"
-              style={{ background: 'rgba(184,134,11,0.15)', border: '1px solid rgba(184,134,11,0.3)', color: '#b8860b' }}
-            >
-              Run Morning Cron
-            </button>
-          </div>
+
         </div>
 
         {/* Tabs */}
@@ -224,8 +210,8 @@ export default function Admin() {
           </div>
         )}
 
-        {/* ── USERS / SUBSCRIBERS ── */}
-        {(tab === 'Users' || tab === 'Subscribers') && (
+        {/* ── USERS ── */}
+        {tab === 'Users' && (
           <div>
             <div className="flex gap-3 mb-5">
               <input
@@ -235,6 +221,16 @@ export default function Admin() {
                 className="flex-1 px-4 py-2 rounded-lg text-sm text-white/70 placeholder-white/20 outline-none"
                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
               />
+              <select
+                value={tierFilter}
+                onChange={e => { setTierFilter(e.target.value); setPage(1); }}
+                className="px-3 py-2 rounded-lg text-sm text-white/70 outline-none"
+                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
+              >
+                <option value="all">All Users</option>
+                <option value="free">Free</option>
+                <option value="premium">Premium</option>
+              </select>
               <button
                 onClick={() => setShowAddUser(!showAddUser)}
                 className="px-4 py-2 rounded-lg text-sm"
@@ -457,27 +453,27 @@ export default function Admin() {
           </div>
         )}
 
-        {/* ── NOTIFICATIONS ── */}
-        {tab === 'Notifications' && (
+        {/* ── EMAILS ── */}
+        {tab === 'Emails' && (
           <div className="space-y-6">
             <div className="rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <h3 className="text-sm font-medium text-white/60 mb-4">Notification System</h3>
+              <h3 className="text-sm font-medium text-white/60 mb-4">Email & Notifications</h3>
               <div className="space-y-4">
                 <div className="flex items-center justify-between py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
                   <div>
-                    <p className="text-sm text-white/70">Morning Cron Job</p>
-                    <p className="text-xs text-white/30">Runs daily at each user's notification_time (batches of 50)</p>
+                    <p className="text-sm text-white/70">Send Morning Emails Now</p>
+                    <p className="text-xs text-white/30">Manually trigger today's morning mantra email to all subscribers</p>
                   </div>
                   <button onClick={runMorningCron}
                     className="px-4 py-2 rounded-lg text-sm"
                     style={{ background: 'rgba(184,134,11,0.15)', border: '1px solid rgba(184,134,11,0.3)', color: '#b8860b' }}>
-                    Run Now
+                    Send Now
                   </button>
                 </div>
                 <div className="flex items-center justify-between py-3">
                   <div>
                     <p className="text-sm text-white/70">Test Push Notification</p>
-                    <p className="text-xs text-white/30">Sends a test push to your own device</p>
+                    <p className="text-xs text-white/30">Sends a test push notification to your device</p>
                   </div>
                   <button onClick={sendTestNotification}
                     className="px-4 py-2 rounded-lg text-sm"

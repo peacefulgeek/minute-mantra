@@ -19,7 +19,7 @@ app.use(helmet({
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       imgSrc: ["'self'", "data:", "https://minute-mantra.b-cdn.net", "https://cdn.minutemantra.com"],
       mediaSrc: ["'self'", "https://minute-mantra.b-cdn.net", "https://cdn.minutemantra.com"],
-      connectSrc: ["'self'", "https://web.squarecdn.com"],
+      connectSrc: ["'self'", "https://web.squarecdn.com", "https://minute-mantra.b-cdn.net", "https://cdn.minutemantra.com"],
     },
   },
 }));

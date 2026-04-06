@@ -338,7 +338,7 @@ function PhoneMockup() {
           width: '100%', padding: '10px 0',
           background: 'linear-gradient(135deg, #C9943A 0%, #a8762a 100%)',
           border: 'none', borderRadius: 10,
-          fontSize: 11, color: '#fffdf8',
+          fontSize: 11, color: '#ffffff',
           fontFamily: 'DM Sans, sans-serif',
           fontWeight: 600, letterSpacing: '0.1em',
           cursor: 'default',
@@ -497,7 +497,7 @@ export default function Landing() {
         {/* ENTER button + hamburger */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <Link to="/enter" style={{
-            background: gold, color: '#fffdf8',
+            background: gold, color: '#ffffff',
             padding: '9px 22px', borderRadius: 6,
             fontFamily: 'DM Sans, sans-serif', fontSize: 12,
             fontWeight: 600, letterSpacing: '0.14em',
@@ -558,7 +558,7 @@ export default function Landing() {
             <Link to="/enter" onClick={() => setMenuOpen(false)}
               style={{
                 display: 'block', marginTop: 20,
-                background: gold, color: '#fffdf8',
+                background: gold, color: '#ffffff',
                 padding: '14px 0', borderRadius: 8,
                 textAlign: 'center', textDecoration: 'none',
                 fontFamily: 'DM Sans, sans-serif', fontSize: 13,
@@ -627,7 +627,7 @@ export default function Landing() {
 
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 32 }}>
               <Link to="/enter" style={{
-                background: gold, color: '#fffdf8',
+                background: gold, color: '#ffffff',
                 padding: '14px 32px', borderRadius: 7,
                 fontFamily: 'DM Sans, sans-serif', fontSize: 12,
                 fontWeight: 600, letterSpacing: '0.16em',
@@ -920,7 +920,7 @@ export default function Landing() {
               }}>
               <div style={{
                 position: 'absolute', top: -12, left: '50%', transform: 'translateX(-50%)',
-                background: gold, color: '#fffdf8',
+                background: gold, color: '#ffffff',
                 padding: '4px 16px', borderRadius: 20,
                 fontSize: 10, fontWeight: 700, letterSpacing: '0.12em',
                 fontFamily: 'DM Sans, sans-serif', textTransform: 'uppercase',
@@ -944,7 +944,7 @@ export default function Landing() {
               </div>
               <Link to="/enter" style={{
                 display: 'block', textAlign: 'center',
-                background: gold, color: '#fffdf8',
+                background: gold, color: '#ffffff',
                 padding: '14px 0', borderRadius: 8,
                 fontFamily: 'DM Sans, sans-serif', fontSize: 12,
                 fontWeight: 600, letterSpacing: '0.14em',
@@ -1058,7 +1058,7 @@ export default function Landing() {
           </p>
           <Link to="/enter" style={{
             display: 'inline-block',
-            background: gold, color: '#fffdf8',
+            background: gold, color: '#ffffff',
             padding: '16px 48px', borderRadius: 8,
             fontFamily: 'DM Sans, sans-serif', fontSize: 13,
             fontWeight: 600, letterSpacing: '0.18em',
