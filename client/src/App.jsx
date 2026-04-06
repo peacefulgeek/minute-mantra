@@ -1,10 +1,14 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import AppHeader from './components/AppHeader';
 import BottomNav from './components/BottomNav';
 
 // Lazy load pages
+const Landing = lazy(() => import('./pages/Landing'));
+const Enter = lazy(() => import('./pages/Enter'));
+const MagicLinkVerify = lazy(() => import('./pages/MagicLinkVerify'));
 const Home = lazy(() => import('./pages/Home'));
 const History = lazy(() => import('./pages/History'));
 const Favorites = lazy(() => import('./pages/Favorites'));
@@ -13,21 +17,24 @@ const Settings = lazy(() => import('./pages/Settings'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Subscription = lazy(() => import('./pages/Subscription'));
 const Billing = lazy(() => import('./pages/Billing'));
-const Login = lazy(() => import('./pages/Login'));
-const Signup = lazy(() => import('./pages/Signup'));
-const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
-const ResetPassword = lazy(() => import('./pages/ResetPassword'));
 const About = lazy(() => import('./pages/About'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Onboarding = lazy(() => import('./pages/Onboarding'));
+const Admin = lazy(() => import('./pages/Admin'));
+
+// Pages that have their own full-screen layout (no shared header/nav)
+const STANDALONE_PATHS = ['/enter', '/auth/verify', '/onboarding'];
+const LANDING_PATH = '/';
 
 function LoadingScreen() {
   return (
-    <div className="fixed inset-0 flex items-center justify-center" style={{ background: 'var(--bg-base)' }}>
+    <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#0d0d1a' }}>
       <div className="text-center">
-        <div className="w-16 h-16 mx-auto mb-4 rounded-full skeleton" />
-        <p className="font-serif text-lg" style={{ color: 'var(--text-accent)' }}>Minute Mantra</p>
+        <div className="text-4xl mb-4" style={{ color: '#b8860b' }}>ॐ</div>
+        <p className="text-white/40 text-sm tracking-widest" style={{ fontFamily: 'system-ui, sans-serif' }}>
+          MINUTE MANTRA
+        </p>
       </div>
     </div>
   );
@@ -36,57 +43,85 @@ function LoadingScreen() {
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen />;
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return <Navigate to="/enter" replace />;
   return children;
 }
 
-function PublicOnlyRoute({ children }) {
+function AdminRoute({ children }) {
   const { user, loading } = useAuth();
   if (loading) return <LoadingScreen />;
-  if (user) return <Navigate to="/" replace />;
+  if (!user) return <Navigate to="/enter" replace />;
+  if (user.email !== 'paul@creativelab.tv' && user.role !== 'admin') return <Navigate to="/" replace />;
   return children;
 }
 
 function AppLayout() {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) return <LoadingScreen />;
 
-  const showNav = user && !window.location.pathname.startsWith('/onboarding');
+  const isLanding = location.pathname === '/' && !user;
+  const isStandalone = STANDALONE_PATHS.some(p => location.pathname.startsWith(p));
+  const isAdmin = location.pathname.startsWith('/admin');
+
+  // Show header on all pages except standalone and the public landing
+  const showHeader = !isLanding && !isStandalone;
+  // Show bottom nav only for logged-in users on app pages
+  const showBottomNav = user && !isStandalone && !isAdmin && !isLanding;
 
   return (
-    <div className="flex flex-col min-h-screen" style={{ background: 'var(--bg-base)' }}>
-      <main className="flex-1 overflow-y-auto" style={{ paddingBottom: showNav ? '80px' : '0' }}>
+    <div className="flex flex-col min-h-screen" style={{ background: '#0d0d1a' }}>
+      {showHeader && <AppHeader />}
+
+      <main
+        className="flex-1 overflow-y-auto"
+        style={{ paddingTop: showHeader ? '56px' : '0', paddingBottom: showBottomNav ? '72px' : '0' }}
+      >
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
-            {/* Public routes */}
-            <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
-            <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+            {/* ── PUBLIC ── */}
+            {/* Landing page — shown to logged-out users at / */}
+            <Route path="/" element={user ? <Navigate to="/home" replace /> : <Landing />} />
+
+            {/* Magic link auth */}
+            <Route path="/enter" element={user ? <Navigate to="/home" replace /> : <Enter />} />
+            <Route path="/auth/verify" element={<MagicLinkVerify />} />
+
+            {/* Static pages */}
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
 
-            {/* Onboarding */}
+            {/* ── ONBOARDING ── */}
             <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
 
-            {/* Protected routes */}
-            <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            {/* ── APP (protected) ── */}
+            <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
             <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
             <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+            <Route path="/library" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
             <Route path="/mantra/:id" element={<ProtectedRoute><MantraDetail /></ProtectedRoute>} />
+
+            {/* Settings */}
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/settings/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/settings/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
             <Route path="/settings/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
+            <Route path="/settings/notifications" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/settings/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {/* ── ADMIN ── */}
+            <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+            <Route path="/admin/*" element={<AdminRoute><Admin /></AdminRoute>} />
+
+            {/* Fallback */}
+            <Route path="*" element={<Navigate to={user ? '/home' : '/'} replace />} />
           </Routes>
         </Suspense>
       </main>
-      {user && <BottomNav />}
+
+      {showBottomNav && <BottomNav />}
     </div>
   );
 }

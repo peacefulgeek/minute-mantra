@@ -121,4 +121,45 @@ async function sendPasswordResetEmail(email, token) {
   });
 }
 
-module.exports = { sendMorningEmail, sendPasswordResetEmail };
+async function sendMagicLinkEmail(email, magicUrl, isNew) {
+  const t = getTransporter();
+  const subject = isNew
+    ? 'Welcome to Minute Mantra — enter your practice'
+    : 'Your Minute Mantra magic link';
+
+  const headline = isNew ? 'Welcome to Minute Mantra' : 'Enter your practice';
+  const body = isNew
+    ? 'Your account is ready. Click the link below to begin your daily mantra practice.'
+    : 'Click the link below to sign in. This link expires in 15 minutes.';
+
+  await t.sendMail({
+    from: `"${process.env.SMTP_FROM_NAME || 'Minute Mantra'}" <${process.env.SMTP_FROM_ADDRESS || 'mantra@minutemantra.com'}>`,
+    to: email,
+    subject,
+    html: `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${subject}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#1a1a2e;font-family:Georgia,serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#1a1a2e;">
+    <tr><td align="center" style="padding:40px 20px;">
+      <table width="480" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#1a1a2e;border-radius:16px;border:1px solid rgba(184,134,11,0.25);overflow:hidden;">
+        <tr><td style="padding:48px 40px;text-align:center;">
+          <div style="font-size:48px;margin-bottom:16px;">ॐ</div>
+          <h2 style="margin:0 0 8px;font-family:Georgia,serif;font-size:24px;color:#f0ebe3;font-weight:normal;">${headline}</h2>
+          <p style="margin:0 0 32px;font-size:15px;color:#9a8c7e;line-height:1.7;">${body}</p>
+          <a href="${magicUrl}" style="display:inline-block;background:linear-gradient(135deg,#b8860b,#d4a017);color:#1a1a2e;text-decoration:none;padding:16px 40px;border-radius:50px;font-family:Georgia,serif;font-size:15px;font-weight:bold;letter-spacing:0.1em;">ENTER YOUR PRACTICE</a>
+          <p style="margin:32px 0 0;font-size:12px;color:#5a4e44;">This link expires in 15 minutes and can only be used once.<br>If you didn't request this, you can safely ignore this email.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  });
+}
+
+module.exports = { sendMorningEmail, sendPasswordResetEmail, sendMagicLinkEmail };

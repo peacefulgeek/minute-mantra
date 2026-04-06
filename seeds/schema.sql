@@ -1,4 +1,4 @@
--- Minute Mantra — Full Database Schema
+-- Minute Mantra — MySQL Schema
 -- Run this against your Railway MySQL database before seeding
 
 CREATE TABLE IF NOT EXISTS mantras (
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS mantras (
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   email VARCHAR(255) NOT NULL UNIQUE,
-  password_hash VARCHAR(255) NOT NULL,
+  password_hash VARCHAR(255) NULL,
   display_name VARCHAR(100),
   timezone VARCHAR(50) DEFAULT 'America/New_York',
   notification_time TIME DEFAULT '07:00:00',
@@ -36,11 +36,18 @@ CREATE TABLE IF NOT EXISTS users (
   square_subscription_id VARCHAR(255),
   subscription_status ENUM('active','canceled','past_due','none') DEFAULT 'none',
   subscription_plan ENUM('monthly','annual','none') DEFAULT 'none',
+  -- Magic link auth
+  magic_link_token VARCHAR(128) NULL,
+  magic_link_expires_at DATETIME NULL,
+  -- Password reset (legacy, kept for compatibility)
   reset_token VARCHAR(255),
   reset_token_expiry DATETIME,
+  -- Unsubscribe
   unsubscribe_token VARCHAR(255) UNIQUE DEFAULT (UUID()),
+  unsubscribed_at DATETIME NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_magic_token (magic_link_token)
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
@@ -52,6 +59,7 @@ CREATE TABLE IF NOT EXISTS sessions (
   mode ENUM('timer','mala') DEFAULT 'timer',
   mala_count INT DEFAULT 0,
   completed BOOLEAN DEFAULT TRUE,
+  completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (mantra_id) REFERENCES mantras(id),
@@ -84,4 +92,25 @@ CREATE TABLE IF NOT EXISTS journal_entries (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY (session_id) REFERENCES sessions(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  endpoint TEXT NOT NULL,
+  p256dh TEXT NOT NULL,
+  auth TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_user (user_id)
+);
+
+CREATE TABLE IF NOT EXISTS email_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  mantra_id INT,
+  email_type ENUM('morning','magic_link','reset','welcome') DEFAULT 'morning',
+  sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_sent_at (sent_at)
 );
