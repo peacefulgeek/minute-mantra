@@ -39,7 +39,7 @@ export default function BottomNav() {
                 weight={isActive ? 'fill' : 'regular'}
                 style={{ transition: 'all 0.2s' }}
               />
-              <span className="text-xs font-sans" style={{ fontSize: '10px', letterSpacing: '0.5px' }}>
+              <span className="text-xs font-sans" style={{ fontSize: '12px', letterSpacing: '0.5px' }}>
                 {label}
               </span>
             </NavLink>

@@ -5,7 +5,7 @@ function getFlameConfig(streak) {
   if (streak >= 91) return { size: 36, color: '#FF6B00', particles: true, label: 'blazing' };
   if (streak >= 31) return { size: 32, color: '#FF8C00', particles: false, label: 'bright' };
   if (streak >= 8) return { size: 28, color: '#FFA500', particles: false, label: 'steady' };
-  return { size: 22, color: '#FFB347', particles: false, label: 'ember' };
+  return { size: 24, color: '#FFB347', particles: false, label: 'ember' };
 }
 
 export default function StreakFlame({ streak = 0, showCount = true }) {
@@ -26,14 +26,27 @@ export default function StreakFlame({ streak = 0, showCount = true }) {
         🔥
       </span>
       {showCount && (
-        <div className="flex flex-col">
+        <div className="flex flex-col items-end">
           <span
-            className="font-serif font-semibold leading-none"
-            style={{ color: config.color, fontSize: '18px' }}
+            style={{
+              color: config.color,
+              fontSize: '26px',
+              fontWeight: 700,
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              lineHeight: 1,
+            }}
           >
             {streak}
           </span>
-          <span className="font-sans text-xs" style={{ color: 'var(--text-secondary)', fontSize: '10px' }}>
+          <span
+            style={{
+              color: '#7a5c3e',
+              fontSize: '16px',
+              fontFamily: "'DM Sans', sans-serif",
+              fontWeight: 500,
+              letterSpacing: '0.02em',
+            }}
+          >
             day streak
           </span>
         </div>

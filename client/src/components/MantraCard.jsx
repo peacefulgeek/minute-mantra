@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { SpeakerHigh, Heart, ArrowRight, Play, Stop } from '@phosphor-icons/react';
+import React, { useState, useRef, useEffect } from 'react';
+import { SpeakerHigh, Heart, ArrowRight, Stop } from '@phosphor-icons/react';
 
 const TRADITION_LABELS = {
   vedic_shiva: 'Vedic / Shaivite',
@@ -12,7 +12,6 @@ const TRADITION_LABELS = {
   universal: 'Universal',
 };
 
-// Rich Easter purple
 const PURPLE = '#6B2FA0';
 
 export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, isFavorited }) {
@@ -27,8 +26,9 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
     onFavoriteToggle?.();
   }
 
-  // Single-click audio — plays immediately, no two-step reveal
   function toggleAudio() {
+    if (!mantra?.audio_url) return;
+
     if (playing && audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -36,18 +36,55 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
       return;
     }
 
-    if (!audioRef.current) {
-      audioRef.current = new Audio(mantra.audio_url);
-      audioRef.current.onended = () => setPlaying(false);
-      audioRef.current.onerror = () => {
+    // Create a fresh Audio object each time — most reliable across all browsers
+    try {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+
+      const audio = new Audio();
+      audio.preload = 'auto';
+      audio.volume = 1.0;
+
+      audio.oncanplaythrough = () => {
+        audio.play().then(() => {
+          setPlaying(true);
+        }).catch((e) => {
+          console.error('Play failed:', e);
+          setAudioError(true);
+        });
+      };
+
+      audio.onended = () => {
+        setPlaying(false);
+        audioRef.current = null;
+      };
+
+      audio.onerror = (e) => {
+        console.error('Audio load error:', e);
         setAudioError(true);
         setPlaying(false);
       };
+
+      audioRef.current = audio;
+      audio.src = mantra.audio_url;
+      audio.load();
+    } catch (e) {
+      console.error('Audio creation error:', e);
+      setAudioError(true);
     }
-    audioRef.current.play()
-      .then(() => setPlaying(true))
-      .catch(() => setAudioError(true));
   }
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
 
   if (!mantra) {
     return (
@@ -72,20 +109,31 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
           boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
         }}
       >
-        {/* Tradition badge */}
+        {/* Tradition badge + Intention */}
         <div
           className="px-5 py-3 flex items-center justify-between"
           style={{ borderBottom: '1px solid var(--border-color)' }}
         >
           <span
-            className="text-xs tracking-widest uppercase"
-            style={{ color: PURPLE, fontFamily: "'DM Sans', sans-serif" }}
+            className="tracking-widest uppercase"
+            style={{
+              color: PURPLE,
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              fontWeight: 600,
+            }}
           >
             {TRADITION_LABELS[mantra.tradition] || mantra.tradition}
           </span>
           <span
-            className="text-xs px-2 py-0.5 rounded-full"
-            style={{ background: 'rgba(107,47,160,0.1)', color: '#5a3e1b', fontFamily: "'DM Sans', sans-serif" }}
+            className="px-3 py-1 rounded-full"
+            style={{
+              background: 'rgba(107,47,160,0.1)',
+              color: PURPLE,
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '14px',
+              fontWeight: 600,
+            }}
           >
             {mantra.intention}
           </span>
@@ -94,12 +142,12 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
         {/* Main content */}
         <div className="px-5 pt-6 pb-4">
 
-          {/* TRANSLITERATION — top, same size as English, rich purple */}
+          {/* TRANSLITERATION — top, rich Easter purple, same size as English */}
           <p
             className="text-center mb-3"
             style={{
               fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: '24px',
+              fontSize: '27px',
               fontWeight: 600,
               lineHeight: 1.4,
               color: PURPLE,
@@ -108,12 +156,12 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
             {mantra.transliteration}
           </p>
 
-          {/* ENGLISH TRANSLATION — largest, most prominent */}
+          {/* ENGLISH TRANSLATION — prominent, dark brown */}
           <p
             className="text-center mb-4"
             style={{
               fontFamily: "'Cormorant Garamond', Georgia, serif",
-              fontSize: '24px',
+              fontSize: '27px',
               fontWeight: 500,
               lineHeight: 1.4,
               color: '#3d2b1f',
@@ -122,14 +170,14 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
             {mantra.english_translation}
           </p>
 
-          {/* Original script (Sanskrit/Gurmukhi) — rich purple, 3pts larger than before */}
+          {/* Original script (Sanskrit/Gurmukhi) — rich purple, larger */}
           <p
             className="text-center mb-4"
             style={{
               fontFamily: mantra.tradition === 'sikh'
                 ? 'Noto Sans Gurmukhi, serif'
                 : 'Noto Sans Devanagari, Cormorant Garamond, serif',
-              fontSize: '23px',
+              fontSize: '26px',
               lineHeight: 1.5,
               color: PURPLE,
             }}
@@ -137,35 +185,37 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
             {mantra.original_script}
           </p>
 
-          {/* Audio pronunciation — single click plays immediately */}
+          {/* Audio pronunciation — single click plays */}
           {mantra.audio_url && !audioError && (
             <div className="flex justify-center mb-4">
               <button
                 onClick={toggleAudio}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full text-sm"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-full"
                 style={{
                   background: playing ? PURPLE : 'rgba(107,47,160,0.08)',
                   color: playing ? '#ffffff' : PURPLE,
                   border: `1px solid ${playing ? PURPLE : 'rgba(107,47,160,0.25)'}`,
                   fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: 500,
+                  fontWeight: 600,
+                  fontSize: '15px',
                   transition: 'all 0.2s',
                 }}
               >
-                {playing ? <Stop size={16} /> : <SpeakerHigh size={16} />}
+                {playing ? <Stop size={18} /> : <SpeakerHigh size={18} />}
                 {playing ? 'Stop' : 'Hear pronunciation'}
               </button>
             </div>
           )}
 
-          {/* Context note */}
+          {/* Context note — bigger text */}
           {mantra.context_note && (
             <p
-              className="text-center text-sm leading-relaxed mb-4 px-2"
+              className="text-center leading-relaxed mb-4 px-2"
               style={{
                 color: '#5a3e1b',
                 fontFamily: "'DM Sans', sans-serif",
                 fontStyle: 'italic',
+                fontSize: '18px',
               }}
             >
               {mantra.context_note}
@@ -182,12 +232,12 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
               style={{
                 color: PURPLE,
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: '15px',
-                fontWeight: 600,
+                fontSize: '18px',
+                fontWeight: 700,
               }}
             >
               <span>{mantra.go_deeper_teaser}</span>
-              <ArrowRight size={14} weight="bold" />
+              <ArrowRight size={16} weight="bold" />
             </a>
           )}
         </div>
@@ -213,13 +263,13 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
           {/* Begin Chanting — high contrast gold */}
           <button
             onClick={onBeginChanting}
-            className="flex-1 py-3.5 rounded-xl text-base tracking-wide"
+            className="flex-1 py-3.5 rounded-xl tracking-wide"
             style={{
               background: 'linear-gradient(135deg, #b8860b, #d4a017)',
               color: '#ffffff',
               fontFamily: "'DM Sans', system-ui, sans-serif",
-              fontWeight: 600,
-              fontSize: '16px',
+              fontWeight: 700,
+              fontSize: '18px',
               letterSpacing: '0.05em',
               border: 'none',
               boxShadow: '0 4px 16px rgba(184,134,11,0.3)',

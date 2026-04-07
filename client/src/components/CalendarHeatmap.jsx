@@ -71,7 +71,7 @@ export default function CalendarHeatmap({ sessions = [], onMonthChange }) {
       {/* Day labels */}
       <div className="grid grid-cols-7 gap-1 mb-1">
         {dayLabels.map(d => (
-          <div key={d} className="text-center text-xs font-sans" style={{ color: 'var(--text-secondary)', fontSize: '10px' }}>
+          <div key={d} className="text-center text-xs font-sans" style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>
             {d}
           </div>
         ))}
@@ -104,7 +104,7 @@ export default function CalendarHeatmap({ sessions = [], onMonthChange }) {
                 fontWeight: isToday ? 700 : 400,
                 outline: isToday ? '2px solid var(--text-accent)' : 'none',
                 outlineOffset: '1px',
-                fontSize: '11px',
+                fontSize: '13px',
                 transition: 'background 0.2s',
               }}
             >
@@ -116,11 +116,11 @@ export default function CalendarHeatmap({ sessions = [], onMonthChange }) {
 
       {/* Legend */}
       <div className="flex items-center gap-2 mt-3 justify-end">
-        <span className="text-xs font-sans" style={{ color: 'var(--text-secondary)', fontSize: '10px' }}>Less</span>
+        <span className="text-xs font-sans" style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>Less</span>
         {[0, 1, 2, 3, 4].map(i => (
           <div key={i} className="w-3 h-3 rounded-sm" style={{ background: getHeatColor(i) }} />
         ))}
-        <span className="text-xs font-sans" style={{ color: 'var(--text-secondary)', fontSize: '10px' }}>More</span>
+        <span className="text-xs font-sans" style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>More</span>
       </div>
     </div>
   );

@@ -63,7 +63,7 @@ export default function History() {
                 {streak.current_streak}
               </span>
             </div>
-            <p className="font-sans text-xs" style={{ color: 'var(--text-secondary)' }}>Current streak</p>
+            <p className="font-sans text-sm" style={{ color: 'var(--text-secondary)' }}>Current streak</p>
           </div>
           <div
             className="flex-1 rounded-xl p-4 text-center"
@@ -72,7 +72,7 @@ export default function History() {
             <span className="font-serif text-2xl block mb-1" style={{ color: 'var(--text-primary)' }}>
               {streak.longest_streak}
             </span>
-            <p className="font-sans text-xs" style={{ color: 'var(--text-secondary)' }}>Longest streak</p>
+            <p className="font-sans text-sm" style={{ color: 'var(--text-secondary)' }}>Longest streak</p>
           </div>
         </div>
       )}

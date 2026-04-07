@@ -109,7 +109,7 @@ export default function Home() {
             Minute Mantra
           </h1>
           <p
-            className="text-xs mt-0.5"
+            className="text-sm mt-0.5"
             style={{ color: '#7a5c3e', fontFamily: "'DM Sans', system-ui, sans-serif" }}
           >
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
@@ -167,7 +167,7 @@ export default function Home() {
             Session logged. Beautiful practice.
           </p>
           {streak && (
-            <p className="text-sm mt-1" style={{ color: '#7a5c3e', fontFamily: "'DM Sans', sans-serif" }}>
+            <p className="text-base mt-1" style={{ color: '#7a5c3e', fontFamily: "'DM Sans', sans-serif" }}>
               {streak.current_streak} day streak
             </p>
           )}
