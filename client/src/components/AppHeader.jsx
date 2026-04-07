@@ -113,7 +113,7 @@ export default function AppHeader() {
                   transition={{ duration: 0.18, ease: 'easeOut' }}
                   className="absolute right-0 mt-2 rounded-2xl overflow-hidden"
                   style={{
-                    width: 220,
+                    width: 240,
                     background: 'rgba(253,248,240,0.98)',
                     border: '1px solid rgba(184,134,11,0.2)',
                     boxShadow: '0 20px 60px rgba(0,0,0,0.08), 0 0 0 1px rgba(184,134,11,0.1)',

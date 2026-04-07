@@ -97,7 +97,7 @@ export default function Favorites() {
                 >
                   <p
                     className="font-serif text-base italic mb-1"
-                    style={{ color: 'var(--text-accent)' }}
+                    style={{ color: '#8B6914' }}
                   >
                     {mantra.transliteration}
                   </p>
