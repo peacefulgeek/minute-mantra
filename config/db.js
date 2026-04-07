@@ -17,8 +17,8 @@ function getPool() {
 }
 
 async function query(sql, params) {
-  const pool = getPool();
-  const [rows] = await pool.execute(sql, params);
+  const p = getPool();
+  const [rows] = await p.query(sql, params);
   return rows;
 }
 
