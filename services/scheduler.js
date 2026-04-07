@@ -27,16 +27,11 @@ function getCurrentTimeInTimezone(timezone) {
     minute: '2-digit',
     hour12: false,
   });
-  return formatter.format(new Date()); // e.g. "07:00"
+  return formatter.format(new Date());
 }
 
 async function sendNotifications() {
   try {
-    const now = new Date();
-    const currentHour = now.getUTCHours();
-    const currentMinute = now.getUTCMinutes();
-
-    // Get all users with notifications enabled
     const users = await query(
       `SELECT id, email, display_name, timezone, notification_time, 
               email_notifications_enabled, push_notifications_enabled, 
@@ -102,9 +97,9 @@ async function sendNotifications() {
 }
 
 function startScheduler() {
-  // Run every minute
+  // Run every minute to check for users whose notification time matches
   cron.schedule('* * * * *', sendNotifications);
   console.log('Notification scheduler started');
 }
 
-module.exports = { startScheduler };
+module.exports = { startScheduler, sendNotifications };

@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { query, queryOne } = require('../config/db');
 const { requireAuth } = require('../middleware/auth');
-const { sendMorningNotifications } = require('../services/scheduler');
 
 // Admin guard middleware
 function requireAdmin(req, res, next) {
@@ -126,7 +125,7 @@ router.get('/mantras', async (req, res) => {
     params.push(parseInt(limit), offset);
 
     const mantras = await query(
-      `SELECT m.id, m.day_of_year, m.transliteration, m.tradition, m.audio_url, m.hero_image_url,
+      `SELECT m.id, m.day_of_year, m.transliteration, m.tradition, m.audio_filename,
               COUNT(f.id) as favorite_count
        FROM mantras m
        LEFT JOIN favorites f ON f.mantra_id = m.id
@@ -144,26 +143,65 @@ router.get('/mantras', async (req, res) => {
   }
 });
 
-// POST /api/admin/run-cron
+// POST /api/admin/run-cron — manually trigger morning notifications
 router.post('/run-cron', async (req, res) => {
   try {
-    const result = await sendMorningNotifications();
-    res.json({ ok: true, sent: result?.sent || 0 });
+    // Import the sendNotifications function dynamically to avoid circular deps
+    const { sendMorningEmail } = require('../services/email');
+    const users = await query(
+      `SELECT id, email, display_name, timezone, notification_time,
+              email_notifications_enabled, unsubscribe_token
+       FROM users
+       WHERE email_notifications_enabled = TRUE`
+    );
+
+    let sent = 0;
+    for (const user of users) {
+      try {
+        const dayOfYear = getDayOfYearForTimezone(user.timezone || 'America/New_York');
+        const mantra = await queryOne('SELECT * FROM mantras WHERE day_of_year = ?', [dayOfYear]);
+        if (!mantra) continue;
+        await sendMorningEmail(user, mantra);
+        sent++;
+      } catch (e) {
+        console.error(`Failed to send to ${user.email}:`, e.message);
+      }
+    }
+
+    res.json({ ok: true, sent });
   } catch (err) {
     console.error('Admin run-cron error:', err);
     res.status(500).json({ error: 'Failed to run cron' });
   }
 });
 
+function getDayOfYearForTimezone(timezone) {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    month: 'numeric',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  const parts = formatter.formatToParts(now);
+  const month = parseInt(parts.find(p => p.type === 'month').value);
+  const day = parseInt(parts.find(p => p.type === 'day').value);
+  const year = parseInt(parts.find(p => p.type === 'year').value);
+  const start = new Date(year, 0, 0);
+  const date = new Date(year, month - 1, day);
+  return Math.floor((date - start) / (1000 * 60 * 60 * 24));
+}
+
 // POST /api/admin/test-notification
 router.post('/test-notification', async (req, res) => {
   try {
-    const { sendPushToUser } = require('../services/push');
-    await sendPushToUser(req.user.id, {
-      title: 'Minute Mantra Test',
-      body: 'Your push notifications are working!',
-      url: '/',
-    });
+    const { sendPushNotification } = require('../services/push');
+    const user = await queryOne('SELECT push_subscription FROM users WHERE id = ?', [req.user.id]);
+    if (!user || !user.push_subscription) {
+      return res.status(400).json({ error: 'No push subscription found for your account' });
+    }
+    const mantra = { transliteration: 'Test Notification', intention: 'testing' };
+    await sendPushNotification(user.push_subscription, mantra);
     res.json({ ok: true });
   } catch (err) {
     console.error('Admin test-notification error:', err);
@@ -177,7 +215,6 @@ router.post('/add-user', async (req, res) => {
     const { email, tier = 'free', plan = 'none' } = req.body;
     if (!email) return res.status(400).json({ error: 'Email is required' });
 
-    // Check if user already exists
     const existing = await queryOne('SELECT id FROM users WHERE email = ?', [email]);
     if (existing) return res.status(409).json({ error: 'User already exists' });
 
@@ -251,7 +288,6 @@ router.delete('/delete-user/:userId', async (req, res) => {
 // POST /api/admin/reseed-mantras — Update all mantras in DB from seed data
 router.post('/reseed-mantras', async (req, res) => {
   try {
-    // Clear require cache to get fresh data
     const path = require('path');
     for (let i = 1; i <= 4; i++) {
       const mod = path.resolve(__dirname, `../seeds/mantras-part${i}.js`);

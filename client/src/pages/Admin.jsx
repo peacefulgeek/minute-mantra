@@ -397,7 +397,7 @@ export default function Admin() {
                         </span>
                       </td>
                       <td className="px-4 py-3">
-                        {m.audio_url ? (
+                        {m.audio_filename ? (
                           <span className="text-green-400 text-xs">✓</span>
                         ) : (
                           <span className="text-white/20 text-xs">—</span>

@@ -17,7 +17,7 @@ async function sendPushNotification(subscription, mantra) {
 
   const payload = JSON.stringify({
     title: 'Minute Mantra',
-    body: `${mantra.transliteration} — ${mantra.intention.toLowerCase()}`,
+    body: `${mantra.transliteration} — ${(mantra.intention || 'practice').toLowerCase()}`,
     icon: `${process.env.BUNNY_CDN_BASE_URL || 'https://minute-mantra.b-cdn.net'}/icons/icon-192.png`,
     badge: `${process.env.BUNNY_CDN_BASE_URL || 'https://minute-mantra.b-cdn.net'}/icons/badge-72.png`,
     url: process.env.APP_URL || 'https://minutemantra.com',
@@ -33,7 +33,6 @@ async function sendPushNotification(subscription, mantra) {
     return true;
   } catch (err) {
     if (err.statusCode === 410) {
-      // Subscription expired — caller should remove it
       return 'expired';
     }
     console.error('Push notification error:', err.message);
