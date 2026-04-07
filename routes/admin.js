@@ -444,7 +444,8 @@ router.post('/update-square-pricing', async (req, res) => {
     res.json({ ok: true, monthly: safe(monthlyResult), annual: safe(annualResult) });
   } catch (err) {
     console.error('Update Square pricing error:', err);
-    res.status(500).json({ error: 'Failed to update Square pricing', detail: err.message });
+    const detail = err.errors ? err.errors : (err.body ? err.body : err.message);
+    res.status(500).json({ error: 'Failed to update Square pricing', detail, statusCode: err.statusCode });
   }
 });
 
