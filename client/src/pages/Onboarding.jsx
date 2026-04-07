@@ -34,7 +34,7 @@ export default function Onboarding() {
     if (step < STEPS.length - 1) {
       setStep(s => s + 1);
     } else {
-      navigate('/');
+      navigate('/home');
     }
   }
 

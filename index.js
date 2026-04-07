@@ -49,7 +49,7 @@ app.use('/api/admin', require('./routes/admin'));
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', version: 'v7-full-audit-fix', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', version: 'v8-routing-fix', timestamp: new Date().toISOString() });
 });
 
 // Serve React app in production
@@ -74,7 +74,7 @@ const { startScheduler } = require('./services/scheduler');
 startScheduler();
 
 app.listen(PORT, () => {
-  console.log(`Minute Mantra server v7-full-audit-fix running on port ${PORT}`);
+  console.log(`Minute Mantra server v8-routing-fix running on port ${PORT}`);
 });
 
 module.exports = app;

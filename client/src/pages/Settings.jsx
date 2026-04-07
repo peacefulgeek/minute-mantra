@@ -79,7 +79,7 @@ export default function Settings() {
 
       {/* Sign out */}
       <button
-        onClick={async () => { await logout(); navigate('/login'); }}
+        onClick={async () => { await logout(); navigate('/'); }}
         className="w-full py-3.5 rounded-xl font-sans text-sm flex items-center justify-center gap-2"
         style={{
           background: 'rgba(255,59,48,0.1)',

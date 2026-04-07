@@ -29,7 +29,7 @@ export default function MagicLinkVerify() {
         setStatus('success');
         await refetch();
         // Redirect: new users → onboarding, returning → home
-        setTimeout(() => navigate(data.isNew ? '/onboarding' : '/'), 1200);
+        setTimeout(() => navigate(data.isNew ? '/onboarding' : '/home'), 1200);
       } catch (err) {
         setStatus('error');
         setErrorMsg(err.message);

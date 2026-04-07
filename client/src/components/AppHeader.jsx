@@ -42,7 +42,7 @@ export default function AppHeader() {
       }}
     >
       {/* Logo */}
-      <Link to="/" className="flex items-center gap-2 no-underline">
+      <Link to={user ? '/home' : '/'} className="flex items-center gap-2 no-underline">
         <span className="text-xl" style={{ color: '#b8860b' }}>ॐ</span>
         <span className="tracking-widest text-xs font-light hidden sm:block"
           style={{ fontFamily: 'Georgia, serif', letterSpacing: '0.15em', color: '#7a6050' }}>
@@ -133,7 +133,7 @@ export default function AppHeader() {
 
                   {/* Nav items */}
                   <nav className="py-2">
-                    <MenuItem to="/" icon="🏠" label="Home" />
+                    <MenuItem to="/home" icon="🏠" label="Home" />
                     <MenuItem to="/history" icon="📅" label="History" />
                     <MenuItem to="/favorites" icon="♡" label="Favorites" />
                     <MenuItem to="/library" icon="📚" label="Mantra Library" />
