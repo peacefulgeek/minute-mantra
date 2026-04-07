@@ -16,7 +16,7 @@ export default function Billing() {
         <h1 className="font-serif text-xl" style={{ color: 'var(--text-primary)' }}>Billing</h1>
       </div>
 
-      {user?.subscription_tier !== 'premium' ? (
+      {user?.subscription_tier !== 'platinum' ? (
         <div className="text-center py-16">
           <p className="font-serif text-lg mb-4" style={{ color: 'var(--text-primary)' }}>No active subscription</p>
           <button
@@ -24,7 +24,7 @@ export default function Billing() {
             className="px-6 py-3 rounded-xl font-serif"
             style={{ background: 'var(--text-accent)', color: 'var(--bg-base)' }}
           >
-            Upgrade to Premium
+            Upgrade to Platinum
           </button>
         </div>
       ) : (
@@ -37,7 +37,7 @@ export default function Billing() {
               Current Plan
             </p>
             <p className="font-serif text-base" style={{ color: 'var(--text-primary)' }}>
-              {user?.subscription_plan === 'annual' ? 'Annual — $16.95/year' : 'Monthly — $1.97/month'}
+              {user?.subscription_plan === 'annual' ? 'Annual — $9.99/year' : 'Monthly — $0.99/month'}
             </p>
             <p className="font-sans text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
               Status: {user?.subscription_status}

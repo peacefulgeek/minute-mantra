@@ -36,11 +36,11 @@ const FEATURES = [
   { icon: '◎', title: 'Sacred geometry timer', desc: 'Tap Begin Chanting and watch a sacred geometry pattern — Seed of Life, Flower of Life, Lotus, or Sri Yantra — slowly bloom over sixty seconds. The animation IS the timer. No numbers. No pressure. Just presence.' },
   { icon: '♪', title: 'Studio-quality pronunciation', desc: 'Every mantra includes a professionally recorded audio pronunciation so you chant with confidence and accuracy, not guesswork. Hear the sacred sounds as they were meant to be heard.' },
   { icon: '🔥', title: 'Streak tracking', desc: 'A living flame grows with your consistency. Miss a day and it dims. The calendar heatmap shows your entire journey — every morning you showed up for yourself.' },
-  { icon: '📿', title: 'Mala counter', desc: '108 beads rendered around the sacred geometry. Tap each bead as you chant. Ancient japa practice, modern interface. Available in Premium.' },
+  { icon: '📿', title: 'Mala counter', desc: '108 beads rendered around the sacred geometry. Tap each bead as you chant. Ancient japa practice, modern interface. Available in Platinum.' },
   { icon: '🌅', title: 'Morning reminders', desc: 'Email and push notifications at your chosen time. Your mantra arrives before the world does — before the inbox, before the news, before the noise.' },
-  { icon: '⏱', title: 'Extended timers', desc: 'Deepen your practice with 2, 5, or 10-minute sessions. The sacred geometry scales with your intention. Available in Premium.' },
-  { icon: '♾', title: 'Full mantra library', desc: 'Browse and search all 365 mantras by tradition, intention, or keyword. Save your favorites. Return to the ones that move you. Available in Premium.' },
-  { icon: '🔔', title: 'Singing bowl ambient', desc: 'A singing bowl strikes at the start and end of each session. Optional ambient bowl sound fills the space between. Available in Premium.' },
+  { icon: '⏱', title: 'Extended timers', desc: 'Deepen your practice with 2, 5, or 10-minute sessions. The sacred geometry scales with your intention. Available in Platinum.' },
+  { icon: '♾', title: 'Full mantra library', desc: 'Browse and search all 365 mantras by tradition, intention, or keyword. Save your favorites. Return to the ones that move you. Available in Platinum.' },
+  { icon: '🔔', title: 'Singing bowl ambient', desc: 'A singing bowl strikes at the start and end of each session. Optional ambient bowl sound fills the space between. Available in Platinum.' },
 ];
 
 const TESTIMONIALS = [
@@ -100,7 +100,7 @@ const FAQS = [
   },
   {
     q: 'How does the 5-day free trial work?',
-    a: 'You get full access to the complete practice for 5 days — no credit card required. After 5 days, you can choose a Monthly ($1.97/mo) or Annual ($16.95/yr) plan to continue. If you don\'t subscribe, your account remains but you won\'t receive new daily mantras.',
+    a: 'You get full access to the complete practice for 5 days — no credit card required. After 5 days, you can choose a Monthly ($0.99/mo) or Annual ($9.99/yr) plan to continue. If you don\'t subscribe, your account remains but you won\'t receive new daily mantras.',
   },
   {
     q: 'Is this an app I download from the App Store?',
@@ -112,7 +112,7 @@ const FAQS = [
   },
   {
     q: 'Can I practice for longer than one minute?',
-    a: 'Yes — Premium subscribers have access to extended timers: 2, 5, and 10-minute sessions. The sacred geometry animation scales beautifully to longer durations. The one-minute default is intentional — it removes every excuse not to practice.',
+    a: 'Yes — Platinum subscribers have access to extended timers: 2, 5, and 10-minute sessions. The sacred geometry animation scales beautifully to longer durations. The one-minute default is intentional — it removes every excuse not to practice.',
   },
   {
     q: 'What traditions are the mantras drawn from?',
@@ -884,7 +884,7 @@ export default function Landing() {
               style={{ background: ivory, borderRadius: 20, padding: '36px 28px', border: '1px solid rgba(201,148,58,0.2)' }}>
               <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 600, color: midBrown, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>Monthly</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>
-                <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 52, fontWeight: 300, color: warmBrown, lineHeight: 1 }}>$1.97</span>
+                <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 52, fontWeight: 300, color: warmBrown, lineHeight: 1 }}>$0.99</span>
                 <span style={{ fontSize: 13, color: lightBrown, fontFamily: 'DM Sans, sans-serif' }}>per month</span>
               </div>
               <p style={{ fontSize: 13, color: midBrown, marginBottom: 28, lineHeight: 1.6 }}>Less than a cup of tea. Cancel anytime.</p>
@@ -926,14 +926,14 @@ export default function Landing() {
                 fontFamily: 'DM Sans, sans-serif', textTransform: 'uppercase',
                 whiteSpace: 'nowrap',
               }}>
-                Best Value — Save 28%
+                Best Value — Save 16%
               </div>
               <div style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 600, color: gold, letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: 8 }}>Annual</div>
               <div style={{ display: 'flex', alignItems: 'baseline', gap: 6, marginBottom: 8 }}>
-                <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 52, fontWeight: 300, color: warmBrown, lineHeight: 1 }}>$16.95</span>
+                <span style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 52, fontWeight: 300, color: warmBrown, lineHeight: 1 }}>$9.99</span>
                 <span style={{ fontSize: 13, color: lightBrown, fontFamily: 'DM Sans, sans-serif' }}>per year</span>
               </div>
-              <p style={{ fontSize: 13, color: midBrown, marginBottom: 28, lineHeight: 1.6 }}>One year of daily practice. Less than $1.42/month.</p>
+              <p style={{ fontSize: 13, color: midBrown, marginBottom: 28, lineHeight: 1.6 }}>One year of daily practice. Less than $0.84/month.</p>
               <div style={{ borderTop: '1px solid rgba(201,148,58,0.2)', paddingTop: 24, marginBottom: 28 }}>
                 {ANNUAL_FEATURES.map((f, i) => (
                   <div key={i} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', marginBottom: 10 }}>
@@ -958,7 +958,7 @@ export default function Landing() {
           </div>
 
           <p style={{ textAlign: 'center', fontSize: 12, color: lightBrown, marginTop: 32, lineHeight: 1.7 }}>
-            All plans include the core practice. Premium unlocks deeper tools for committed practitioners.<br />
+            All plans include the core practice. Platinum unlocks deeper tools for committed practitioners.<br />
             No partial refunds. Cancel anytime from your account settings.
           </p>
         </div>

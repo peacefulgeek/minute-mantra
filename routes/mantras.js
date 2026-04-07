@@ -87,8 +87,8 @@ router.get('/favorites', requireAuth, async (req, res) => {
 router.get('/library', requireAuth, async (req, res) => {
   try {
     const user = await queryOne('SELECT subscription_tier FROM users WHERE id = ?', [req.user.id]);
-    if (user.subscription_tier !== 'premium') {
-      return res.status(403).json({ error: 'Premium subscription required to browse the full library' });
+    if (user.subscription_tier !== 'platinum') {
+      return res.status(403).json({ error: 'Platinum subscription required to browse the full library' });
     }
 
     const { tradition, intention, page = 1, limit = 20 } = req.query;
@@ -152,14 +152,14 @@ router.post('/:id/favorite', requireAuth, async (req, res) => {
     }
 
     // Check free tier limit
-    if (user.subscription_tier !== 'premium') {
+    if (user.subscription_tier !== 'platinum') {
       const count = await queryOne(
         'SELECT COUNT(*) as cnt FROM favorites WHERE user_id = ?',
         [userId]
       );
       if (count.cnt >= 5) {
         return res.status(403).json({
-          error: 'Free users can save up to 5 favorites. Upgrade to Premium for unlimited favorites.',
+          error: 'Free users can save up to 5 favorites. Upgrade to Platinum for unlimited favorites.',
           upgrade_required: true,
         });
       }

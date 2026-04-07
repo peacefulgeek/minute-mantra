@@ -52,7 +52,7 @@ async function handleSubscriptionCreated(subscription) {
   if (user) {
     await query(
       'UPDATE users SET subscription_tier = ?, subscription_status = ? WHERE id = ?',
-      ['premium', 'active', user.id]
+      ['platinum', 'active', user.id]
     );
   }
 }
@@ -66,7 +66,7 @@ async function handleSubscriptionUpdated(subscription) {
     : subscription.status === 'PAUSED' ? 'past_due'
     : 'none';
 
-  const tier = status === 'active' ? 'premium' : 'free';
+  const tier = status === 'active' ? 'platinum' : 'free';
   await query(
     'UPDATE users SET subscription_status = ?, subscription_tier = ? WHERE id = ?',
     [status, tier, user.id]

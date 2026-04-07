@@ -80,8 +80,8 @@ async function createCheckoutLink(user, plan) {
   const planVariationId = VARIATION_IDS[plan];
   if (!planVariationId) throw new Error(`No variation ID configured for plan: ${plan}`);
 
-  const price = plan === 'annual' ? 1695 : 197; // cents
-  const planLabel = plan === 'annual' ? 'Annual Premium ($16.95/yr)' : 'Monthly Premium ($1.97/mo)';
+  const price = plan === 'annual' ? 999 : 99; // cents
+  const planLabel = plan === 'annual' ? 'Annual Platinum ($9.99/yr)' : 'Monthly Platinum ($0.99/mo)';
 
   const { result } = await client.checkoutApi.createPaymentLink({
     idempotencyKey: `checkout-${user.id}-${plan}-${Date.now()}`,

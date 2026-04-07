@@ -80,7 +80,7 @@ export default function Admin() {
       const res = await fetch('/api/admin/add-user', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: newEmail, tier: newTier, plan: newTier === 'premium' ? 'monthly' : 'none' }),
+        body: JSON.stringify({ email: newEmail, tier: newTier, plan: newTier === 'platinum' ? 'admin_granted' : 'none' }),
       });
       const data = await res.json();
       if (data.ok) { setNewEmail(''); setShowAddUser(false); fetchUsers(); }
@@ -89,31 +89,18 @@ export default function Admin() {
     setActionLoading(null);
   }
 
-  async function upgradeUser(userId, plan = 'monthly') {
-    if (!confirm('Upgrade this user to premium?')) return;
+  async function setUserTier(userId, tier) {
+    const label = tier === 'platinum' ? 'Platinum' : 'Free';
+    if (!confirm(`Set this user to ${label}?`)) return;
     setActionLoading(userId);
     try {
-      await fetch('/api/admin/upgrade-user', {
+      await fetch('/api/admin/set-tier', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, plan }),
+        body: JSON.stringify({ userId, tier }),
       });
       fetchUsers();
-    } catch (e) { alert('Failed to upgrade user'); }
-    setActionLoading(null);
-  }
-
-  async function downgradeUser(userId) {
-    if (!confirm('Downgrade this user to free?')) return;
-    setActionLoading(userId);
-    try {
-      await fetch('/api/admin/downgrade-user', {
-        method: 'POST', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
-      });
-      fetchUsers();
-    } catch (e) { alert('Failed to downgrade user'); }
+    } catch (e) { alert('Failed to update user tier'); }
     setActionLoading(null);
   }
 
@@ -171,7 +158,7 @@ export default function Admin() {
                 {/* KPI cards */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <StatCard label="Total Users" value={stats.total_users?.toLocaleString() || '—'} icon="👤" />
-                  <StatCard label="Premium Subscribers" value={stats.premium_users?.toLocaleString() || '—'} icon="✦" gold />
+                  <StatCard label="Platinum Subscribers" value={stats.platinum_users?.toLocaleString() || '—'} icon="✦" gold />
                   <StatCard label="Active Streaks" value={stats.active_streaks?.toLocaleString() || '—'} icon="🔥" />
                   <StatCard label="Sessions Today" value={stats.sessions_today?.toLocaleString() || '—'} icon="🧘" />
                 </div>
@@ -196,7 +183,7 @@ export default function Admin() {
                           <p className="text-xs text-white/30">{new Date(u.created_at).toLocaleDateString()}</p>
                         </div>
                         <span className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: u.subscription_tier === 'premium' ? 'rgba(184,134,11,0.2)' : 'rgba(255,255,255,0.06)', color: u.subscription_tier === 'premium' ? '#b8860b' : 'rgba(255,255,255,0.4)' }}>
+                          style={{ background: u.subscription_tier === 'platinum' ? 'rgba(184,134,11,0.2)' : 'rgba(255,255,255,0.06)', color: u.subscription_tier === 'platinum' ? '#b8860b' : 'rgba(255,255,255,0.4)' }}>
                           {u.subscription_tier || 'free'}
                         </span>
                       </div>
@@ -229,7 +216,7 @@ export default function Admin() {
               >
                 <option value="all">All Users</option>
                 <option value="free">Free</option>
-                <option value="premium">Premium</option>
+                <option value="platinum">Platinum</option>
               </select>
               <button
                 onClick={() => setShowAddUser(!showAddUser)}
@@ -262,8 +249,8 @@ export default function Admin() {
                       className="px-3 py-2 rounded-lg text-sm text-white/70 outline-none"
                       style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
                     >
-                      <option value="free">Free</option>
-                      <option value="premium">Premium</option>
+<option value="free">Free</option>
+                <option value="platinum">Platinum</option>
                     </select>
                   </div>
                   <button
@@ -293,7 +280,7 @@ export default function Admin() {
                       <td className="px-4 py-3 text-white/70">{u.email}</td>
                       <td className="px-4 py-3">
                         <span className="px-2 py-0.5 rounded-full text-xs"
-                          style={{ background: u.subscription_tier === 'premium' ? 'rgba(184,134,11,0.2)' : 'rgba(255,255,255,0.06)', color: u.subscription_tier === 'premium' ? '#b8860b' : 'rgba(255,255,255,0.4)' }}>
+                          style={{ background: u.subscription_tier === 'platinum' ? 'rgba(184,134,11,0.2)' : 'rgba(255,255,255,0.06)', color: u.subscription_tier === 'platinum' ? '#b8860b' : 'rgba(255,255,255,0.4)' }}>
                           {u.subscription_tier || 'free'}
                         </span>
                       </td>
@@ -307,25 +294,25 @@ export default function Admin() {
                       <td className="px-4 py-3 text-white/40 text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
                       <td className="px-4 py-3">
                         <div className="flex gap-1">
-                          {u.subscription_tier !== 'premium' ? (
+                          {u.subscription_tier !== 'platinum' ? (
                             <button
-                              onClick={() => upgradeUser(u.id)}
+                              onClick={() => setUserTier(u.id, 'platinum')}
                               disabled={actionLoading === u.id}
                               className="px-2 py-1 rounded text-xs"
                               style={{ background: 'rgba(184,134,11,0.2)', color: '#b8860b' }}
-                              title="Upgrade to Premium"
+                              title="Upgrade to Platinum"
                             >
-                              Upgrade
+                              Platinum
                             </button>
                           ) : (
                             <button
-                              onClick={() => downgradeUser(u.id)}
+                              onClick={() => setUserTier(u.id, 'free')}
                               disabled={actionLoading === u.id}
                               className="px-2 py-1 rounded text-xs"
                               style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}
                               title="Downgrade to Free"
                             >
-                              Downgrade
+                              Free
                             </button>
                           )}
                           {u.email !== 'paul@creativelab.tv' && (
@@ -433,7 +420,7 @@ export default function Admin() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <StatCard label="Monthly Recurring Revenue" value={stats.mrr ? `$${stats.mrr.toFixed(2)}` : '$0.00'} icon="💰" gold />
                   <StatCard label="Annual Run Rate" value={stats.mrr ? `$${(stats.mrr * 12).toFixed(2)}` : '$0.00'} icon="📈" />
-                  <StatCard label="Premium Subscribers" value={stats.premium_users?.toLocaleString() || '0'} icon="✦" />
+                  <StatCard label="Platinum Subscribers" value={stats.platinum_users?.toLocaleString() || '0'} icon="✦" />
                   <StatCard label="Monthly Subs" value={stats.monthly_subs?.toLocaleString() || '0'} icon="📅" />
                   <StatCard label="Annual Subs" value={stats.annual_subs?.toLocaleString() || '0'} icon="🗓" />
                   <StatCard label="Churn (30d)" value={stats.churned_30d ? `${stats.churned_30d}` : '0'} icon="📉" />
@@ -442,8 +429,8 @@ export default function Admin() {
                 <div className="rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                   <h3 className="text-sm text-white/50 mb-4">Revenue Breakdown</h3>
                   <div className="space-y-3">
-                    <RevenueRow label="Monthly plans ($1.97/mo)" count={stats.monthly_subs || 0} rate={1.97} />
-                    <RevenueRow label="Annual plans ($16.95/yr)" count={stats.annual_subs || 0} rate={16.95 / 12} />
+                    <RevenueRow label="Monthly plans ($0.99/mo)" count={stats.monthly_subs || 0} rate={0.99} />
+                    <RevenueRow label="Annual plans ($9.99/yr)" count={stats.annual_subs || 0} rate={9.99 / 12} />
                   </div>
                 </div>
               </>

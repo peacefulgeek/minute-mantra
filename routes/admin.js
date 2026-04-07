@@ -18,7 +18,7 @@ router.get('/stats', async (req, res) => {
   try {
     const [
       totalUsers,
-      premiumUsers,
+      platinumUsers,
       activeStreaks,
       sessionsToday,
       emailSubscribers,
@@ -31,7 +31,7 @@ router.get('/stats', async (req, res) => {
       churn30d,
     ] = await Promise.all([
       queryOne('SELECT COUNT(*) as count FROM users'),
-      queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_tier = 'premium' AND subscription_status = 'active'"),
+      queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_tier = 'platinum' AND subscription_status = 'active'"),
       queryOne('SELECT COUNT(*) as count FROM streaks WHERE current_streak > 0'),
       queryOne('SELECT COUNT(*) as count FROM sessions WHERE DATE(completed_at) = CURDATE()'),
       queryOne('SELECT COUNT(*) as count FROM users WHERE email_notifications_enabled = 1'),
@@ -44,11 +44,11 @@ router.get('/stats', async (req, res) => {
       queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_status = 'canceled' AND updated_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
     ]);
 
-    const monthlyRevenue = (monthlySubs.count * 1.97) + (annualSubs.count * 16.95 / 12);
+    const monthlyRevenue = (monthlySubs.count * 0.99) + (annualSubs.count * 9.99 / 12);
 
     res.json({
       total_users: totalUsers.count,
-      premium_users: premiumUsers.count,
+      platinum_users: platinumUsers.count,
       active_streaks: activeStreaks.count,
       sessions_today: sessionsToday.count,
       email_subscribers: emailSubscribers.count,
@@ -89,7 +89,8 @@ router.get('/users', async (req, res) => {
 
     const users = await query(
       `SELECT u.id, u.email, u.display_name, u.subscription_tier, u.subscription_status,
-              u.subscription_plan, u.email_notifications_enabled, u.push_notifications_enabled,
+              u.subscription_plan, u.square_subscription_id,
+              u.email_notifications_enabled, u.push_notifications_enabled,
               u.created_at, u.timezone,
               COALESCE(s.current_streak, 0) as current_streak,
               COALESCE(s.longest_streak, 0) as longest_streak
@@ -146,7 +147,6 @@ router.get('/mantras', async (req, res) => {
 // POST /api/admin/run-cron — manually trigger morning notifications
 router.post('/run-cron', async (req, res) => {
   try {
-    // Import the sendNotifications function dynamically to avoid circular deps
     const { sendMorningEmail } = require('../services/email');
     const users = await query(
       `SELECT id, email, display_name, timezone, notification_time,
@@ -218,9 +218,12 @@ router.post('/add-user', async (req, res) => {
     const existing = await queryOne('SELECT id FROM users WHERE email = ?', [email]);
     if (existing) return res.status(409).json({ error: 'User already exists' });
 
+    const status = tier === 'free' ? 'none' : 'active';
+    const effectivePlan = tier === 'free' ? 'none' : 'admin_granted';
+
     await query(
       `INSERT INTO users (email, subscription_tier, subscription_plan, subscription_status) VALUES (?, ?, ?, ?)`,
-      [email, tier, plan, tier === 'premium' ? 'active' : 'none']
+      [email, tier, effectivePlan, status]
     );
 
     const newUser = await queryOne('SELECT id, email, subscription_tier, subscription_plan, subscription_status, created_at FROM users WHERE email = ?', [email]);
@@ -231,41 +234,48 @@ router.post('/add-user', async (req, res) => {
   }
 });
 
-// POST /api/admin/upgrade-user
-router.post('/upgrade-user', async (req, res) => {
+// POST /api/admin/set-tier — Set user to free or platinum
+// If downgrading a Square-paying user, cancels their Square subscription first
+router.post('/set-tier', async (req, res) => {
   try {
-    const { userId, plan = 'monthly' } = req.body;
+    const { userId, tier } = req.body;
     if (!userId) return res.status(400).json({ error: 'userId is required' });
+    const validTiers = ['free', 'platinum'];
+    if (!validTiers.includes(tier)) return res.status(400).json({ error: 'tier must be free or platinum' });
 
-    await query(
-      `UPDATE users SET subscription_tier = 'premium', subscription_plan = ?, subscription_status = 'active', updated_at = NOW() WHERE id = ?`,
-      [plan, userId]
-    );
-
-    const user = await queryOne('SELECT id, email, subscription_tier, subscription_plan, subscription_status FROM users WHERE id = ?', [userId]);
-    res.json({ ok: true, user });
-  } catch (err) {
-    console.error('Admin upgrade-user error:', err);
-    res.status(500).json({ error: 'Failed to upgrade user' });
-  }
-});
-
-// POST /api/admin/downgrade-user
-router.post('/downgrade-user', async (req, res) => {
-  try {
-    const { userId } = req.body;
-    if (!userId) return res.status(400).json({ error: 'userId is required' });
-
-    await query(
-      `UPDATE users SET subscription_tier = 'free', subscription_plan = 'none', subscription_status = 'none', square_subscription_id = NULL, updated_at = NOW() WHERE id = ?`,
+    // Get current user info
+    const currentUser = await queryOne(
+      'SELECT id, email, subscription_tier, subscription_plan, square_subscription_id FROM users WHERE id = ?',
       [userId]
     );
+    if (!currentUser) return res.status(404).json({ error: 'User not found' });
+
+    // If downgrading to free AND user has a Square subscription, cancel it
+    let squareCanceled = false;
+    if (tier === 'free' && currentUser.square_subscription_id) {
+      try {
+        const squareService = require('../services/square');
+        await squareService.cancelSubscription(currentUser.square_subscription_id);
+        squareCanceled = true;
+      } catch (squareErr) {
+        console.error('Square cancellation error:', squareErr.message);
+        // Continue with downgrade even if Square cancel fails — admin override
+      }
+    }
+
+    const plan = tier === 'free' ? 'none' : (currentUser.subscription_plan === 'monthly' || currentUser.subscription_plan === 'annual' ? currentUser.subscription_plan : 'admin_granted');
+    const status = tier === 'free' ? 'none' : 'active';
+
+    await query(
+      `UPDATE users SET subscription_tier = ?, subscription_plan = ?, subscription_status = ?, ${tier === 'free' ? 'square_subscription_id = NULL,' : ''} updated_at = NOW() WHERE id = ?`,
+      [tier, tier === 'free' ? 'none' : plan, status, userId]
+    );
 
     const user = await queryOne('SELECT id, email, subscription_tier, subscription_plan, subscription_status FROM users WHERE id = ?', [userId]);
-    res.json({ ok: true, user });
+    res.json({ ok: true, user, square_canceled: squareCanceled });
   } catch (err) {
-    console.error('Admin downgrade-user error:', err);
-    res.status(500).json({ error: 'Failed to downgrade user' });
+    console.error('Admin set-tier error:', err);
+    res.status(500).json({ error: 'Failed to set user tier' });
   }
 });
 
@@ -273,10 +283,24 @@ router.post('/downgrade-user', async (req, res) => {
 router.delete('/delete-user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
-    const user = await queryOne('SELECT id, email FROM users WHERE id = ?', [userId]);
+    const user = await queryOne('SELECT id, email, square_subscription_id FROM users WHERE id = ?', [userId]);
     if (!user) return res.status(404).json({ error: 'User not found' });
     if (user.email === 'paul@creativelab.tv') return res.status(403).json({ error: 'Cannot delete admin user' });
 
+    // Cancel Square subscription if exists before deleting
+    if (user.square_subscription_id) {
+      try {
+        const squareService = require('../services/square');
+        await squareService.cancelSubscription(user.square_subscription_id);
+      } catch (squareErr) {
+        console.error('Square cancellation on delete error:', squareErr.message);
+      }
+    }
+
+    // Delete related data first
+    await query('DELETE FROM sessions WHERE user_id = ?', [userId]);
+    await query('DELETE FROM favorites WHERE user_id = ?', [userId]);
+    await query('DELETE FROM streaks WHERE user_id = ?', [userId]);
     await query('DELETE FROM users WHERE id = ?', [userId]);
     res.json({ ok: true });
   } catch (err) {

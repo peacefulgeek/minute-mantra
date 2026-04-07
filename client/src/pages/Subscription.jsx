@@ -13,7 +13,7 @@ const FREE_FEATURES = [
   '"Go Deeper" links to PaulWagner.com',
 ];
 
-const PREMIUM_FEATURES = [
+const PLATINUM_FEATURES = [
   'Everything in Free',
   'Extended timers (2, 5, 10 minutes)',
   'Mala counter (108 beads)',
@@ -25,7 +25,7 @@ const PREMIUM_FEATURES = [
 export default function Subscription() {
   const { user, refetch } = useAuth();
   const navigate = useNavigate();
-  const isPremium = user?.subscription_tier === 'premium';
+  const isPlatinum = user?.subscription_tier === 'platinum';
   const [plan, setPlan] = useState('annual');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -52,14 +52,14 @@ export default function Subscription() {
   }
 
   async function handleCancel() {
-    if (!confirm('Cancel your subscription? You\'ll keep premium access until the end of your billing period.')) return;
+    if (!confirm('Cancel your subscription? You\'ll keep Platinum access until the end of your billing period.')) return;
     setLoading(true);
     try {
       const res = await fetch('/api/subscriptions/cancel', { method: 'POST', credentials: 'include' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       await refetch();
-      alert(`Subscription canceled. Premium access continues until ${data.effective_date || 'end of period'}.`);
+      alert(`Subscription canceled. Platinum access continues until ${data.effective_date || 'end of period'}.`);
     } catch (e) {
       setError(e.message);
     }
@@ -75,16 +75,16 @@ export default function Subscription() {
         <h1 className="font-serif text-xl" style={{ color: 'var(--text-primary)' }}>Subscription</h1>
       </div>
 
-      {isPremium ? (
-        /* Premium user view */
+      {isPlatinum ? (
+        /* Platinum user view */
         <div>
           <div
             className="rounded-xl p-5 mb-6 text-center"
             style={{ background: 'rgba(184,134,11,0.1)', border: '1px solid var(--border-color)' }}
           >
-            <p className="font-serif text-xl mb-1" style={{ color: 'var(--text-accent)' }}>✦ Premium</p>
+            <p className="font-serif text-xl mb-1" style={{ color: 'var(--text-accent)' }}>✦ Platinum</p>
             <p className="font-sans text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Plan: {user?.subscription_plan === 'annual' ? 'Annual ($16.95/yr)' : 'Monthly ($1.97/mo)'}
+              Plan: {user?.subscription_plan === 'annual' ? 'Annual ($9.99/yr)' : user?.subscription_plan === 'admin_granted' ? 'Granted by admin' : 'Monthly ($0.99/mo)'}
             </p>
             <p className="font-sans text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
               Status: {user?.subscription_status}
@@ -92,7 +92,7 @@ export default function Subscription() {
           </div>
 
           <div className="flex flex-col gap-3">
-            {PREMIUM_FEATURES.map(f => (
+            {PLATINUM_FEATURES.map(f => (
               <div key={f} className="flex items-center gap-2">
                 <Check size={16} style={{ color: 'var(--text-accent)', flexShrink: 0 }} />
                 <span className="font-sans text-sm" style={{ color: 'var(--text-primary)' }}>{f}</span>
@@ -100,7 +100,7 @@ export default function Subscription() {
             ))}
           </div>
 
-          {user?.subscription_status === 'active' && (
+          {user?.subscription_status === 'active' && user?.subscription_plan !== 'admin_granted' && (
             <button
               onClick={handleCancel}
               disabled={loading}
@@ -115,7 +115,7 @@ export default function Subscription() {
         /* Upgrade view — opens Square checkout in new tab */
         <div>
           <p className="font-serif text-lg mb-6 text-center" style={{ color: 'var(--text-primary)' }}>
-            Upgrade to Premium
+            Upgrade to Platinum
           </p>
 
           {/* Plan selector */}
@@ -129,7 +129,7 @@ export default function Subscription() {
                 color: plan === 'monthly' ? 'var(--bg-base)' : 'var(--text-primary)',
               }}
             >
-              <p className="font-serif text-lg">$1.97</p>
+              <p className="font-serif text-lg">$0.99</p>
               <p className="font-sans text-xs mt-0.5">per month</p>
             </button>
             <button
@@ -147,14 +147,14 @@ export default function Subscription() {
               >
                 Best Value
               </span>
-              <p className="font-serif text-lg">$16.95</p>
-              <p className="font-sans text-xs mt-0.5">per year · Save 28%</p>
+              <p className="font-serif text-lg">$9.99</p>
+              <p className="font-sans text-xs mt-0.5">per year · Save 16%</p>
             </button>
           </div>
 
           {/* Features */}
           <div className="flex flex-col gap-2 mb-6">
-            {PREMIUM_FEATURES.map(f => (
+            {PLATINUM_FEATURES.map(f => (
               <div key={f} className="flex items-center gap-2">
                 <Check size={14} style={{ color: 'var(--text-accent)', flexShrink: 0 }} />
                 <span className="font-sans text-sm" style={{ color: 'var(--text-secondary)' }}>{f}</span>
@@ -176,7 +176,7 @@ export default function Subscription() {
               opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? 'Creating checkout...' : `Subscribe — ${plan === 'annual' ? '$16.95/yr' : '$1.97/mo'}`}
+            {loading ? 'Creating checkout...' : `Subscribe — ${plan === 'annual' ? '$9.99/yr' : '$0.99/mo'}`}
           </button>
 
           <p className="text-xs text-center mt-3 font-sans" style={{ color: 'var(--text-secondary)' }}>

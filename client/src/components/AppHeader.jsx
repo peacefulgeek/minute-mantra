@@ -124,9 +124,9 @@ export default function AppHeader() {
                   <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(184,134,11,0.1)' }}>
                     <p className="text-xs mb-0.5" style={{ fontFamily: 'system-ui, sans-serif', color: '#a07850' }}>Signed in as</p>
                     <p className="text-sm truncate" style={{ fontFamily: 'system-ui, sans-serif', color: '#5a3e28' }}>{user.email}</p>
-                    {user.subscription_tier === 'premium' && (
+                    {user.subscription_tier === 'platinum' && (
                       <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs" style={{ background: 'rgba(184,134,11,0.2)', color: '#b8860b', fontFamily: 'system-ui, sans-serif' }}>
-                        Premium
+                        Platinum
                       </span>
                     )}
                   </div>

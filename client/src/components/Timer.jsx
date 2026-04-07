@@ -14,7 +14,7 @@ const DURATIONS = [
 
 export default function Timer({ mantra, onComplete }) {
   const { user } = useAuth();
-  const isPremium = user?.subscription_tier === 'premium';
+  const isPremium = user?.subscription_tier === 'platinum';
 
   const [phase, setPhase] = useState('idle'); // idle | chanting | complete
   const [selectedDuration, setSelectedDuration] = useState(60);
