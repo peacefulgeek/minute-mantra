@@ -57,7 +57,7 @@ async function sendEmail(to, subject, html, text) {
 let _templateCache = null;
 function loadTemplate() {
   if (!_templateCache) {
-    const templatePath = path.join(__dirname, 'templates/morning-mantra.html');
+    const templatePath = path.join(__dirname, '../templates/morning-mantra.html');
     _templateCache = fs.readFileSync(templatePath, 'utf8');
   }
   return _templateCache;

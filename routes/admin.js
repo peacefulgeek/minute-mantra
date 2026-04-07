@@ -35,13 +35,13 @@ router.get('/stats', async (req, res) => {
       queryOne('SELECT COUNT(*) as count FROM streaks WHERE current_streak > 0'),
       queryOne('SELECT COUNT(*) as count FROM sessions WHERE DATE(completed_at) = CURDATE()'),
       queryOne('SELECT COUNT(*) as count FROM users WHERE email_notifications_enabled = 1'),
-      queryOne('SELECT COUNT(*) as count FROM push_subscriptions'),
+      queryOne('SELECT COUNT(*) as count FROM users WHERE push_subscription IS NOT NULL AND push_notifications_enabled = TRUE'),
       queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_plan = 'monthly' AND subscription_status = 'active'"),
       queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_plan = 'annual' AND subscription_status = 'active'"),
       queryOne("SELECT COUNT(*) as count FROM email_logs WHERE sent_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
       queryOne("SELECT COUNT(*) as count FROM users WHERE unsubscribed_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
       query("SELECT email, subscription_tier, created_at FROM users ORDER BY created_at DESC LIMIT 10"),
-      queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_status = 'cancelled' AND updated_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
+      queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_status = 'canceled' AND updated_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
     ]);
 
     const monthlyRevenue = (monthlySubs.count * 1.97) + (annualSubs.count * 16.95 / 12);
