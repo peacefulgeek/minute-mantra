@@ -380,31 +380,18 @@ router.post('/update-square-pricing', async (req, res) => {
       environment: process.env.SQUARE_ENVIRONMENT === 'production' ? Environment.Production : Environment.Sandbox,
     });
 
-    // List all catalog items to find subscription plans
+    // BigInt serializer
+    const safe = (obj) => JSON.parse(JSON.stringify(obj, (k, v) => typeof v === 'bigint' ? v.toString() : v));
+
+    // List subscription plans
     const { result: catalogResult } = await client.catalogApi.listCatalog(undefined, 'SUBSCRIPTION_PLAN');
-    const plans = catalogResult.objects || [];
-    
-    const updates = [];
-    for (const plan of plans) {
-      if (plan.subscriptionPlanData) {
-        const variations = plan.subscriptionPlanVariationData ? [plan] : 
-          (plan.subscriptionPlanData.subscriptionPlanVariations || []);
-        updates.push({ id: plan.id, name: plan.subscriptionPlanData.name, variations: variations.length });
-      }
-    }
+    const plans = safe(catalogResult.objects || []);
 
-    // Get all catalog items including variations
-    const { result: allResult } = await client.catalogApi.listCatalog(undefined, 'SUBSCRIPTION_PLAN_VARIATION');
-    const allVariations = allResult.objects || [];
-    
-    const variationDetails = allVariations.map(v => ({
-      id: v.id,
-      type: v.type,
-      version: v.version,
-      data: v.subscriptionPlanVariationData || null,
-    }));
+    // List subscription plan variations
+    const { result: varResult } = await client.catalogApi.listCatalog(undefined, 'SUBSCRIPTION_PLAN_VARIATION');
+    const variations = safe(varResult.objects || []);
 
-    res.json({ ok: true, plans: updates, variations: variationDetails, raw_plan_count: plans.length, raw_variation_count: allVariations.length });
+    res.json({ ok: true, plans, variations });
   } catch (err) {
     console.error('Update Square pricing error:', err);
     res.status(500).json({ error: 'Failed to update Square pricing', detail: err.message });
