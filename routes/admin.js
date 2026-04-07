@@ -266,10 +266,17 @@ router.post('/set-tier', async (req, res) => {
     const plan = tier === 'free' ? 'none' : (currentUser.subscription_plan === 'monthly' || currentUser.subscription_plan === 'annual' ? currentUser.subscription_plan : 'admin_granted');
     const status = tier === 'free' ? 'none' : 'active';
 
-    await query(
-      `UPDATE users SET subscription_tier = ?, subscription_plan = ?, subscription_status = ?, ${tier === 'free' ? 'square_subscription_id = NULL,' : ''} updated_at = NOW() WHERE id = ?`,
-      [tier, tier === 'free' ? 'none' : plan, status, userId]
-    );
+    if (tier === 'free') {
+      await query(
+        'UPDATE users SET subscription_tier = ?, subscription_plan = ?, subscription_status = ?, square_subscription_id = NULL, updated_at = NOW() WHERE id = ?',
+        [tier, 'none', status, userId]
+      );
+    } else {
+      await query(
+        'UPDATE users SET subscription_tier = ?, subscription_plan = ?, subscription_status = ?, updated_at = NOW() WHERE id = ?',
+        [tier, plan, status, userId]
+      );
+    }
 
     const user = await queryOne('SELECT id, email, subscription_tier, subscription_plan, subscription_status FROM users WHERE id = ?', [userId]);
     res.json({ ok: true, user, square_canceled: squareCanceled });
