@@ -43,7 +43,7 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
         style={{
           background: 'var(--bg-card)',
           border: '1px solid var(--border-color)',
-          boxShadow: '0 4px 24px rgba(0,0,0,0.3)',
+          boxShadow: '0 4px 24px rgba(0,0,0,0.06)',
         }}
       >
         {/* Tradition badge */}
@@ -59,7 +59,7 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
           </span>
           <span
             className="text-xs font-sans px-2 py-0.5 rounded-full"
-            style={{ background: 'rgba(255,255,255,0.06)', color: 'var(--text-secondary)' }}
+            style={{ background: 'rgba(184,134,11,0.1)', color: 'var(--text-secondary)' }}
           >
             {mantra.intention}
           </span>
@@ -67,14 +67,31 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
 
         {/* Main content */}
         <div className="px-5 pt-6 pb-4">
-          {/* Original script */}
+
+          {/* ENGLISH TRANSLATION — largest, most prominent */}
           <p
-            className="text-center text-3xl leading-relaxed mb-3"
+            className="text-center mb-5"
+            style={{
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontSize: '24px',
+              fontWeight: 500,
+              lineHeight: 1.4,
+              color: '#3d2b1f',
+            }}
+          >
+            {mantra.english_translation}
+          </p>
+
+          {/* Original script (Sanskrit/Gurmukhi) — smaller, secondary */}
+          <p
+            className="text-center mb-2"
             style={{
               fontFamily: mantra.tradition === 'sikh'
                 ? 'Noto Sans Gurmukhi, serif'
                 : 'Noto Sans Devanagari, Cormorant Garamond, serif',
-              color: 'var(--text-primary)',
+              fontSize: '20px',
+              lineHeight: 1.5,
+              color: 'var(--text-secondary)',
             }}
           >
             {mantra.original_script}
@@ -82,8 +99,13 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
 
           {/* Transliteration */}
           <p
-            className="text-center text-lg italic mb-4"
-            style={{ fontFamily: 'Cormorant Garamond, serif', color: 'var(--text-accent)' }}
+            className="text-center mb-4"
+            style={{
+              fontFamily: "'Cormorant Garamond', Georgia, serif",
+              fontSize: '16px',
+              fontStyle: 'italic',
+              color: 'var(--text-accent)',
+            }}
           >
             {mantra.transliteration}
           </p>
@@ -95,9 +117,9 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
                 onClick={() => setShowAudio(prev => !prev)}
                 className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-sans"
                 style={{
-                  background: 'rgba(255,255,255,0.06)',
-                  color: 'var(--text-secondary)',
-                  border: '1px solid var(--border-color)',
+                  background: 'rgba(184,134,11,0.08)',
+                  color: '#7a5c3e',
+                  border: '1px solid rgba(184,134,11,0.2)',
                 }}
               >
                 <SpeakerHigh size={16} />
@@ -108,39 +130,40 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
 
           {showAudio && mantra.audio_url && (
             <div className="mb-4">
-              <AudioPlayer src={mantra.audio_url} phonetic={mantra.phonetic_guide} />
+              <AudioPlayer src={mantra.audio_url} phonetic={mantra.phonetic_guide} autoPlay={true} />
             </div>
           )}
-
-          {/* Translation */}
-          <p
-            className="text-center text-sm leading-relaxed mb-4"
-            style={{ color: 'var(--text-secondary)', fontFamily: 'DM Sans, sans-serif' }}
-          >
-            {mantra.english_translation}
-          </p>
 
           {/* Context note */}
           {mantra.context_note && (
             <p
-              className="text-center text-xs leading-relaxed mb-4 px-2"
-              style={{ color: 'var(--text-secondary)', opacity: 0.8, fontStyle: 'italic' }}
+              className="text-center text-sm leading-relaxed mb-4 px-2"
+              style={{
+                color: '#7a5c3e',
+                fontFamily: "'DM Sans', sans-serif",
+                fontStyle: 'italic',
+              }}
             >
               {mantra.context_note}
             </p>
           )}
 
-          {/* Go Deeper */}
+          {/* Go Deeper — clearly readable */}
           {mantra.go_deeper_teaser && (
             <a
               href={mantra.go_deeper_url || 'https://paulwagner.com'}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-1 text-sm mb-4"
-              style={{ color: 'var(--text-accent)', fontFamily: 'DM Sans, sans-serif' }}
+              className="flex items-center justify-center gap-1 mb-4"
+              style={{
+                color: '#b8860b',
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '15px',
+                fontWeight: 500,
+              }}
             >
               <span>{mantra.go_deeper_teaser}</span>
-              <ArrowRight size={14} />
+              <ArrowRight size={14} weight="bold" />
             </a>
           )}
         </div>
@@ -163,14 +186,19 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
             <Heart size={22} weight={isFavorited ? 'fill' : 'regular'} />
           </button>
 
-          {/* Begin Chanting */}
+          {/* Begin Chanting — high contrast, clearly readable */}
           <button
             onClick={onBeginChanting}
-            className="flex-1 py-3 rounded-xl font-serif text-base tracking-wide"
+            className="flex-1 py-3.5 rounded-xl text-base tracking-wide"
             style={{
-              background: 'var(--text-accent)',
+              background: 'linear-gradient(135deg, #b8860b, #d4a017)',
               color: '#ffffff',
-              boxShadow: '0 2px 12px var(--geometry-glow)',
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontWeight: 600,
+              fontSize: '16px',
+              letterSpacing: '0.05em',
+              border: 'none',
+              boxShadow: '0 4px 16px rgba(184,134,11,0.3)',
             }}
           >
             Begin Chanting

@@ -1,34 +1,28 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-
 const STEPS = [
   {
     title: 'Welcome to Minute Mantra',
     body: 'Each morning, you receive a new mantra from the world\'s great sacred traditions — Vedic, Buddhist, Sikh, and Universal.',
-    symbol: 'ॐ',
   },
   {
     title: 'One Minute of Chanting',
     body: 'Chant the mantra aloud for one minute while sacred geometry unfolds on your screen. The geometry completes as your practice does.',
-    symbol: '🙏',
   },
   {
     title: 'Streak & Growth',
     body: 'Your flame grows with every consecutive day of practice. Even one minute a day transforms your relationship with sound and silence.',
-    symbol: '🔥',
   },
   {
     title: 'Your Practice Begins',
     body: 'Tap "Begin" to see today\'s mantra. Audio pronunciation is available for Sanskrit mantras. Chant with confidence.',
-    symbol: '✦',
   },
 ];
 
 export default function Onboarding() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
-
 
   function next() {
     if (step < STEPS.length - 1) {
@@ -42,42 +36,47 @@ export default function Onboarding() {
 
   return (
     <div
-      className="min-h-screen flex flex-col items-center justify-center px-6 py-12 pt-safe"
-      style={{ background: 'var(--bg-base)' }}
+      className="fixed inset-0 flex flex-col items-center justify-center px-6"
+      style={{ background: 'var(--bg-base, #fdf8f0)' }}
     >
       {/* Progress dots */}
-      <div className="flex gap-2 mb-12">
+      <div className="flex gap-2 mb-10">
         {STEPS.map((_, i) => (
           <div
             key={i}
-            className="rounded-full transition-all duration-300"
+            className="rounded-full"
             style={{
               width: i === step ? '24px' : '6px',
               height: '6px',
-              background: i <= step ? 'var(--text-accent)' : 'var(--border-color)',
+              background: i <= step ? '#b8860b' : 'rgba(184,134,11,0.25)',
+              transition: 'width 0.3s, background 0.3s',
             }}
           />
         ))}
       </div>
 
-      {/* Symbol */}
-      <div
-        className="mb-8"
-        style={{
-          fontSize: '48px',
-          lineHeight: 1,
-          color: 'var(--text-accent)',
-        }}
-      >
-        {current.symbol}
-      </div>
-
       {/* Text - centered */}
-      <div className="text-center max-w-sm mb-12">
-        <h2 className="font-serif text-2xl mb-4" style={{ color: 'var(--text-accent)' }}>
+      <div className="text-center max-w-md mb-10">
+        <h2
+          className="mb-4"
+          style={{
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontSize: '28px',
+            fontWeight: 400,
+            color: '#3d2b1f',
+            lineHeight: 1.3,
+          }}
+        >
           {current.title}
         </h2>
-        <p className="font-sans text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+        <p
+          style={{
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontSize: '16px',
+            lineHeight: 1.7,
+            color: '#7a5c3e',
+          }}
+        >
           {current.body}
         </p>
       </div>
@@ -85,10 +84,20 @@ export default function Onboarding() {
       {/* Button */}
       <button
         onClick={next}
-        className="w-full max-w-xs py-4 rounded-xl font-serif text-lg tracking-wide"
-        style={{ background: 'var(--text-accent)', color: '#ffffff' }}
+        className="w-full max-w-xs py-4 rounded-full"
+        style={{
+          background: 'linear-gradient(135deg, #b8860b, #d4a017)',
+          color: '#ffffff',
+          fontFamily: "'DM Sans', system-ui, sans-serif",
+          fontSize: '15px',
+          fontWeight: 600,
+          letterSpacing: '0.1em',
+          border: 'none',
+          cursor: 'pointer',
+          boxShadow: '0 4px 20px rgba(184,134,11,0.3)',
+        }}
       >
-        {step < STEPS.length - 1 ? 'Continue' : 'Begin My Practice'}
+        {step < STEPS.length - 1 ? 'CONTINUE' : 'BEGIN MY PRACTICE'}
       </button>
     </div>
   );

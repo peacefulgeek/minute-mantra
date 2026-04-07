@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import SacredGeometry from './SacredGeometry';
-import BreathingPreamble from './BreathingPreamble';
 import MalaCounter from './MalaCounter';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -17,7 +16,7 @@ export default function Timer({ mantra, onComplete }) {
   const { user } = useAuth();
   const isPremium = user?.subscription_tier === 'premium';
 
-  const [phase, setPhase] = useState('idle'); // idle | breathing | chanting | complete
+  const [phase, setPhase] = useState('idle'); // idle | chanting | complete
   const [selectedDuration, setSelectedDuration] = useState(60);
   const [elapsed, setElapsed] = useState(0);
   const [showTime, setShowTime] = useState(false);
@@ -91,6 +90,7 @@ export default function Timer({ mantra, onComplete }) {
     } catch (e) {}
   }
 
+  // Go straight to chanting — no breathing preamble
   function startChanting() {
     setPhase('chanting');
     setElapsed(0);
@@ -164,8 +164,8 @@ export default function Timer({ mantra, onComplete }) {
                 onClick={() => !locked && setSelectedDuration(seconds)}
                 className="px-3 py-1.5 rounded-lg text-sm font-sans relative"
                 style={{
-                  background: selectedDuration === seconds ? 'var(--text-accent)' : 'var(--bg-card)',
-                  color: selectedDuration === seconds ? 'var(--bg-base)' : locked ? 'var(--text-secondary)' : 'var(--text-primary)',
+                  background: selectedDuration === seconds ? '#b8860b' : 'var(--bg-card)',
+                  color: selectedDuration === seconds ? '#ffffff' : locked ? 'var(--text-secondary)' : 'var(--text-primary)',
                   border: '1px solid var(--border-color)',
                   opacity: locked ? 0.6 : 1,
                 }}
@@ -183,8 +183,8 @@ export default function Timer({ mantra, onComplete }) {
             onClick={() => setMalaMode(prev => !prev)}
             className="text-sm font-sans px-4 py-2 rounded-lg"
             style={{
-              background: malaMode ? 'var(--text-accent)' : 'var(--bg-card)',
-              color: malaMode ? 'var(--bg-base)' : 'var(--text-secondary)',
+              background: malaMode ? '#b8860b' : 'var(--bg-card)',
+              color: malaMode ? '#ffffff' : 'var(--text-secondary)',
               border: '1px solid var(--border-color)',
             }}
           >
@@ -193,27 +193,19 @@ export default function Timer({ mantra, onComplete }) {
         )}
 
         <button
-          onClick={() => setPhase('breathing')}
-          className="w-full max-w-xs py-4 rounded-2xl font-serif text-lg tracking-wide"
+          onClick={startChanting}
+          className="w-full max-w-xs py-4 rounded-2xl text-lg tracking-wide"
           style={{
-            background: 'var(--text-accent)',
+            background: 'linear-gradient(135deg, #b8860b, #d4a017)',
             color: '#ffffff',
-            boxShadow: '0 4px 20px var(--geometry-glow)',
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontWeight: 600,
+            boxShadow: '0 4px 20px rgba(184,134,11,0.3)',
           }}
         >
           Begin Chanting
         </button>
       </div>
-    );
-  }
-
-  // BREATHING PREAMBLE
-  if (phase === 'breathing') {
-    return (
-      <BreathingPreamble
-        onComplete={startChanting}
-        onSkip={startChanting}
-      />
     );
   }
 
@@ -243,10 +235,10 @@ export default function Timer({ mantra, onComplete }) {
       >
         {/* Mantra text */}
         <div className="text-center mb-8 px-8">
-          <p className="font-serif text-xl mb-2" style={{ color: 'var(--text-accent)', fontFamily: 'Noto Sans Devanagari, serif' }}>
+          <p className="text-xl mb-2" style={{ color: 'var(--text-accent)', fontFamily: 'Noto Sans Devanagari, serif' }}>
             {mantra?.original_script}
           </p>
-          <p className="font-serif text-base italic" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-base italic" style={{ color: 'var(--text-secondary)', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
             {mantra?.transliteration}
           </p>
         </div>
@@ -262,8 +254,8 @@ export default function Timer({ mantra, onComplete }) {
           {/* Numeric timer (tap to reveal) */}
           {showTime && (
             <div
-              className="absolute inset-0 flex items-center justify-center font-serif"
-              style={{ color: 'var(--text-accent)', fontSize: '32px', pointerEvents: 'none' }}
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ color: 'var(--text-accent)', fontSize: '32px', pointerEvents: 'none', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
             >
               {mins}:{secs.toString().padStart(2, '0')}
             </div>
@@ -289,10 +281,10 @@ export default function Timer({ mantra, onComplete }) {
           />
         </div>
         <div className="text-center">
-          <h2 className="font-serif text-2xl mb-2" style={{ color: 'var(--text-accent)' }}>
+          <h2 className="text-2xl mb-2" style={{ color: 'var(--text-accent)', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
             Session Complete
           </h2>
-          <p className="font-sans text-sm" style={{ color: 'var(--text-secondary)' }}>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)', fontFamily: "'DM Sans', sans-serif" }}>
             {malaMode ? '108 beads completed' : `${Math.round(selectedDuration / 60)} minute${selectedDuration > 60 ? 's' : ''} of chanting`}
           </p>
         </div>

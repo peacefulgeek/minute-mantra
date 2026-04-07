@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MantraCard from '../components/MantraCard';
 import Timer from '../components/Timer';
@@ -17,6 +17,8 @@ export default function Home() {
   const [view, setView] = useState('card'); // 'card' | 'timer'
   const [loading, setLoading] = useState(true);
   const [sessionDone, setSessionDone] = useState(false);
+  const [error, setError] = useState(null);
+  const retryCount = useRef(0);
 
   useEffect(() => {
     fetchToday();
@@ -33,9 +35,23 @@ export default function Home() {
         setMantra(data.mantra);
         setIsFavorited(data.mantra?.is_favorited || false);
         applyTradition(data.mantra?.tradition);
+        setError(null);
+      } else if (res.status === 401 && retryCount.current < 3) {
+        // Auth cookie might not be set yet after magic link verify — retry
+        retryCount.current += 1;
+        setTimeout(fetchToday, 1000);
+        return;
+      } else {
+        setError('Could not load today\'s mantra');
       }
     } catch (e) {
       console.error(e);
+      if (retryCount.current < 3) {
+        retryCount.current += 1;
+        setTimeout(fetchToday, 1000);
+        return;
+      }
+      setError('Could not load today\'s mantra');
     } finally {
       setLoading(false);
     }
@@ -86,25 +102,52 @@ export default function Home() {
       {/* Header */}
       <div className="flex items-center justify-between px-5 pt-6 pb-2">
         <div>
-          <h1 className="font-serif text-2xl" style={{ color: 'var(--text-accent)' }}>
+          <h1
+            className="text-2xl"
+            style={{ color: '#3d2b1f', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          >
             Minute Mantra
           </h1>
-          <p className="font-sans text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
+          <p
+            className="text-xs mt-0.5"
+            style={{ color: '#7a5c3e', fontFamily: "'DM Sans', system-ui, sans-serif" }}
+          >
             {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
           </p>
         </div>
         {streak && <StreakFlame streak={streak.current_streak} />}
       </div>
 
+      {/* Error state */}
+      {error && !mantra && (
+        <div className="px-6 py-8 text-center">
+          <p className="text-sm mb-4" style={{ color: '#7a5c3e' }}>{error}</p>
+          <button
+            onClick={() => { setError(null); setLoading(true); retryCount.current = 0; fetchToday(); }}
+            className="px-6 py-2 rounded-full text-sm"
+            style={{
+              background: 'linear-gradient(135deg, #b8860b, #d4a017)',
+              color: '#ffffff',
+              fontWeight: 600,
+              border: 'none',
+            }}
+          >
+            Try Again
+          </button>
+        </div>
+      )}
+
       {/* Content */}
-      {view === 'card' ? (
+      {!error && view === 'card' && (
         <MantraCard
           mantra={mantra}
           onBeginChanting={() => setView('timer')}
           onFavoriteToggle={toggleFavorite}
           isFavorited={isFavorited}
         />
-      ) : (
+      )}
+
+      {view === 'timer' && (
         <Timer
           mantra={mantra}
           onComplete={handleSessionComplete}
@@ -115,14 +158,17 @@ export default function Home() {
       {sessionDone && view === 'card' && (
         <div
           className="mx-4 mt-2 p-4 rounded-xl text-center animate-fade-in"
-          style={{ background: 'rgba(184,134,11,0.1)', border: '1px solid var(--border-color)' }}
+          style={{ background: 'rgba(184,134,11,0.1)', border: '1px solid rgba(184,134,11,0.15)' }}
         >
-          <p className="font-serif text-base" style={{ color: 'var(--text-accent)' }}>
-            ✓ Session logged. Beautiful practice.
+          <p
+            className="text-base"
+            style={{ color: '#3d2b1f', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+          >
+            Session logged. Beautiful practice.
           </p>
           {streak && (
-            <p className="font-sans text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
-              {streak.current_streak} day streak 🔥
+            <p className="text-sm mt-1" style={{ color: '#7a5c3e', fontFamily: "'DM Sans', sans-serif" }}>
+              {streak.current_streak} day streak
             </p>
           )}
         </div>
