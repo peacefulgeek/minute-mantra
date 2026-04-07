@@ -3,6 +3,48 @@ const router = express.Router();
 const { query, queryOne } = require('../config/db');
 const { requireAuth } = require('../middleware/auth');
 
+// Get today's date string in the user's timezone
+function getTodayInTimezone(timezone) {
+  try {
+    const now = new Date();
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezone || 'America/New_York',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(now);
+    const y = parts.find(p => p.type === 'year').value;
+    const m = parts.find(p => p.type === 'month').value;
+    const d = parts.find(p => p.type === 'day').value;
+    return `${y}-${m}-${d}`;
+  } catch (e) {
+    // Fallback to UTC if timezone is invalid
+    return new Date().toISOString().split('T')[0];
+  }
+}
+
+// Get yesterday's date string in the user's timezone
+function getYesterdayInTimezone(timezone) {
+  try {
+    const now = new Date();
+    now.setDate(now.getDate() - 1);
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezone || 'America/New_York',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(now);
+    const y = parts.find(p => p.type === 'year').value;
+    const m = parts.find(p => p.type === 'month').value;
+    const d = parts.find(p => p.type === 'day').value;
+    return `${y}-${m}-${d}`;
+  } catch (e) {
+    const now = new Date();
+    now.setDate(now.getDate() - 1);
+    return now.toISOString().split('T')[0];
+  }
+}
+
 // POST /api/sessions
 router.post('/', requireAuth, async (req, res) => {
   try {
@@ -13,7 +55,10 @@ router.post('/', requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'mantra_id and duration_seconds are required' });
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    // Get user's timezone for accurate date
+    const user = await queryOne('SELECT timezone FROM users WHERE id = ?', [userId]);
+    const userTimezone = user?.timezone || 'America/New_York';
+    const today = getTodayInTimezone(userTimezone);
 
     const result = await query(
       'INSERT INTO sessions (user_id, mantra_id, session_date, duration_seconds, mode, mala_count) VALUES (?, ?, ?, ?, ?, ?)',
@@ -21,7 +66,7 @@ router.post('/', requireAuth, async (req, res) => {
     );
 
     // Update streak
-    await updateStreak(userId, today);
+    await updateStreak(userId, today, userTimezone);
 
     const streak = await queryOne('SELECT * FROM streaks WHERE user_id = ?', [userId]);
     res.status(201).json({ session_id: result.insertId, streak });
@@ -31,7 +76,7 @@ router.post('/', requireAuth, async (req, res) => {
   }
 });
 
-async function updateStreak(userId, today) {
+async function updateStreak(userId, today, timezone) {
   const streak = await queryOne('SELECT * FROM streaks WHERE user_id = ?', [userId]);
   if (!streak) {
     await query('INSERT INTO streaks (user_id, current_streak, longest_streak, last_session_date) VALUES (?, 1, 1, ?)', [userId, today]);
@@ -41,9 +86,7 @@ async function updateStreak(userId, today) {
   const last = streak.last_session_date ? new Date(streak.last_session_date).toISOString().split('T')[0] : null;
   if (last === today) return; // Already logged today
 
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yStr = yesterday.toISOString().split('T')[0];
+  const yStr = getYesterdayInTimezone(timezone);
 
   let newStreak = last === yStr ? streak.current_streak + 1 : 1;
   let longest = Math.max(streak.longest_streak, newStreak);

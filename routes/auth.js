@@ -168,55 +168,5 @@ router.get('/me', requireAuth, async (req, res) => {
   }
 });
 
-// GET /api/auth/diag — temporary diagnostic endpoint (remove after debugging)
-router.get('/diag', async (req, res) => {
-  const checks = { version: 'v3-http-api' };
-  
-  // Check DB
-  try {
-    const result = await queryOne('SELECT 1 as ok');
-    checks.db = result ? 'ok' : 'no result';
-  } catch (e) {
-    checks.db = 'FAIL: ' + e.message;
-  }
-  
-  // Check SMTP2GO HTTP API config
-  checks.smtp_api_key = process.env.SMTP_API ? 'set (' + process.env.SMTP_API.substring(0, 10) + '...)' : 'MISSING';
-  checks.smtp_from = process.env.SMTP_FROM_ADDRESS || 'default';
-  checks.smtp_from_name = process.env.SMTP_FROM_NAME || 'default';
-  checks.email_mode = 'SMTP2GO HTTP API (no nodemailer)';
-  
-  // Check DB schema - magic_link columns
-  try {
-    const cols = await query("SHOW COLUMNS FROM users LIKE 'magic_link%'");
-    checks.magic_link_columns = cols.map(c => c.Field);
-  } catch (e) {
-    checks.magic_link_columns = 'FAIL: ' + e.message;
-  }
-  
-  // Test SMTP2GO HTTP API connectivity
-  if (process.env.SMTP_API) {
-    try {
-      const testResp = await fetch('https://api.smtp2go.com/v3/email/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          api_key: process.env.SMTP_API,
-          to: ['paul@creativelab.tv'],
-          sender: `${process.env.SMTP_FROM_NAME || 'Minute Mantra'} <${process.env.SMTP_FROM_ADDRESS || 'paul@paulwagner.one'}>`,
-          subject: 'MM Diag Test ' + new Date().toISOString(),
-          html_body: '<p>Diag test from minutemantra.com server</p>',
-          text_body: 'Diag test',
-        }),
-      });
-      const testResult = await testResp.json();
-      checks.smtp2go_api_test = testResult;
-    } catch (e) {
-      checks.smtp2go_api_test = 'FAIL: ' + e.message;
-    }
-  }
-  
-  res.json(checks);
-});
 
 module.exports = router;
