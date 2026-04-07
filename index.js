@@ -49,7 +49,7 @@ app.use('/api/admin', require('./routes/admin'));
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', version: 'v4-deploy-fix', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', version: 'v5-workspace-fix', timestamp: new Date().toISOString() });
 });
 
 // Serve React app in production
@@ -74,7 +74,7 @@ const { startScheduler } = require('./services/scheduler');
 startScheduler();
 
 app.listen(PORT, () => {
-  console.log(`Minute Mantra server v4-deploy-fix running on port ${PORT}`);
+  console.log(`Minute Mantra server v5-workspace-fix running on port ${PORT}`);
 });
 
 module.exports = app;
