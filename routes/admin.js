@@ -371,7 +371,8 @@ router.post('/reseed-mantras', async (req, res) => {
   }
 });
 
-// POST /api/admin/update-square-pricing — Update Square catalog plan pricing
+// POST /api/admin/update-square-pricing — Create NEW Square catalog plan variations with updated pricing
+// Square does not allow updating pricing on existing variations, so we create new ones
 router.post('/update-square-pricing', async (req, res) => {
   try {
     const { Client, Environment } = require('square');
@@ -382,30 +383,15 @@ router.post('/update-square-pricing', async (req, res) => {
 
     const safe = (obj) => JSON.parse(JSON.stringify(obj, (k, v) => typeof v === 'bigint' ? v.toString() : v));
 
-    // First fetch current versions
-    const monthlyId = 'QADA7PDPEPVERXQYUBQOMBKT';
-    const annualId = 'QYKFLSBAIO5UJZUL6VERFKBA';
-    const { result: batchResult } = await client.catalogApi.batchRetrieveCatalogObjects({
-      objectIds: [monthlyId, annualId],
-    });
-    const objects = batchResult.objects || [];
-    const monthlyObj = objects.find(o => o.id === monthlyId);
-    const annualObj = objects.find(o => o.id === annualId);
-    if (!monthlyObj || !annualObj) {
-      return res.status(404).json({ error: 'Could not find catalog objects', found: objects.map(o => o.id) });
-    }
-
-    // Update Monthly variation -> $1.08/mo
+    // Create NEW Monthly variation -> $1.08/mo
     const { result: monthlyResult } = await client.catalogApi.upsertCatalogObject({
-      idempotencyKey: `update-monthly-${Date.now()}`,
+      idempotencyKey: `create-monthly-108-${Date.now()}`,
       object: {
         type: 'SUBSCRIPTION_PLAN_VARIATION',
-        id: monthlyId,
-        version: monthlyObj.version,
+        id: '#monthly-108',
         subscriptionPlanVariationData: {
           name: 'Platinum Monthly - $1.08/mo',
           phases: [{
-            uid: 'CSPH7JKEGSJCHPDPZPLM6IHP',
             cadence: 'MONTHLY',
             ordinal: BigInt(0),
             pricing: {
@@ -418,17 +404,17 @@ router.post('/update-square-pricing', async (req, res) => {
       },
     });
 
-    // Update Annual variation -> $9.88/yr
+    const newMonthlyId = monthlyResult.catalogObject.id;
+
+    // Create NEW Annual variation -> $9.88/yr
     const { result: annualResult } = await client.catalogApi.upsertCatalogObject({
-      idempotencyKey: `update-annual-${Date.now()}`,
+      idempotencyKey: `create-annual-988-${Date.now()}`,
       object: {
         type: 'SUBSCRIPTION_PLAN_VARIATION',
-        id: annualId,
-        version: annualObj.version,
+        id: '#annual-988',
         subscriptionPlanVariationData: {
           name: 'Platinum Annual - $9.88/yr',
           phases: [{
-            uid: 'B47QLHAQYHOBR2GSPHHJFVBQ',
             cadence: 'ANNUAL',
             ordinal: BigInt(0),
             pricing: {
@@ -441,7 +427,16 @@ router.post('/update-square-pricing', async (req, res) => {
       },
     });
 
-    res.json({ ok: true, monthly: safe(monthlyResult), annual: safe(annualResult) });
+    const newAnnualId = annualResult.catalogObject.id;
+
+    res.json({
+      ok: true,
+      message: 'New plan variations created. Update Railway env vars with these IDs.',
+      newMonthlyVariationId: newMonthlyId,
+      newAnnualVariationId: newAnnualId,
+      monthly: safe(monthlyResult),
+      annual: safe(annualResult),
+    });
   } catch (err) {
     console.error('Update Square pricing error:', err);
     const detail = err.errors ? err.errors : (err.body ? err.body : err.message);
