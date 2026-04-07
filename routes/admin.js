@@ -371,4 +371,44 @@ router.post('/reseed-mantras', async (req, res) => {
   }
 });
 
+// POST /api/admin/update-square-pricing — Update Square catalog plan pricing
+router.post('/update-square-pricing', async (req, res) => {
+  try {
+    const { Client, Environment } = require('square');
+    const client = new Client({
+      accessToken: process.env.SQUARE_ACCESS_TOKEN,
+      environment: process.env.SQUARE_ENVIRONMENT === 'production' ? Environment.Production : Environment.Sandbox,
+    });
+
+    // List all catalog items to find subscription plans
+    const { result: catalogResult } = await client.catalogApi.listCatalog(undefined, 'SUBSCRIPTION_PLAN');
+    const plans = catalogResult.objects || [];
+    
+    const updates = [];
+    for (const plan of plans) {
+      if (plan.subscriptionPlanData) {
+        const variations = plan.subscriptionPlanVariationData ? [plan] : 
+          (plan.subscriptionPlanData.subscriptionPlanVariations || []);
+        updates.push({ id: plan.id, name: plan.subscriptionPlanData.name, variations: variations.length });
+      }
+    }
+
+    // Get all catalog items including variations
+    const { result: allResult } = await client.catalogApi.listCatalog(undefined, 'SUBSCRIPTION_PLAN_VARIATION');
+    const allVariations = allResult.objects || [];
+    
+    const variationDetails = allVariations.map(v => ({
+      id: v.id,
+      type: v.type,
+      version: v.version,
+      data: v.subscriptionPlanVariationData || null,
+    }));
+
+    res.json({ ok: true, plans: updates, variations: variationDetails, raw_plan_count: plans.length, raw_variation_count: allVariations.length });
+  } catch (err) {
+    console.error('Update Square pricing error:', err);
+    res.status(500).json({ error: 'Failed to update Square pricing', detail: err.message });
+  }
+});
+
 module.exports = router;
