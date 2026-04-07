@@ -380,18 +380,55 @@ router.post('/update-square-pricing', async (req, res) => {
       environment: process.env.SQUARE_ENVIRONMENT === 'production' ? Environment.Production : Environment.Sandbox,
     });
 
-    // BigInt serializer
     const safe = (obj) => JSON.parse(JSON.stringify(obj, (k, v) => typeof v === 'bigint' ? v.toString() : v));
 
-    // List subscription plans
-    const { result: catalogResult } = await client.catalogApi.listCatalog(undefined, 'SUBSCRIPTION_PLAN');
-    const plans = safe(catalogResult.objects || []);
+    // Update Monthly variation: QADA7PDPEPVERXQYUBQOMBKT -> $0.99/mo
+    const { result: monthlyResult } = await client.catalogApi.upsertCatalogObject({
+      idempotencyKey: `update-monthly-${Date.now()}`,
+      object: {
+        type: 'SUBSCRIPTION_PLAN_VARIATION',
+        id: 'QADA7PDPEPVERXQYUBQOMBKT',
+        version: BigInt('1769011303018'),
+        subscriptionPlanVariationData: {
+          name: 'Platinum Monthly - $0.99/mo',
+          phases: [{
+            uid: 'CSPH7JKEGSJCHPDPZPLM6IHP',
+            cadence: 'MONTHLY',
+            ordinal: BigInt(0),
+            pricing: {
+              type: 'STATIC',
+              priceMoney: { amount: BigInt(99), currency: 'USD' },
+            },
+          }],
+          subscriptionPlanId: 'JS4HR7SNYWOU6PX3ZMZFQKUL',
+        },
+      },
+    });
 
-    // List subscription plan variations
-    const { result: varResult } = await client.catalogApi.listCatalog(undefined, 'SUBSCRIPTION_PLAN_VARIATION');
-    const variations = safe(varResult.objects || []);
+    // Update Annual variation: QYKFLSBAIO5UJZUL6VERFKBA -> $9.99/yr
+    const { result: annualResult } = await client.catalogApi.upsertCatalogObject({
+      idempotencyKey: `update-annual-${Date.now()}`,
+      object: {
+        type: 'SUBSCRIPTION_PLAN_VARIATION',
+        id: 'QYKFLSBAIO5UJZUL6VERFKBA',
+        version: BigInt('1769011303018'),
+        subscriptionPlanVariationData: {
+          name: 'Platinum Annual - $9.99/yr',
+          phases: [{
+            uid: 'B47QLHAQYHOBR2GSPHHJFVBQ',
+            cadence: 'ANNUAL',
+            ordinal: BigInt(0),
+            pricing: {
+              type: 'STATIC',
+              priceMoney: { amount: BigInt(999), currency: 'USD' },
+            },
+          }],
+          subscriptionPlanId: 'V6D5B3RVX7UAN4V5BRAOMUIC',
+        },
+      },
+    });
 
-    res.json({ ok: true, plans, variations });
+    res.json({ ok: true, monthly: safe(monthlyResult), annual: safe(annualResult) });
   } catch (err) {
     console.error('Update Square pricing error:', err);
     res.status(500).json({ error: 'Failed to update Square pricing', detail: err.message });
