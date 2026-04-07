@@ -44,7 +44,7 @@ router.get('/stats', async (req, res) => {
       queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_status = 'canceled' AND updated_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
     ]);
 
-    const monthlyRevenue = (monthlySubs.count * 0.99) + (annualSubs.count * 9.99 / 12);
+    const monthlyRevenue = (monthlySubs.count * 1.08) + (annualSubs.count * 9.88 / 12);
 
     res.json({
       total_users: totalUsers.count,
@@ -395,7 +395,7 @@ router.post('/update-square-pricing', async (req, res) => {
       return res.status(404).json({ error: 'Could not find catalog objects', found: objects.map(o => o.id) });
     }
 
-    // Update Monthly variation -> $0.99/mo
+    // Update Monthly variation -> $1.08/mo
     const { result: monthlyResult } = await client.catalogApi.upsertCatalogObject({
       idempotencyKey: `update-monthly-${Date.now()}`,
       object: {
@@ -403,14 +403,14 @@ router.post('/update-square-pricing', async (req, res) => {
         id: monthlyId,
         version: monthlyObj.version,
         subscriptionPlanVariationData: {
-          name: 'Platinum Monthly - $0.99/mo',
+          name: 'Platinum Monthly - $1.08/mo',
           phases: [{
             uid: 'CSPH7JKEGSJCHPDPZPLM6IHP',
             cadence: 'MONTHLY',
             ordinal: BigInt(0),
             pricing: {
               type: 'STATIC',
-              priceMoney: { amount: BigInt(99), currency: 'USD' },
+              priceMoney: { amount: BigInt(108), currency: 'USD' },
             },
           }],
           subscriptionPlanId: 'JS4HR7SNYWOU6PX3ZMZFQKUL',
@@ -418,7 +418,7 @@ router.post('/update-square-pricing', async (req, res) => {
       },
     });
 
-    // Update Annual variation -> $9.99/yr
+    // Update Annual variation -> $9.88/yr
     const { result: annualResult } = await client.catalogApi.upsertCatalogObject({
       idempotencyKey: `update-annual-${Date.now()}`,
       object: {
@@ -426,14 +426,14 @@ router.post('/update-square-pricing', async (req, res) => {
         id: annualId,
         version: annualObj.version,
         subscriptionPlanVariationData: {
-          name: 'Platinum Annual - $9.99/yr',
+          name: 'Platinum Annual - $9.88/yr',
           phases: [{
             uid: 'B47QLHAQYHOBR2GSPHHJFVBQ',
             cadence: 'ANNUAL',
             ordinal: BigInt(0),
             pricing: {
               type: 'STATIC',
-              priceMoney: { amount: BigInt(999), currency: 'USD' },
+              priceMoney: { amount: BigInt(988), currency: 'USD' },
             },
           }],
           subscriptionPlanId: 'V6D5B3RVX7UAN4V5BRAOMUIC',

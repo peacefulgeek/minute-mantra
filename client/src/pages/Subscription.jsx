@@ -84,7 +84,7 @@ export default function Subscription() {
           >
             <p className="font-serif text-xl mb-1" style={{ color: 'var(--text-accent)' }}>✦ Platinum</p>
             <p className="font-sans text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Plan: {user?.subscription_plan === 'annual' ? 'Annual ($9.99/yr)' : user?.subscription_plan === 'admin_granted' ? 'Granted by admin' : 'Monthly ($0.99/mo)'}
+              Plan: {user?.subscription_plan === 'annual' ? 'Annual ($9.88/yr)' : user?.subscription_plan === 'admin_granted' ? 'Granted by admin' : 'Monthly ($1.08/mo)'}
             </p>
             <p className="font-sans text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
               Status: {user?.subscription_status}
@@ -129,7 +129,7 @@ export default function Subscription() {
                 color: plan === 'monthly' ? 'var(--bg-base)' : 'var(--text-primary)',
               }}
             >
-              <p className="font-serif text-lg">$0.99</p>
+              <p className="font-serif text-lg">$1.08</p>
               <p className="font-sans text-xs mt-0.5">per month</p>
             </button>
             <button
@@ -147,8 +147,8 @@ export default function Subscription() {
               >
                 Best Value
               </span>
-              <p className="font-serif text-lg">$9.99</p>
-              <p className="font-sans text-xs mt-0.5">per year · Save 16%</p>
+              <p className="font-serif text-lg">$9.88</p>
+              <p className="font-sans text-xs mt-0.5">per year · Save 24%</p>
             </button>
           </div>
 
@@ -176,7 +176,7 @@ export default function Subscription() {
               opacity: loading ? 0.7 : 1,
             }}
           >
-            {loading ? 'Creating checkout...' : `Subscribe — ${plan === 'annual' ? '$9.99/yr' : '$0.99/mo'}`}
+            {loading ? 'Creating checkout...' : `Subscribe — ${plan === 'annual' ? '$9.88/yr' : '$1.08/mo'}`}
           </button>
 
           <p className="text-xs text-center mt-3 font-sans" style={{ color: 'var(--text-secondary)' }}>

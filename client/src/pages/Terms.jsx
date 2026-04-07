@@ -16,7 +16,7 @@ export default function Terms() {
         <p><strong style={{ color: 'var(--text-primary)' }}>Use of Service</strong><br />
         Minute Mantra is provided for personal spiritual practice. You may not reproduce or redistribute the mantra content without permission.</p>
         <p><strong style={{ color: 'var(--text-primary)' }}>Subscriptions</strong><br />
-        Platinum subscriptions are billed monthly ($0.99) or annually ($9.99). Subscriptions auto-renew. You may cancel at any time; no partial refunds are issued.</p>
+        Platinum subscriptions are billed monthly ($1.08) or annually ($9.88). Subscriptions auto-renew. You may cancel at any time; no partial refunds are issued.</p>
         <p><strong style={{ color: 'var(--text-primary)' }}>Account</strong><br />
         You are responsible for maintaining the security of your account. We reserve the right to terminate accounts that violate these terms.</p>
         <p><strong style={{ color: 'var(--text-primary)' }}>Disclaimer</strong><br />

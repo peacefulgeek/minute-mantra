@@ -37,7 +37,7 @@ export default function Billing() {
               Current Plan
             </p>
             <p className="font-serif text-base" style={{ color: 'var(--text-primary)' }}>
-              {user?.subscription_plan === 'annual' ? 'Annual — $9.99/year' : 'Monthly — $0.99/month'}
+              {user?.subscription_plan === 'annual' ? 'Annual — $9.88/year' : 'Monthly — $1.08/month'}
             </p>
             <p className="font-sans text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
               Status: {user?.subscription_status}

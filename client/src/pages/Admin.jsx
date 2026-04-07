@@ -429,8 +429,8 @@ export default function Admin() {
                 <div className="rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
                   <h3 className="text-sm text-white/50 mb-4">Revenue Breakdown</h3>
                   <div className="space-y-3">
-                    <RevenueRow label="Monthly plans ($0.99/mo)" count={stats.monthly_subs || 0} rate={0.99} />
-                    <RevenueRow label="Annual plans ($9.99/yr)" count={stats.annual_subs || 0} rate={9.99 / 12} />
+                    <RevenueRow label="Monthly plans ($1.08/mo)" count={stats.monthly_subs || 0} rate={1.08} />
+                    <RevenueRow label="Annual plans ($9.88/yr)" count={stats.annual_subs || 0} rate={9.88 / 12} />
                   </div>
                 </div>
               </>
