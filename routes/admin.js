@@ -382,13 +382,26 @@ router.post('/update-square-pricing', async (req, res) => {
 
     const safe = (obj) => JSON.parse(JSON.stringify(obj, (k, v) => typeof v === 'bigint' ? v.toString() : v));
 
-    // Update Monthly variation: QADA7PDPEPVERXQYUBQOMBKT -> $0.99/mo
+    // First fetch current versions
+    const monthlyId = 'QADA7PDPEPVERXQYUBQOMBKT';
+    const annualId = 'QYKFLSBAIO5UJZUL6VERFKBA';
+    const { result: batchResult } = await client.catalogApi.batchRetrieveCatalogObjects({
+      objectIds: [monthlyId, annualId],
+    });
+    const objects = batchResult.objects || [];
+    const monthlyObj = objects.find(o => o.id === monthlyId);
+    const annualObj = objects.find(o => o.id === annualId);
+    if (!monthlyObj || !annualObj) {
+      return res.status(404).json({ error: 'Could not find catalog objects', found: objects.map(o => o.id) });
+    }
+
+    // Update Monthly variation -> $0.99/mo
     const { result: monthlyResult } = await client.catalogApi.upsertCatalogObject({
       idempotencyKey: `update-monthly-${Date.now()}`,
       object: {
         type: 'SUBSCRIPTION_PLAN_VARIATION',
-        id: 'QADA7PDPEPVERXQYUBQOMBKT',
-        version: BigInt('1769011303018'),
+        id: monthlyId,
+        version: monthlyObj.version,
         subscriptionPlanVariationData: {
           name: 'Platinum Monthly - $0.99/mo',
           phases: [{
@@ -405,13 +418,13 @@ router.post('/update-square-pricing', async (req, res) => {
       },
     });
 
-    // Update Annual variation: QYKFLSBAIO5UJZUL6VERFKBA -> $9.99/yr
+    // Update Annual variation -> $9.99/yr
     const { result: annualResult } = await client.catalogApi.upsertCatalogObject({
       idempotencyKey: `update-annual-${Date.now()}`,
       object: {
         type: 'SUBSCRIPTION_PLAN_VARIATION',
-        id: 'QYKFLSBAIO5UJZUL6VERFKBA',
-        version: BigInt('1769011303018'),
+        id: annualId,
+        version: annualObj.version,
         subscriptionPlanVariationData: {
           name: 'Platinum Annual - $9.99/yr',
           phases: [{
