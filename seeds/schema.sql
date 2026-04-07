@@ -31,11 +31,11 @@ CREATE TABLE IF NOT EXISTS users (
   push_notifications_enabled BOOLEAN DEFAULT FALSE,
   push_subscription JSON,
   newsletter_opted_in BOOLEAN DEFAULT FALSE,
-  subscription_tier ENUM('free','premium') DEFAULT 'free',
+  subscription_tier ENUM('free','premium','platinum') DEFAULT 'free',
   square_customer_id VARCHAR(255),
   square_subscription_id VARCHAR(255),
   subscription_status ENUM('active','canceled','past_due','none') DEFAULT 'none',
-  subscription_plan ENUM('monthly','annual','none') DEFAULT 'none',
+  subscription_plan ENUM('monthly','annual','admin_granted','none') DEFAULT 'none',
   -- Magic link auth
   magic_link_token VARCHAR(128) NULL,
   magic_link_expires_at DATETIME NULL,

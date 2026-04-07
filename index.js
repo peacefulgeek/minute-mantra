@@ -49,7 +49,7 @@ app.use('/api/admin', require('./routes/admin'));
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', version: 'v11-audio-fix-sizes', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', version: 'v12-platinum-tier', timestamp: new Date().toISOString() });
 });
 
 // Serve React app in production
@@ -69,12 +69,25 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// Run DB migrations on startup
+const { query } = require('./config/db');
+(async () => {
+  try {
+    await query("ALTER TABLE users MODIFY COLUMN subscription_tier ENUM('free','premium','platinum') DEFAULT 'free'");
+    await query("ALTER TABLE users MODIFY COLUMN subscription_plan ENUM('monthly','annual','admin_granted','none') DEFAULT 'none'");
+    console.log('DB migration: subscription_tier and subscription_plan ENUMs updated');
+  } catch (err) {
+    // Ignore if already migrated or table doesn't exist yet
+    console.log('DB migration note:', err.message);
+  }
+})();
+
 // Start cron jobs
 const { startScheduler } = require('./services/scheduler');
 startScheduler();
 
 app.listen(PORT, () => {
-  console.log(`Minute Mantra server v11-audio-fix-sizes running on port ${PORT}`);
+  console.log(`Minute Mantra server v12-platinum-tier running on port ${PORT}`);
 });
 
 module.exports = app;
