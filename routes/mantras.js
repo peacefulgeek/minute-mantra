@@ -25,7 +25,7 @@ function getDayOfYear(timezone = 'America/New_York') {
 function buildCdnUrl(filename) {
   if (!filename) return null;
   const base = process.env.BUNNY_CDN_BASE_URL || 'https://minute-mantra.b-cdn.net';
-  return `${base}/audio/${filename}`;
+  return `${base}/audio/${filename}?v=2`;
 }
 
 // GET /api/mantras/today
