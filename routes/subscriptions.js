@@ -76,12 +76,17 @@ router.post('/cancel', requireAuth, async (req, res) => {
     }
 
     const result = await squareService.cancelSubscription(user.square_subscription_id);
+
+    // Set status to canceled AND tier to free. Square webhook will also fire,
+    // but we update immediately so the UI reflects the change right away.
+    // Also clear square_subscription_id so the user can re-subscribe later.
     await query(
-      'UPDATE users SET subscription_status = ? WHERE id = ?',
-      ['canceled', req.user.id]
+      `UPDATE users SET subscription_status = 'canceled', subscription_tier = 'free',
+       subscription_plan = 'none', square_subscription_id = NULL, updated_at = NOW() WHERE id = ?`,
+      [req.user.id]
     );
 
-    res.json({ message: 'Subscription canceled. Platinum access continues until period end.', effective_date: result.chargedThroughDate });
+    res.json({ message: 'Subscription canceled.', effective_date: result.chargedThroughDate });
   } catch (err) {
     console.error('Cancel subscription error:', err);
     res.status(500).json({ error: err.message || 'Failed to cancel subscription' });

@@ -47,14 +47,27 @@ router.post('/square', express.raw({ type: 'application/json' }), async (req, re
   }
 });
 
+// Helper: determine plan from Square subscription's plan_variation_id
+function determinePlan(subscription) {
+  const variationId = subscription.plan_variation_id;
+  const monthlyId = process.env.SQUARE_MONTHLY_VARIATION_ID;
+  const annualId = process.env.SQUARE_ANNUAL_VARIATION_ID;
+  if (variationId === monthlyId) return 'monthly';
+  if (variationId === annualId) return 'annual';
+  // Fallback: check if any phase cadence hints at the plan
+  return 'monthly';
+}
+
 async function handleSubscriptionCreated(subscription) {
   const user = await queryOne('SELECT id FROM users WHERE square_subscription_id = ?', [subscription.id]);
-  if (user) {
-    await query(
-      'UPDATE users SET subscription_tier = ?, subscription_status = ? WHERE id = ?',
-      ['platinum', 'active', user.id]
-    );
-  }
+  if (!user) return;
+
+  const plan = determinePlan(subscription);
+  await query(
+    `UPDATE users SET subscription_tier = 'platinum', subscription_status = 'active',
+     subscription_plan = ?, updated_at = NOW() WHERE id = ?`,
+    [plan, user.id]
+  );
 }
 
 async function handleSubscriptionUpdated(subscription) {
@@ -66,32 +79,51 @@ async function handleSubscriptionUpdated(subscription) {
     : subscription.status === 'PAUSED' ? 'past_due'
     : 'none';
 
-  const tier = status === 'active' ? 'platinum' : 'free';
-  await query(
-    'UPDATE users SET subscription_status = ?, subscription_tier = ? WHERE id = ?',
-    [status, tier, user.id]
-  );
+  if (status === 'active') {
+    // Subscription is active — ensure all fields reflect platinum
+    const plan = determinePlan(subscription);
+    await query(
+      `UPDATE users SET subscription_tier = 'platinum', subscription_status = 'active',
+       subscription_plan = ?, updated_at = NOW() WHERE id = ?`,
+      [plan, user.id]
+    );
+  } else if (status === 'canceled') {
+    // Fully canceled — clear everything
+    await query(
+      `UPDATE users SET subscription_tier = 'free', subscription_status = 'canceled',
+       subscription_plan = 'none', square_subscription_id = NULL, updated_at = NOW() WHERE id = ?`,
+      [user.id]
+    );
+  } else {
+    // past_due or other — keep tier but flag status
+    await query(
+      `UPDATE users SET subscription_status = ?, updated_at = NOW() WHERE id = ?`,
+      [status, user.id]
+    );
+  }
 }
 
 async function handleSubscriptionCanceled(subscription) {
   const user = await queryOne('SELECT id FROM users WHERE square_subscription_id = ?', [subscription.id]);
-  if (user) {
-    await query(
-      'UPDATE users SET subscription_status = ?, subscription_tier = ? WHERE id = ?',
-      ['canceled', 'free', user.id]
-    );
-  }
+  if (!user) return;
+
+  await query(
+    `UPDATE users SET subscription_tier = 'free', subscription_status = 'canceled',
+     subscription_plan = 'none', square_subscription_id = NULL, updated_at = NOW() WHERE id = ?`,
+    [user.id]
+  );
 }
 
 async function handlePaymentFailed(invoice) {
   if (!invoice.subscription_id) return;
   const user = await queryOne('SELECT id FROM users WHERE square_subscription_id = ?', [invoice.subscription_id]);
-  if (user) {
-    await query(
-      'UPDATE users SET subscription_status = ? WHERE id = ?',
-      ['past_due', user.id]
-    );
-  }
+  if (!user) return;
+
+  // Keep platinum access but flag as past_due so admin can see
+  await query(
+    `UPDATE users SET subscription_status = 'past_due', updated_at = NOW() WHERE id = ?`,
+    [user.id]
+  );
 }
 
 module.exports = router;

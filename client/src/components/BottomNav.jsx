@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { House, Clock, Heart, Gear } from '@phosphor-icons/react';
+import { House, Clock, Heart, Books } from '@phosphor-icons/react';
 
 export default function BottomNav() {
   const location = useLocation();
@@ -9,7 +9,7 @@ export default function BottomNav() {
     { to: '/home', icon: House, label: 'Home' },
     { to: '/history', icon: Clock, label: 'History' },
     { to: '/favorites', icon: Heart, label: 'Favorites' },
-    { to: '/settings', icon: Gear, label: 'Settings' },
+    { to: '/library', icon: Books, label: 'Library' },
   ];
 
   return (

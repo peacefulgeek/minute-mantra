@@ -22,6 +22,7 @@ const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
 const Onboarding = lazy(() => import('./pages/Onboarding'));
 const Admin = lazy(() => import('./pages/Admin'));
+const Library = lazy(() => import('./pages/Library'));
 
 // Pages that have their own full-screen layout (no shared header/nav)
 const STANDALONE_PATHS = ['/enter', '/auth/verify', '/onboarding'];
@@ -100,7 +101,7 @@ function AppLayout() {
             <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
             <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
             <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
-            <Route path="/library" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+            <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
             <Route path="/mantra/:id" element={<ProtectedRoute><MantraDetail /></ProtectedRoute>} />
 
             {/* Settings */}

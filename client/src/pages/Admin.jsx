@@ -182,10 +182,21 @@ export default function Admin() {
                           <p className="text-sm text-white/70">{u.email}</p>
                           <p className="text-xs text-white/30">{new Date(u.created_at).toLocaleDateString()}</p>
                         </div>
-                        <span className="text-xs px-2 py-0.5 rounded-full"
-                          style={{ background: u.subscription_tier === 'platinum' ? 'rgba(184,134,11,0.2)' : 'rgba(255,255,255,0.06)', color: u.subscription_tier === 'platinum' ? '#b8860b' : 'rgba(255,255,255,0.4)' }}>
-                          {u.subscription_tier || 'free'}
-                        </span>
+                        <div className="flex gap-1.5 items-center">
+                          <span className="text-xs px-2 py-0.5 rounded-full"
+                            style={{ background: u.subscription_tier === 'platinum' ? 'rgba(184,134,11,0.2)' : 'rgba(255,255,255,0.06)', color: u.subscription_tier === 'platinum' ? '#b8860b' : 'rgba(255,255,255,0.4)' }}>
+                            {u.subscription_tier || 'free'}
+                          </span>
+                          <span className="text-xs px-2 py-0.5 rounded-full"
+                            style={{
+                              background: u.subscription_status === 'active' ? 'rgba(74,103,65,0.3)'
+                                : u.subscription_status === 'canceled' ? 'rgba(220,38,38,0.15)' : 'rgba(255,255,255,0.06)',
+                              color: u.subscription_status === 'active' ? '#7fb069'
+                                : u.subscription_status === 'canceled' ? '#ef4444' : 'rgba(255,255,255,0.4)'
+                            }}>
+                            {u.subscription_status || 'none'}
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -269,7 +280,7 @@ export default function Admin() {
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                    {['Email', 'Plan', 'Status', 'Streak', 'Joined', 'Actions'].map(h => (
+                    {['Email', 'Tier', 'Plan', 'Status', 'Streak', 'Joined', 'Actions'].map(h => (
                       <th key={h} className="px-4 py-3 text-left text-xs text-white/30 font-normal">{h}</th>
                     ))}
                   </tr>
@@ -286,8 +297,30 @@ export default function Admin() {
                       </td>
                       <td className="px-4 py-3">
                         <span className="px-2 py-0.5 rounded-full text-xs"
-                          style={{ background: u.subscription_status === 'active' ? 'rgba(74,103,65,0.3)' : 'rgba(255,255,255,0.06)', color: u.subscription_status === 'active' ? '#7fb069' : 'rgba(255,255,255,0.4)' }}>
-                          {u.subscription_status || '—'}
+                          style={{
+                            background: u.subscription_plan === 'monthly' || u.subscription_plan === 'annual'
+                              ? 'rgba(100,149,237,0.15)' : u.subscription_plan === 'admin_granted'
+                              ? 'rgba(184,134,11,0.1)' : 'rgba(255,255,255,0.06)',
+                            color: u.subscription_plan === 'monthly' || u.subscription_plan === 'annual'
+                              ? '#6495ed' : u.subscription_plan === 'admin_granted'
+                              ? '#b8860b' : 'rgba(255,255,255,0.4)'
+                          }}>
+                          {u.subscription_plan === 'admin_granted' ? 'granted' : u.subscription_plan || 'none'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="px-2 py-0.5 rounded-full text-xs"
+                          style={{
+                            background: u.subscription_status === 'active' ? 'rgba(74,103,65,0.3)'
+                              : u.subscription_status === 'past_due' ? 'rgba(220,160,38,0.2)'
+                              : u.subscription_status === 'canceled' ? 'rgba(220,38,38,0.15)'
+                              : 'rgba(255,255,255,0.06)',
+                            color: u.subscription_status === 'active' ? '#7fb069'
+                              : u.subscription_status === 'past_due' ? '#dca026'
+                              : u.subscription_status === 'canceled' ? '#ef4444'
+                              : 'rgba(255,255,255,0.4)'
+                          }}>
+                          {u.subscription_status || 'none'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-white/50">{u.current_streak || 0}🔥</td>
@@ -331,7 +364,7 @@ export default function Admin() {
                     </tr>
                   ))}
                   {users.length === 0 && (
-                    <tr><td colSpan={6} className="px-4 py-10 text-center text-white/30">No users found</td></tr>
+                    <tr><td colSpan={7} className="px-4 py-10 text-center text-white/30">No users found</td></tr>
                   )}
                 </tbody>
               </table>

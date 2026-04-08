@@ -83,6 +83,23 @@ router.get('/favorites', requireAuth, async (req, res) => {
   }
 });
 
+// Category-to-intention mapping for the Library page
+// Each category maps to multiple intentions from the 170+ unique intentions in the DB
+const CATEGORIES = {
+  'Love': ['Love', 'Unconditional Love', 'Loving-Kindness', 'Devotion', 'Compassion', 'Companionship', 'Friendship', 'Sweetness', 'Nurturing'],
+  'Healing': ['Healing', 'Complete Healing', 'Relief', 'Wellbeing', 'Nourishment', 'Rescue', 'Body Reverence'],
+  'Peace': ['Peace', 'Inner Peace', 'Ease', 'Contentment', 'Equanimity', 'Rest', 'Simplicity', 'Stillness', 'Imperturbability'],
+  'Transitions': ['Transformation', 'Beginnings', 'New Beginnings', 'New Day', 'Becoming', 'Renewal', 'Release', 'Impermanence', 'Completion'],
+  'Strength': ['Strength', 'Courage', 'Fearlessness', 'Power', 'Empowerment', 'Unstoppability', 'Victory', 'Sovereignty', 'Stability', 'Steadiness'],
+  'Trauma': ['Release', 'Self-Forgiveness', 'Forgiveness', 'Healing', 'Liberation', 'Freedom', 'Purification', 'Transmutation', 'Cutting Through'],
+  'Wisdom': ['Wisdom', 'Inner Wisdom', 'Knowledge', 'Clarity', 'Awareness', 'Consciousness', 'Illumination', 'Intelligence', 'Inner Guidance', 'Guidance', 'Self-Knowledge', 'Self-Realization', 'Self-realization', 'Nature of Mind'],
+  'Abundance': ['Abundance', 'Prosperity', 'Success', 'Achievement', 'Accomplishment', 'Attraction', 'Generosity', 'Greatness'],
+  'Protection': ['Protection', 'Obstacle Removal', 'Grounding', 'Stability', 'Support', 'Refuge', 'Constancy'],
+  'Joy': ['Joy', 'Supreme Joy', 'Bliss', 'Gratitude', 'Optimism', 'Wonder', 'Beauty', 'Radiance', 'Luminosity'],
+  'Focus': ['Focus', 'Meditation', 'Presence', 'Absorption', 'Practice', 'Commitment', 'Mastery', 'Breath', 'Breath Practice'],
+  'Surrender': ['Surrender', 'Trust', 'Faith', 'Devotion', 'Humility', 'Acceptance', 'Self-Acceptance', 'Grace', 'Offering', 'Reverence', 'Renunciation'],
+};
+
 // GET /api/mantras/library
 router.get('/library', requireAuth, async (req, res) => {
   try {
@@ -91,23 +108,52 @@ router.get('/library', requireAuth, async (req, res) => {
       return res.status(403).json({ error: 'Platinum subscription required to browse the full library' });
     }
 
-    const { tradition, intention, page = 1, limit = 20 } = req.query;
+    const { tradition, intention, category, search: searchTerm, page = 1, limit = 20 } = req.query;
     let sql = 'SELECT * FROM mantras WHERE 1=1';
     const params = [];
 
     if (tradition) { sql += ' AND tradition = ?'; params.push(tradition); }
     if (intention) { sql += ' AND intention = ?'; params.push(intention); }
 
+    // Category filter: map category name to list of intentions
+    if (category && CATEGORIES[category]) {
+      const intentions = CATEGORIES[category];
+      sql += ` AND intention IN (${intentions.map(() => '?').join(',')})`;
+      params.push(...intentions);
+    }
+
+    // Text search across transliteration, translation, intention, context_note
+    if (searchTerm) {
+      sql += ' AND (transliteration LIKE ? OR english_translation LIKE ? OR intention LIKE ? OR context_note LIKE ?)';
+      const term = `%${searchTerm}%`;
+      params.push(term, term, term, term);
+    }
+
+    // Get total count for pagination
+    const countSql = sql.replace('SELECT *', 'SELECT COUNT(*) as total');
+    const countResult = await queryOne(countSql, [...params]);
+
     sql += ' ORDER BY day_of_year LIMIT ? OFFSET ?';
     params.push(parseInt(limit), (parseInt(page) - 1) * parseInt(limit));
 
     const mantras = await query(sql, params);
     const result = mantras.map(m => ({ ...m, audio_url: buildCdnUrl(m.audio_filename) }));
-    res.json({ mantras: result, page: parseInt(page), limit: parseInt(limit) });
+    res.json({
+      mantras: result,
+      page: parseInt(page),
+      limit: parseInt(limit),
+      total: countResult.total,
+      categories: Object.keys(CATEGORIES),
+    });
   } catch (err) {
     console.error('Get library error:', err);
     res.status(500).json({ error: 'Server error' });
   }
+});
+
+// GET /api/mantras/categories — return available categories
+router.get('/categories', async (req, res) => {
+  res.json({ categories: Object.keys(CATEGORIES) });
 });
 
 // GET /api/mantras/:id

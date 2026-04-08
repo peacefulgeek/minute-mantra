@@ -40,7 +40,7 @@ router.get('/stats', async (req, res) => {
       queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_plan = 'annual' AND subscription_status = 'active'"),
       queryOne("SELECT COUNT(*) as count FROM email_logs WHERE sent_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
       queryOne("SELECT COUNT(*) as count FROM users WHERE unsubscribed_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
-      query("SELECT email, subscription_tier, created_at FROM users ORDER BY created_at DESC LIMIT 10"),
+      query("SELECT email, subscription_tier, subscription_plan, subscription_status, created_at FROM users ORDER BY created_at DESC LIMIT 10"),
       queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_status = 'canceled' AND updated_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
     ]);
 
@@ -263,18 +263,22 @@ router.post('/set-tier', async (req, res) => {
       }
     }
 
-    const plan = tier === 'free' ? 'none' : (currentUser.subscription_plan === 'monthly' || currentUser.subscription_plan === 'annual' ? currentUser.subscription_plan : 'admin_granted');
-    const status = tier === 'free' ? 'none' : 'active';
-
+    // Always set all 3 subscription fields atomically to avoid inconsistent state
     if (tier === 'free') {
       await query(
-        'UPDATE users SET subscription_tier = ?, subscription_plan = ?, subscription_status = ?, square_subscription_id = NULL, updated_at = NOW() WHERE id = ?',
-        [tier, 'none', status, userId]
+        `UPDATE users SET subscription_tier = 'free', subscription_plan = 'none',
+         subscription_status = 'none', square_subscription_id = NULL, updated_at = NOW() WHERE id = ?`,
+        [userId]
       );
     } else {
+      // When admin grants platinum, preserve existing plan if it's a real Square plan,
+      // otherwise mark as admin_granted
+      const plan = (currentUser.subscription_plan === 'monthly' || currentUser.subscription_plan === 'annual')
+        ? currentUser.subscription_plan : 'admin_granted';
       await query(
-        'UPDATE users SET subscription_tier = ?, subscription_plan = ?, subscription_status = ?, updated_at = NOW() WHERE id = ?',
-        [tier, plan, status, userId]
+        `UPDATE users SET subscription_tier = 'platinum', subscription_plan = ?,
+         subscription_status = 'active', updated_at = NOW() WHERE id = ?`,
+        [plan, userId]
       );
     }
 
