@@ -7,6 +7,8 @@ const { requireAuth } = require('../middleware/auth');
 const { sendMagicLinkEmail } = require('../services/email');
 const rateLimit = require('express-rate-limit');
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
@@ -29,7 +31,7 @@ function issueJwt(user) {
     {
       id: user.id,
       email: user.email,
-      role: user.email === 'paul@creativelab.tv' ? 'admin' : 'user',
+      role: user.email === ADMIN_EMAIL ? 'admin' : 'user',
     },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRY || '7d' }
@@ -126,7 +128,7 @@ router.get('/magic-link/verify', async (req, res) => {
         newsletter_opted_in: user.newsletter_opted_in,
         timezone: user.timezone,
         notification_time: user.notification_time,
-        role: user.email === 'paul@creativelab.tv' ? 'admin' : 'user',
+        role: user.email === ADMIN_EMAIL ? 'admin' : 'user',
       },
     });
   } catch (err) {
@@ -159,7 +161,7 @@ router.get('/me', requireAuth, async (req, res) => {
     res.json({
       user: {
         ...user,
-        role: user.email === 'paul@creativelab.tv' ? 'admin' : 'user',
+        role: user.email === ADMIN_EMAIL ? 'admin' : 'user',
       },
     });
   } catch (err) {

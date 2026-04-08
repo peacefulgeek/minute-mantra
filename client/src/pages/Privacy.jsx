@@ -22,7 +22,7 @@ export default function Privacy() {
         <p><strong style={{ color: 'var(--text-primary)' }}>Email</strong><br />
         We send a daily mantra email if you opt in. You can unsubscribe at any time via the link in any email.</p>
         <p><strong style={{ color: 'var(--text-primary)' }}>Contact</strong><br />
-        Questions? Email <a href="mailto:paul@paulwagner.com" style={{ color: 'var(--text-accent)' }}>paul@paulwagner.com</a></p>
+        Questions? Use the contact form on our website.</p>
       </div>
     </div>
   );

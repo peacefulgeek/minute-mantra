@@ -4,8 +4,9 @@ const { query, queryOne } = require('../config/db');
 const { requireAuth } = require('../middleware/auth');
 
 // Admin guard middleware
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
 function requireAdmin(req, res, next) {
-  if (!req.user || req.user.email !== 'paul@creativelab.tv') {
+  if (!req.user || (req.user.role !== 'admin' && req.user.email !== ADMIN_EMAIL)) {
     return res.status(403).json({ error: 'Admin access required' });
   }
   next();
@@ -296,7 +297,7 @@ router.delete('/delete-user/:userId', async (req, res) => {
     const { userId } = req.params;
     const user = await queryOne('SELECT id, email, square_subscription_id FROM users WHERE id = ?', [userId]);
     if (!user) return res.status(404).json({ error: 'User not found' });
-    if (user.email === 'paul@creativelab.tv') return res.status(403).json({ error: 'Cannot delete admin user' });
+    if (user.email === ADMIN_EMAIL) return res.status(403).json({ error: 'Cannot delete admin user' });
 
     // Cancel Square subscription if exists before deleting
     if (user.square_subscription_id) {

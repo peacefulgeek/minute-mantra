@@ -29,7 +29,7 @@ export default function AppHeader() {
     navigate('/');
   }
 
-  const isAdmin = user?.role === 'admin' || user?.email === 'paul@creativelab.tv';
+  const isAdmin = user?.role === 'admin';
 
   return (
     <header

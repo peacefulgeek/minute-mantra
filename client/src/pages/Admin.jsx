@@ -22,7 +22,7 @@ export default function Admin() {
   const [actionLoading, setActionLoading] = useState(null);
   const [tierFilter, setTierFilter] = useState('all');
 
-  const isAdmin = user?.role === 'admin' || user?.email === 'paul@creativelab.tv';
+  const isAdmin = user?.role === 'admin';
 
   useEffect(() => {
     if (!user) { navigate('/enter'); return; }
@@ -125,7 +125,7 @@ export default function Admin() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-light" style={{ fontFamily: 'Georgia, serif', color: '#f0ebe3' }}>Admin Panel</h1>
-            <p className="text-sm text-white/40 mt-1">Minute Mantra · paul@creativelab.tv</p>
+            <p className="text-sm text-white/40 mt-1">Minute Mantra</p>
           </div>
 
         </div>
@@ -348,7 +348,7 @@ export default function Admin() {
                               Free
                             </button>
                           )}
-                          {u.email !== 'paul@creativelab.tv' && (
+                          {u.role !== 'admin' && (
                             <button
                               onClick={() => deleteUser(u.id, u.email)}
                               disabled={actionLoading === u.id}

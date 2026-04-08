@@ -45,8 +45,7 @@ export default function Billing() {
           </div>
 
           <p className="font-sans text-sm text-center" style={{ color: 'var(--text-secondary)' }}>
-            Payment details are managed securely by Square. To update your payment method or view invoices, please contact{' '}
-            <a href="mailto:paul@paulwagner.com" style={{ color: 'var(--text-accent)' }}>paul@paulwagner.com</a>.
+            Payment details are managed securely by Square. To update your payment method or view invoices, please use the contact form on our website.
           </p>
         </div>
       )}

@@ -22,7 +22,7 @@ export default function Terms() {
         <p><strong style={{ color: 'var(--text-primary)' }}>Disclaimer</strong><br />
         Minute Mantra is not a substitute for medical, psychological, or religious guidance. Practice at your own discretion.</p>
         <p><strong style={{ color: 'var(--text-primary)' }}>Contact</strong><br />
-        <a href="mailto:paul@paulwagner.com" style={{ color: 'var(--text-accent)' }}>paul@paulwagner.com</a></p>
+        Use the contact form on our website.</p>
       </div>
     </div>
   );

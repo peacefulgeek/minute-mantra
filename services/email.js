@@ -8,7 +8,7 @@ const path = require('path');
 function getEmailConfig() {
   return {
     apiKey: process.env.SMTP_API || '',
-    from: process.env.SMTP_FROM_ADDRESS || 'paul@paulwagner.one',
+    from: process.env.SMTP_FROM_ADDRESS || 'noreply@minutemantra.com',
     fromName: process.env.SMTP_FROM_NAME || 'Minute Mantra',
     appUrl: process.env.APP_URL || 'https://minutemantra.com',
   };

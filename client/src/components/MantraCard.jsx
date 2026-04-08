@@ -225,7 +225,7 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
           {/* Go Deeper — clearly readable */}
           {mantra.go_deeper_teaser && (
             <a
-              href={mantra.go_deeper_url || 'https://paulwagner.com'}
+              href={mantra.go_deeper_url || '#'}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-1 mb-4"
