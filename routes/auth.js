@@ -7,7 +7,7 @@ const { requireAuth } = require('../middleware/auth');
 const { sendMagicLinkEmail } = require('../services/email');
 const rateLimit = require('express-rate-limit');
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'paul@creativelab.tv';
 
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

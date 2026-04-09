@@ -6,6 +6,48 @@ import AppHeader from '../components/AppHeader';
 
 const TABS = ['Overview', 'Users', 'Mantras', 'Revenue', 'Emails'];
 
+const USER_FILTERS = [
+  { value: '', label: 'All Users' },
+  { value: 'free', label: 'Free' },
+  { value: 'paying', label: 'Paying Subscribers' },
+  { value: 'granted', label: 'Admin Granted' },
+  { value: 'canceled', label: 'Canceled' },
+];
+
+// Determine user category for display
+function getUserCategory(u) {
+  if (u.subscription_plan === 'monthly' && u.subscription_status === 'active') return 'paying_monthly';
+  if (u.subscription_plan === 'annual' && u.subscription_status === 'active') return 'paying_annual';
+  if (u.subscription_plan === 'admin_granted' && u.subscription_tier === 'platinum') return 'granted';
+  if (u.subscription_status === 'canceled') return 'canceled';
+  if (u.subscription_status === 'past_due') return 'past_due';
+  return 'free';
+}
+
+function getCategoryBadge(category) {
+  switch (category) {
+    case 'paying_monthly':
+      return { label: 'Monthly', bg: 'rgba(100,149,237,0.15)', color: '#6495ed' };
+    case 'paying_annual':
+      return { label: 'Annual', bg: 'rgba(100,149,237,0.15)', color: '#6495ed' };
+    case 'granted':
+      return { label: 'Granted', bg: 'rgba(184,134,11,0.15)', color: '#b8860b' };
+    case 'canceled':
+      return { label: 'Canceled', bg: 'rgba(220,38,38,0.15)', color: '#ef4444' };
+    case 'past_due':
+      return { label: 'Past Due', bg: 'rgba(220,160,38,0.2)', color: '#dca026' };
+    default:
+      return { label: 'Free', bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' };
+  }
+}
+
+function getTierBadge(tier) {
+  if (tier === 'platinum') {
+    return { label: 'Platinum', bg: 'rgba(184,134,11,0.2)', color: '#b8860b' };
+  }
+  return { label: 'Free', bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' };
+}
+
 export default function Admin() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -20,7 +62,7 @@ export default function Admin() {
   const [newEmail, setNewEmail] = useState('');
   const [newTier, setNewTier] = useState('free');
   const [actionLoading, setActionLoading] = useState(null);
-  const [tierFilter, setTierFilter] = useState('all');
+  const [userFilter, setUserFilter] = useState('');
 
   const isAdmin = user?.role === 'admin';
 
@@ -33,7 +75,7 @@ export default function Admin() {
   useEffect(() => {
     if (tab === 'Users') fetchUsers();
     if (tab === 'Mantras') fetchMantras();
-  }, [tab, page, search, tierFilter]);
+  }, [tab, page, search, userFilter]);
 
   async function fetchStats() {
     try {
@@ -46,7 +88,7 @@ export default function Admin() {
 
   async function fetchUsers() {
     try {
-      const params = new URLSearchParams({ page, limit: 25, search, tier: tierFilter === 'all' ? '' : tierFilter });
+      const params = new URLSearchParams({ page, limit: 25, search, filter: userFilter });
       const res = await fetch(`/api/admin/users?${params}`, { credentials: 'include' });
       const data = await res.json();
       setUsers(data.users || []);
@@ -83,24 +125,44 @@ export default function Admin() {
         body: JSON.stringify({ email: newEmail, tier: newTier, plan: newTier === 'platinum' ? 'admin_granted' : 'none' }),
       });
       const data = await res.json();
-      if (data.ok) { setNewEmail(''); setShowAddUser(false); fetchUsers(); }
+      if (data.ok) { setNewEmail(''); setShowAddUser(false); fetchUsers(); fetchStats(); }
       else alert(data.error || 'Failed to add user');
     } catch (e) { alert('Failed to add user'); }
     setActionLoading(null);
   }
 
-  async function setUserTier(userId, tier) {
-    const label = tier === 'platinum' ? 'Platinum' : 'Free';
-    if (!confirm(`Set this user to ${label}?`)) return;
+  async function grantPlatinum(userId) {
+    if (!confirm('Grant this user free Platinum access?')) return;
     setActionLoading(userId);
     try {
       await fetch('/api/admin/set-tier', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, tier }),
+        body: JSON.stringify({ userId, tier: 'platinum' }),
       });
       fetchUsers();
-    } catch (e) { alert('Failed to update user tier'); }
+      fetchStats();
+    } catch (e) { alert('Failed to grant platinum'); }
+    setActionLoading(null);
+  }
+
+  async function revokePlatinum(userId, category) {
+    // Only allow revoking admin-granted platinum, not paying subscribers
+    if (category === 'paying_monthly' || category === 'paying_annual') {
+      alert('This user has an active Square subscription. To cancel their subscription, they must cancel through their account or you can use the Square dashboard.');
+      return;
+    }
+    if (!confirm('Revoke this user\'s Platinum access and set to Free?')) return;
+    setActionLoading(userId);
+    try {
+      await fetch('/api/admin/set-tier', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, tier: 'free' }),
+      });
+      fetchUsers();
+      fetchStats();
+    } catch (e) { alert('Failed to revoke platinum'); }
     setActionLoading(null);
   }
 
@@ -110,6 +172,7 @@ export default function Admin() {
     try {
       await fetch(`/api/admin/delete-user/${userId}`, { method: 'DELETE', credentials: 'include' });
       fetchUsers();
+      fetchStats();
     } catch (e) { alert('Failed to delete user'); }
     setActionLoading(null);
   }
@@ -127,7 +190,6 @@ export default function Admin() {
             <h1 className="text-2xl font-light" style={{ fontFamily: 'Georgia, serif', color: '#f0ebe3' }}>Admin Panel</h1>
             <p className="text-sm text-white/40 mt-1">Minute Mantra</p>
           </div>
-
         </div>
 
         {/* Tabs */}
@@ -155,19 +217,28 @@ export default function Admin() {
               <div className="text-white/30 text-center py-20">Loading stats...</div>
             ) : stats ? (
               <div className="space-y-8">
-                {/* KPI cards */}
+                {/* KPI cards — row 1: user counts */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <StatCard label="Total Users" value={stats.total_users?.toLocaleString() || '—'} icon="👤" />
-                  <StatCard label="Platinum Subscribers" value={stats.platinum_users?.toLocaleString() || '—'} icon="✦" gold />
+                  <StatCard label="Free Users" value={stats.free_users?.toLocaleString() || '—'} icon="🆓" />
+                  <StatCard label="Platinum Total" value={stats.platinum_users?.toLocaleString() || '—'} icon="✦" gold />
                   <StatCard label="Active Streaks" value={stats.active_streaks?.toLocaleString() || '—'} icon="🔥" />
-                  <StatCard label="Sessions Today" value={stats.sessions_today?.toLocaleString() || '—'} icon="🧘" />
                 </div>
 
+                {/* KPI cards — row 2: subscriber breakdown */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  <StatCard label="MRR" value={stats.mrr ? `$${stats.mrr.toFixed(2)}` : '—'} icon="💰" gold />
-                  <StatCard label="ARR (est.)" value={stats.mrr ? `$${(stats.mrr * 12).toFixed(2)}` : '—'} icon="📈" />
-                  <StatCard label="Emails Sent (30d)" value={stats.emails_sent_30d?.toLocaleString() || '—'} icon="✉️" />
-                  <StatCard label="Push Subscribers" value={stats.push_subscribers?.toLocaleString() || '—'} icon="🔔" />
+                  <StatCard label="Paying Monthly" value={stats.monthly_subs?.toLocaleString() || '0'} icon="💳" />
+                  <StatCard label="Paying Annual" value={stats.annual_subs?.toLocaleString() || '0'} icon="📅" />
+                  <StatCard label="Admin Granted" value={stats.granted_subs?.toLocaleString() || '0'} icon="🎁" gold />
+                  <StatCard label="Churn (30d)" value={stats.churned_30d?.toLocaleString() || '0'} icon="📉" />
+                </div>
+
+                {/* KPI cards — row 3: revenue + engagement */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <StatCard label="MRR" value={stats.mrr ? `$${stats.mrr.toFixed(2)}` : '$0.00'} icon="💰" gold />
+                  <StatCard label="ARR (est.)" value={stats.mrr ? `$${(stats.mrr * 12).toFixed(2)}` : '$0.00'} icon="📈" />
+                  <StatCard label="Sessions Today" value={stats.sessions_today?.toLocaleString() || '0'} icon="🧘" />
+                  <StatCard label="Emails Sent (30d)" value={stats.emails_sent_30d?.toLocaleString() || '0'} icon="✉️" />
                 </div>
 
                 {/* Recent signups */}
@@ -176,29 +247,27 @@ export default function Admin() {
                     <h3 className="text-sm font-medium text-white/60">Recent Signups</h3>
                   </div>
                   <div className="divide-y" style={{ borderColor: 'rgba(255,255,255,0.05)' }}>
-                    {(stats.recent_signups || []).map((u, i) => (
-                      <div key={i} className="px-5 py-3 flex items-center justify-between">
-                        <div>
-                          <p className="text-sm text-white/70">{u.email}</p>
-                          <p className="text-xs text-white/30">{new Date(u.created_at).toLocaleDateString()}</p>
+                    {(stats.recent_signups || []).map((u, i) => {
+                      const cat = getUserCategory(u);
+                      const badge = getCategoryBadge(cat);
+                      const tierBadge = getTierBadge(u.subscription_tier);
+                      return (
+                        <div key={i} className="px-5 py-3 flex items-center justify-between">
+                          <div>
+                            <p className="text-sm text-white/70">{u.email}</p>
+                            <p className="text-xs text-white/30">{new Date(u.created_at).toLocaleDateString()}</p>
+                          </div>
+                          <div className="flex gap-1.5 items-center">
+                            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: tierBadge.bg, color: tierBadge.color }}>
+                              {tierBadge.label}
+                            </span>
+                            <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: badge.bg, color: badge.color }}>
+                              {badge.label}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex gap-1.5 items-center">
-                          <span className="text-xs px-2 py-0.5 rounded-full"
-                            style={{ background: u.subscription_tier === 'platinum' ? 'rgba(184,134,11,0.2)' : 'rgba(255,255,255,0.06)', color: u.subscription_tier === 'platinum' ? '#b8860b' : 'rgba(255,255,255,0.4)' }}>
-                            {u.subscription_tier || 'free'}
-                          </span>
-                          <span className="text-xs px-2 py-0.5 rounded-full"
-                            style={{
-                              background: u.subscription_status === 'active' ? 'rgba(74,103,65,0.3)'
-                                : u.subscription_status === 'canceled' ? 'rgba(220,38,38,0.15)' : 'rgba(255,255,255,0.06)',
-                              color: u.subscription_status === 'active' ? '#7fb069'
-                                : u.subscription_status === 'canceled' ? '#ef4444' : 'rgba(255,255,255,0.4)'
-                            }}>
-                            {u.subscription_status || 'none'}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </div>
@@ -211,38 +280,40 @@ export default function Admin() {
         {/* ── USERS ── */}
         {tab === 'Users' && (
           <div>
-            <div className="flex gap-3 mb-5">
+            {/* Search + Filter + Add */}
+            <div className="flex gap-3 mb-5 flex-wrap">
               <input
                 value={search}
                 onChange={e => { setSearch(e.target.value); setPage(1); }}
                 placeholder="Search by email..."
-                className="flex-1 px-4 py-2 rounded-lg text-sm text-white/70 placeholder-white/20 outline-none"
+                className="flex-1 min-w-[200px] px-4 py-2 rounded-lg text-sm text-white/70 placeholder-white/20 outline-none"
                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
               />
               <select
-                value={tierFilter}
-                onChange={e => { setTierFilter(e.target.value); setPage(1); }}
+                value={userFilter}
+                onChange={e => { setUserFilter(e.target.value); setPage(1); }}
                 className="px-3 py-2 rounded-lg text-sm text-white/70 outline-none"
                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
               >
-                <option value="all">All Users</option>
-                <option value="free">Free</option>
-                <option value="platinum">Platinum</option>
+                {USER_FILTERS.map(f => (
+                  <option key={f.value} value={f.value}>{f.label}</option>
+                ))}
               </select>
               <button
                 onClick={() => setShowAddUser(!showAddUser)}
-                className="px-4 py-2 rounded-lg text-sm"
+                className="px-4 py-2 rounded-lg text-sm whitespace-nowrap"
                 style={{ background: 'rgba(184,134,11,0.15)', border: '1px solid rgba(184,134,11,0.3)', color: '#b8860b' }}
               >
                 + Add User
               </button>
             </div>
 
+            {/* Add user form */}
             {showAddUser && (
               <div className="rounded-2xl p-5 mb-5" style={{ background: 'rgba(184,134,11,0.06)', border: '1px solid rgba(184,134,11,0.2)' }}>
                 <h4 className="text-sm text-white/60 mb-3">Add New User</h4>
-                <div className="flex gap-3 items-end">
-                  <div className="flex-1">
+                <div className="flex gap-3 items-end flex-wrap">
+                  <div className="flex-1 min-w-[200px]">
                     <label className="text-xs text-white/30 block mb-1">Email</label>
                     <input
                       value={newEmail}
@@ -260,8 +331,8 @@ export default function Admin() {
                       className="px-3 py-2 rounded-lg text-sm text-white/70 outline-none"
                       style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)' }}
                     >
-<option value="free">Free</option>
-                <option value="platinum">Platinum</option>
+                      <option value="free">Free</option>
+                      <option value="platinum">Platinum (Admin Granted)</option>
                     </select>
                   </div>
                   <button
@@ -276,93 +347,97 @@ export default function Admin() {
               </div>
             )}
 
-            <div className="rounded-2xl overflow-hidden" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              <table className="w-full text-sm">
+            {/* Users table */}
+            <div className="rounded-2xl overflow-x-auto" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+              <table className="w-full text-sm" style={{ minWidth: 700 }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.07)' }}>
-                    {['Email', 'Tier', 'Plan', 'Status', 'Streak', 'Joined', 'Actions'].map(h => (
+                    {['Email', 'Tier', 'Type', 'Status', 'Streak', 'Joined', 'Actions'].map(h => (
                       <th key={h} className="px-4 py-3 text-left text-xs text-white/30 font-normal">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((u, i) => (
-                    <tr key={i} className="border-b" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-                      <td className="px-4 py-3 text-white/70">{u.email}</td>
-                      <td className="px-4 py-3">
-                        <span className="px-2 py-0.5 rounded-full text-xs"
-                          style={{ background: u.subscription_tier === 'platinum' ? 'rgba(184,134,11,0.2)' : 'rgba(255,255,255,0.06)', color: u.subscription_tier === 'platinum' ? '#b8860b' : 'rgba(255,255,255,0.4)' }}>
-                          {u.subscription_tier || 'free'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="px-2 py-0.5 rounded-full text-xs"
-                          style={{
-                            background: u.subscription_plan === 'monthly' || u.subscription_plan === 'annual'
-                              ? 'rgba(100,149,237,0.15)' : u.subscription_plan === 'admin_granted'
-                              ? 'rgba(184,134,11,0.1)' : 'rgba(255,255,255,0.06)',
-                            color: u.subscription_plan === 'monthly' || u.subscription_plan === 'annual'
-                              ? '#6495ed' : u.subscription_plan === 'admin_granted'
-                              ? '#b8860b' : 'rgba(255,255,255,0.4)'
-                          }}>
-                          {u.subscription_plan === 'admin_granted' ? 'granted' : u.subscription_plan || 'none'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="px-2 py-0.5 rounded-full text-xs"
-                          style={{
-                            background: u.subscription_status === 'active' ? 'rgba(74,103,65,0.3)'
-                              : u.subscription_status === 'past_due' ? 'rgba(220,160,38,0.2)'
-                              : u.subscription_status === 'canceled' ? 'rgba(220,38,38,0.15)'
-                              : 'rgba(255,255,255,0.06)',
-                            color: u.subscription_status === 'active' ? '#7fb069'
-                              : u.subscription_status === 'past_due' ? '#dca026'
-                              : u.subscription_status === 'canceled' ? '#ef4444'
-                              : 'rgba(255,255,255,0.4)'
-                          }}>
-                          {u.subscription_status || 'none'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-white/50">{u.current_streak || 0}🔥</td>
-                      <td className="px-4 py-3 text-white/40 text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-1">
-                          {u.subscription_tier !== 'platinum' ? (
-                            <button
-                              onClick={() => setUserTier(u.id, 'platinum')}
-                              disabled={actionLoading === u.id}
-                              className="px-2 py-1 rounded text-xs"
-                              style={{ background: 'rgba(184,134,11,0.2)', color: '#b8860b' }}
-                              title="Upgrade to Platinum"
-                            >
-                              Platinum
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => setUserTier(u.id, 'free')}
-                              disabled={actionLoading === u.id}
-                              className="px-2 py-1 rounded text-xs"
-                              style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}
-                              title="Downgrade to Free"
-                            >
-                              Free
-                            </button>
+                  {users.map((u, i) => {
+                    const category = getUserCategory(u);
+                    const catBadge = getCategoryBadge(category);
+                    const tierBadge = getTierBadge(u.subscription_tier);
+                    const isPaying = category === 'paying_monthly' || category === 'paying_annual';
+                    const isGranted = category === 'granted';
+                    const isAdminUser = u.email === 'paul@creativelab.tv';
+
+                    return (
+                      <tr key={u.id || i} className="border-b" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
+                        <td className="px-4 py-3">
+                          <span className="text-white/70">{u.email}</span>
+                          {isAdminUser && (
+                            <span className="ml-2 text-xs px-1.5 py-0.5 rounded" style={{ background: 'rgba(255,100,100,0.15)', color: '#ff6b6b' }}>admin</span>
                           )}
-                          {u.role !== 'admin' && (
-                            <button
-                              onClick={() => deleteUser(u.id, u.email)}
-                              disabled={actionLoading === u.id}
-                              className="px-2 py-1 rounded text-xs"
-                              style={{ background: 'rgba(220,38,38,0.15)', color: '#ef4444' }}
-                              title="Delete User"
-                            >
-                              Delete
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="px-2 py-0.5 rounded-full text-xs" style={{ background: tierBadge.bg, color: tierBadge.color }}>
+                            {tierBadge.label}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="px-2 py-0.5 rounded-full text-xs" style={{ background: catBadge.bg, color: catBadge.color }}>
+                            {catBadge.label}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <StatusBadge status={u.subscription_status} />
+                        </td>
+                        <td className="px-4 py-3 text-white/50">{u.current_streak || 0}🔥</td>
+                        <td className="px-4 py-3 text-white/40 text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
+                        <td className="px-4 py-3">
+                          <div className="flex gap-1.5 flex-wrap">
+                            {/* Grant platinum — only for free/canceled users */}
+                            {u.subscription_tier !== 'platinum' && (
+                              <button
+                                onClick={() => grantPlatinum(u.id)}
+                                disabled={actionLoading === u.id}
+                                className="px-2.5 py-1 rounded text-xs whitespace-nowrap"
+                                style={{ background: 'rgba(184,134,11,0.2)', color: '#b8860b' }}
+                                title="Grant free Platinum access"
+                              >
+                                Grant Platinum
+                              </button>
+                            )}
+                            {/* Revoke — only for admin-granted, NOT paying subscribers */}
+                            {isGranted && (
+                              <button
+                                onClick={() => revokePlatinum(u.id, category)}
+                                disabled={actionLoading === u.id}
+                                className="px-2.5 py-1 rounded text-xs whitespace-nowrap"
+                                style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.5)' }}
+                                title="Revoke admin-granted Platinum"
+                              >
+                                Revoke
+                              </button>
+                            )}
+                            {/* Paying subscriber — show read-only label, no revoke */}
+                            {isPaying && (
+                              <span className="px-2.5 py-1 rounded text-xs whitespace-nowrap" style={{ background: 'rgba(100,149,237,0.1)', color: '#6495ed' }}>
+                                Square Sub
+                              </span>
+                            )}
+                            {/* Delete — never for admin */}
+                            {!isAdminUser && (
+                              <button
+                                onClick={() => deleteUser(u.id, u.email)}
+                                disabled={actionLoading === u.id}
+                                className="px-2.5 py-1 rounded text-xs whitespace-nowrap"
+                                style={{ background: 'rgba(220,38,38,0.12)', color: '#ef4444' }}
+                                title="Delete User"
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                   {users.length === 0 && (
                     <tr><td colSpan={7} className="px-4 py-10 text-center text-white/30">No users found</td></tr>
                   )}
@@ -453,9 +528,9 @@ export default function Admin() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <StatCard label="Monthly Recurring Revenue" value={stats.mrr ? `$${stats.mrr.toFixed(2)}` : '$0.00'} icon="💰" gold />
                   <StatCard label="Annual Run Rate" value={stats.mrr ? `$${(stats.mrr * 12).toFixed(2)}` : '$0.00'} icon="📈" />
-                  <StatCard label="Platinum Subscribers" value={stats.platinum_users?.toLocaleString() || '0'} icon="✦" />
-                  <StatCard label="Monthly Subs" value={stats.monthly_subs?.toLocaleString() || '0'} icon="📅" />
-                  <StatCard label="Annual Subs" value={stats.annual_subs?.toLocaleString() || '0'} icon="🗓" />
+                  <StatCard label="Paying Subscribers" value={((stats.monthly_subs || 0) + (stats.annual_subs || 0)).toLocaleString()} icon="💳" />
+                  <StatCard label="Monthly Plans" value={stats.monthly_subs?.toLocaleString() || '0'} icon="🗓" />
+                  <StatCard label="Annual Plans" value={stats.annual_subs?.toLocaleString() || '0'} icon="📅" />
                   <StatCard label="Churn (30d)" value={stats.churned_30d ? `${stats.churned_30d}` : '0'} icon="📉" />
                 </div>
 
@@ -464,6 +539,12 @@ export default function Admin() {
                   <div className="space-y-3">
                     <RevenueRow label="Monthly plans ($1.08/mo)" count={stats.monthly_subs || 0} rate={1.08} />
                     <RevenueRow label="Annual plans ($9.88/yr)" count={stats.annual_subs || 0} rate={9.88 / 12} />
+                  </div>
+                  <div className="mt-4 pt-4 border-t" style={{ borderColor: 'rgba(255,255,255,0.07)' }}>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-white/40">Admin Granted (no revenue)</p>
+                      <p className="text-sm text-white/30">{stats.granted_subs || 0} users</p>
+                    </div>
                   </div>
                 </div>
               </>
@@ -516,6 +597,21 @@ export default function Admin() {
         )}
       </div>
     </div>
+  );
+}
+
+function StatusBadge({ status }) {
+  const styles = {
+    active: { bg: 'rgba(74,103,65,0.3)', color: '#7fb069', label: 'Active' },
+    canceled: { bg: 'rgba(220,38,38,0.15)', color: '#ef4444', label: 'Canceled' },
+    past_due: { bg: 'rgba(220,160,38,0.2)', color: '#dca026', label: 'Past Due' },
+    none: { bg: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)', label: 'None' },
+  };
+  const s = styles[status] || styles.none;
+  return (
+    <span className="px-2 py-0.5 rounded-full text-xs" style={{ background: s.bg, color: s.color }}>
+      {s.label}
+    </span>
   );
 }
 

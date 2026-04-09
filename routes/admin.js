@@ -4,7 +4,7 @@ const { query, queryOne } = require('../config/db');
 const { requireAuth } = require('../middleware/auth');
 
 // Admin guard middleware
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'paul@creativelab.tv';
 function requireAdmin(req, res, next) {
   if (!req.user || (req.user.role !== 'admin' && req.user.email !== ADMIN_EMAIL)) {
     return res.status(403).json({ error: 'Admin access required' });
@@ -26,19 +26,23 @@ router.get('/stats', async (req, res) => {
       pushSubscribers,
       monthlySubs,
       annualSubs,
+      grantedSubs,
+      freeUsers,
       emailsSent30d,
       unsubscribes30d,
       recentSignups,
       churn30d,
     ] = await Promise.all([
       queryOne('SELECT COUNT(*) as count FROM users'),
-      queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_tier = 'platinum' AND subscription_status = 'active'"),
+      queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_tier = 'platinum'"),
       queryOne('SELECT COUNT(*) as count FROM streaks WHERE current_streak > 0'),
       queryOne('SELECT COUNT(*) as count FROM sessions WHERE DATE(completed_at) = CURDATE()'),
       queryOne('SELECT COUNT(*) as count FROM users WHERE email_notifications_enabled = 1'),
       queryOne('SELECT COUNT(*) as count FROM users WHERE push_subscription IS NOT NULL AND push_notifications_enabled = TRUE'),
       queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_plan = 'monthly' AND subscription_status = 'active'"),
       queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_plan = 'annual' AND subscription_status = 'active'"),
+      queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_plan = 'admin_granted' AND subscription_tier = 'platinum'"),
+      queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_tier = 'free'"),
       queryOne("SELECT COUNT(*) as count FROM email_logs WHERE sent_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
       queryOne("SELECT COUNT(*) as count FROM users WHERE unsubscribed_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
       query("SELECT email, subscription_tier, subscription_plan, subscription_status, created_at FROM users ORDER BY created_at DESC LIMIT 10"),
@@ -50,12 +54,14 @@ router.get('/stats', async (req, res) => {
     res.json({
       total_users: totalUsers.count,
       platinum_users: platinumUsers.count,
+      free_users: freeUsers.count,
       active_streaks: activeStreaks.count,
       sessions_today: sessionsToday.count,
       email_subscribers: emailSubscribers.count,
       push_subscribers: pushSubscribers.count,
       monthly_subs: monthlySubs.count,
       annual_subs: annualSubs.count,
+      granted_subs: grantedSubs.count,
       emails_sent_30d: emailsSent30d.count,
       unsubscribes_30d: unsubscribes30d.count,
       churned_30d: churn30d.count,
@@ -71,7 +77,7 @@ router.get('/stats', async (req, res) => {
 // GET /api/admin/users
 router.get('/users', async (req, res) => {
   try {
-    const { page = 1, limit = 25, search = '', tier = '' } = req.query;
+    const { page = 1, limit = 25, search = '', filter = '' } = req.query;
     const offset = (parseInt(page) - 1) * parseInt(limit);
 
     let whereClause = '1=1';
@@ -81,9 +87,17 @@ router.get('/users', async (req, res) => {
       whereClause += ' AND u.email LIKE ?';
       params.push(`%${search}%`);
     }
-    if (tier) {
-      whereClause += ' AND u.subscription_tier = ?';
-      params.push(tier);
+    // Filter supports: free, paying, granted, canceled
+    if (filter === 'free') {
+      whereClause += " AND u.subscription_tier = 'free'";
+    } else if (filter === 'paying') {
+      whereClause += " AND u.subscription_plan IN ('monthly','annual') AND u.subscription_status = 'active'";
+    } else if (filter === 'granted') {
+      whereClause += " AND u.subscription_plan = 'admin_granted' AND u.subscription_tier = 'platinum'";
+    } else if (filter === 'canceled') {
+      whereClause += " AND u.subscription_status = 'canceled'";
+    } else if (filter === 'platinum') {
+      whereClause += " AND u.subscription_tier = 'platinum'";
     }
 
     params.push(parseInt(limit), offset);
