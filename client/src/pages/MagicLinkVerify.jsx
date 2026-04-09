@@ -90,9 +90,9 @@ export default function MagicLinkVerify() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 200 }}
-              style={{ fontSize: 56, marginBottom: 20, color: '#c8860a', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+              style={{ marginBottom: 20, display: 'flex', justifyContent: 'center' }}
             >
-              ॐ
+              <img src="/logo-transparent.png" alt="Minute Mantra" style={{ width: 64, height: 64 }} />
             </motion.div>
             <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 26, fontWeight: 400, color: '#3d2b1f', marginBottom: 8 }}>
               Welcome.

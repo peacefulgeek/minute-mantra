@@ -67,8 +67,8 @@ export default function Enter() {
         {/* Logo */}
         <div className="text-center mb-10">
           <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.15, duration: 0.6 }}
-            style={{ fontSize: 64, lineHeight: 1, marginBottom: 12, color: '#c8860a', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>
-            ॐ
+            style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}>
+            <img src="/logo-transparent.png" alt="Minute Mantra" style={{ width: 72, height: 72 }} />
           </motion.div>
           <h1 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 22, fontWeight: 400, letterSpacing: '0.25em', color: '#3d2b1f', margin: 0 }}>MINUTE MANTRA</h1>
           <p style={{ color: '#a07850', fontSize: 13, marginTop: 6, letterSpacing: '0.08em' }}>One mantra. One minute. Every morning.</p>

@@ -32,7 +32,7 @@ function LoadingScreen() {
   return (
     <div className="fixed inset-0 flex items-center justify-center" style={{ background: 'linear-gradient(160deg, #fdf8f0 0%, #fef3e2 50%, #fdf0e0 100%)' }}>
       <div className="text-center">
-        <div className="text-5xl mb-4" style={{ color: '#c8860a', fontFamily: "'Cormorant Garamond', Georgia, serif" }}>ॐ</div>
+        <img src="/logo-transparent.png" alt="" style={{ width: 64, height: 64, margin: '0 auto 16px' }} />
         <p className="text-sm tracking-widest" style={{ color: '#a07850', fontFamily: 'system-ui, sans-serif' }}>
           MINUTE MANTRA
         </p>

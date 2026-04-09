@@ -17,24 +17,24 @@ export default function About() {
       </div>
 
       <div className="max-w-md mx-auto">
-        {/* Paul photo */}
-        <div className="flex justify-center mb-6">
+        {/* Logo */}
+        <div className="flex justify-center mb-4">
           <img
-            src={`${CDN}/images/paul-wagner.webp`}
-            alt="Paul Wagner"
-            className="w-28 h-28 rounded-full object-cover"
-            style={{ border: '2px solid var(--border-color)' }}
+            src={`${CDN}/icons/logo-about.png`}
+            alt="Minute Mantra"
+            className="w-24 h-24"
+            style={{ objectFit: 'contain' }}
           />
         </div>
 
-        <h2 className="font-serif text-xl text-center mb-2" style={{ color: 'var(--text-accent)' }}>
-          Paul Wagner
+        <h2 className="font-serif text-2xl text-center mb-1" style={{ color: 'var(--text-accent)' }}>
+          Minute Mantra
         </h2>
-        <p className="font-sans text-sm text-center mb-6" style={{ color: 'var(--text-secondary)' }}>
-          Spiritual teacher, author, and mantra practitioner
+        <p className="font-sans text-sm text-center mb-8" style={{ color: 'var(--text-secondary)' }}>
+          One mantra. One minute. Every morning.
         </p>
 
-        <div className="font-sans text-sm leading-relaxed space-y-4" style={{ color: 'var(--text-secondary)' }}>
+        <div className="font-sans text-sm leading-relaxed space-y-4 mb-8" style={{ color: 'var(--text-secondary)' }}>
           <p>
             Minute Mantra was created to make the ancient practice of mantra accessible to anyone — regardless of tradition, background, or how much time they have.
           </p>
@@ -42,11 +42,36 @@ export default function About() {
             Each mantra in this app has been carefully selected from the Vedic, Buddhist, Sikh, and Universal traditions. Every entry includes the original script, phonetic guide, English translation, and context to help you understand what you're chanting.
           </p>
           <p>
-            Paul Wagner has studied with teachers across India, Nepal, and Southeast Asia. He is the author of several books on consciousness, spiritual practice, and self-realization.
+            The practice is simple: one sacred mantra arrives each morning. You chant it for 60 seconds. That single minute of focused vibration can shift your entire nervous system — calming the vagus nerve, steadying the heart, and anchoring your awareness before the day begins.
           </p>
         </div>
 
-        <div className="mt-8 space-y-3">
+        {/* Paul section */}
+        <div style={{ borderTop: '1px solid var(--border-color)' }} className="pt-6 mb-6">
+          <div className="flex justify-center mb-4">
+            <img
+              src={`${CDN}/about/paul-wagner.webp`}
+              alt="Paul Wagner"
+              className="w-32 h-32 rounded-full object-cover"
+              style={{ border: '3px solid var(--border-color)' }}
+            />
+          </div>
+
+          <h3 className="font-serif text-xl text-center mb-1" style={{ color: 'var(--text-accent)' }}>
+            Paul Wagner
+          </h3>
+          <p className="font-sans text-sm text-center mb-4" style={{ color: 'var(--text-secondary)' }}>
+            Spiritual teacher, author, and mantra practitioner
+          </p>
+
+          <div className="font-sans text-sm leading-relaxed space-y-4" style={{ color: 'var(--text-secondary)' }}>
+            <p>
+              Paul Wagner has studied with teachers across India, Nepal, and Southeast Asia. He is the author of several books on consciousness, spiritual practice, and self-realization. His work bridges ancient wisdom with modern life — making timeless practices feel grounded, personal, and real.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
           <a
             href="https://paulwagner.com"
             target="_blank"

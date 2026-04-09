@@ -54,7 +54,7 @@ export default function AppHeader() {
       {/* Left: Logo + Date */}
       <div className="flex items-center gap-3">
         <Link to={user ? '/home' : '/'} className="flex items-center gap-2 no-underline">
-          <span className="text-xl" style={{ color: '#b8860b' }}>ॐ</span>
+          <img src="/logo-transparent.png" alt="Minute Mantra" style={{ width: 28, height: 28 }} />
           <span className="tracking-widest font-light"
             style={{ fontFamily: 'Georgia, serif', letterSpacing: '0.15em', color: '#7a6050', fontSize: '14px' }}>
             MINUTE MANTRA

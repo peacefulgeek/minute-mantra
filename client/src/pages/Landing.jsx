@@ -254,7 +254,7 @@ function PhoneMockup() {
 
       {/* App header */}
       <div style={{ padding: '4px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(201,148,58,0.12)' }}>
-        <span style={{ fontSize: 11, letterSpacing: '0.12em', color: '#C9943A', fontFamily: 'DM Sans, sans-serif', fontWeight: 600 }}>ॐ MINUTE MANTRA</span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><img src="/logo-transparent.png" alt="" style={{ width: 18, height: 18 }} /><span style={{ fontSize: 11, letterSpacing: '0.12em', color: '#C9943A', fontFamily: 'DM Sans, sans-serif', fontWeight: 600 }}>MINUTE MANTRA</span></span>
         <span style={{ fontSize: 13 }}>🔥 <span style={{ fontSize: 11, color: '#C9943A', fontWeight: 600 }}>47</span></span>
       </div>
 
@@ -478,7 +478,7 @@ export default function Landing() {
         {/* Logo */}
         <a href="#" onClick={e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
           style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
-          <span style={{ fontSize: 22, lineHeight: 1 }}>ॐ</span>
+          <img src="/logo-transparent.png" alt="" style={{ width: 24, height: 24 }} />
           <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 13, fontWeight: 600, letterSpacing: '0.14em', color: warmBrown, textTransform: 'uppercase' }}>
             Minute Mantra
           </span>
@@ -597,7 +597,7 @@ export default function Landing() {
           fontSize: 'clamp(300px, 40vw, 600px)',
           color: 'rgba(201,148,58,0.05)', fontFamily: 'serif',
           lineHeight: 1, pointerEvents: 'none', userSelect: 'none',
-        }}>ॐ</div>
+        }}><img src="/logo-transparent.png" alt="" style={{ width: 120, height: 120, opacity: 0.06 }} /></div>
 
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '80px 32px', width: '100%', display: 'flex', alignItems: 'center', gap: 60, position: 'relative', zIndex: 1 }}>
           {/* Left: copy */}
@@ -688,7 +688,7 @@ export default function Landing() {
 
       {/* ── QUOTE ── */}
       <section style={{ background: ivory, padding: '80px 32px', textAlign: 'center', borderTop: '1px solid rgba(201,148,58,0.12)', borderBottom: '1px solid rgba(201,148,58,0.12)' }}>
-        <div style={{ fontSize: 28, color: gold, marginBottom: 20 }}>ॐ</div>
+        <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'center' }}><img src="/logo-transparent.png" alt="" style={{ width: 40, height: 40 }} /></div>
         <blockquote style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(22px, 3.5vw, 36px)', fontStyle: 'italic', color: warmBrown, maxWidth: 700, margin: '0 auto 20px', lineHeight: 1.5, fontWeight: 300 }}>
           "You are beautiful and unlimited<br />
           <em style={{ color: gold }}>in myriad ways.</em><br />
@@ -1019,9 +1019,7 @@ export default function Landing() {
         <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
           <motion.div ref={creatorRef} initial={{ opacity: 0, y: 30 }} animate={creatorVisible ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.7 }}>
             <div style={{ fontSize: 10, letterSpacing: '0.22em', color: gold, fontWeight: 600, marginBottom: 16, fontFamily: 'DM Sans, sans-serif', textTransform: 'uppercase' }}>Created By</div>
-            <div style={{ width: 80, height: 80, borderRadius: '50%', background: `linear-gradient(135deg, #f5e8cc, #e8d0a0)`, border: `2px solid rgba(201,148,58,0.4)`, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', fontSize: 32 }}>
-              ॐ
-            </div>
+            <div style={{ margin: '0 auto 24px' }}><img src="/logo-transparent.png" alt="" style={{ width: 80, height: 80 }} /></div>
             <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 400, color: warmBrown, marginBottom: 20 }}>Paul Wagner</h2>
             <p style={{ fontSize: 16, color: midBrown, lineHeight: 1.85, marginBottom: 24 }}>
               Spiritual teacher, devotee of Amma, and creator of Minute Mantra. Paul has studied and practiced across Vedic, Buddhist, and Sikh traditions for decades. He created this app as a gift — a way to bring the transformative power of sacred sound into the hands of anyone willing to give it one minute.
@@ -1049,7 +1047,7 @@ export default function Landing() {
         borderTop: '1px solid rgba(201,148,58,0.2)',
       }}>
         <div style={{ maxWidth: 600, margin: '0 auto' }}>
-          <div style={{ fontSize: 36, marginBottom: 20 }}>ॐ</div>
+          <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'center' }}><img src="/logo-transparent.png" alt="" style={{ width: 48, height: 48 }} /></div>
           <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 400, color: warmBrown, marginBottom: 20, lineHeight: 1.2 }}>
             Your morning practice<br /><em style={{ color: gold }}>begins tomorrow.</em>
           </h2>
@@ -1076,7 +1074,7 @@ export default function Landing() {
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 32 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-              <span style={{ fontSize: 20, color: gold }}>ॐ</span>
+              <img src="/logo-transparent.png" alt="" style={{ width: 22, height: 22 }} />
               <span style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 12, fontWeight: 600, letterSpacing: '0.14em', color: 'rgba(253,248,240,0.9)', textTransform: 'uppercase' }}>Minute Mantra</span>
             </div>
             <p style={{ fontSize: 12, lineHeight: 1.7, maxWidth: 260 }}>One mantra. One minute. Every morning.</p>
