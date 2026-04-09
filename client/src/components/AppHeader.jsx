@@ -3,6 +3,16 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 
+const SHORT_DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+function getShortDate() {
+  const now = new Date();
+  const day = SHORT_DAYS[now.getDay()];
+  const month = now.toLocaleDateString('en-US', { month: 'long' });
+  const date = now.getDate();
+  return `${day}, ${month} ${date}`;
+}
+
 export default function AppHeader() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -41,14 +51,31 @@ export default function AppHeader() {
         borderBottom: '1px solid rgba(184,134,11,0.12)',
       }}
     >
-      {/* Logo */}
-      <Link to={user ? '/home' : '/'} className="flex items-center gap-2 no-underline">
-        <span className="text-xl" style={{ color: '#b8860b' }}>ॐ</span>
-        <span className="tracking-widest text-xs font-light"
-          style={{ fontFamily: 'Georgia, serif', letterSpacing: '0.15em', color: '#7a6050' }}>
-          MINUTE MANTRA
-        </span>
-      </Link>
+      {/* Left: Logo + Date */}
+      <div className="flex items-center gap-3">
+        <Link to={user ? '/home' : '/'} className="flex items-center gap-2 no-underline">
+          <span className="text-xl" style={{ color: '#b8860b' }}>ॐ</span>
+          <span className="tracking-widest text-xs font-light"
+            style={{ fontFamily: 'Georgia, serif', letterSpacing: '0.15em', color: '#7a6050' }}>
+            MINUTE MANTRA
+          </span>
+        </Link>
+        {user && (
+          <>
+            <span style={{ color: 'rgba(184,134,11,0.3)', fontSize: '14px' }}>|</span>
+            <span
+              style={{
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: '13px',
+                color: '#a07850',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {getShortDate()}
+            </span>
+          </>
+        )}
+      </div>
 
       {/* Right side */}
       <div className="flex items-center gap-3" ref={menuRef}>
@@ -69,7 +96,7 @@ export default function AppHeader() {
             ENTER
           </motion.button>
         ) : (
-          /* Logged in — show hamburger menu */
+          /* Logged in — show hamburger menu with gold outline */
           <div className="relative">
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -78,7 +105,7 @@ export default function AppHeader() {
               className="flex flex-col justify-center items-center w-9 h-9 rounded-full gap-1.5"
               style={{
                 background: menuOpen ? 'rgba(184,134,11,0.15)' : 'rgba(160,120,80,0.08)',
-                border: `1px solid ${menuOpen ? 'rgba(184,134,11,0.4)' : 'rgba(160,120,80,0.2)'}`,
+                border: '1.5px solid #b8860b',
                 transition: 'all 0.2s',
               }}
               aria-label="Menu"
@@ -87,19 +114,19 @@ export default function AppHeader() {
                 animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
                 transition={{ duration: 0.2 }}
                 className="block w-4 h-px rounded-full"
-                style={{ background: menuOpen ? '#b8860b' : 'rgba(120,90,60,0.6)' }}
+                style={{ background: '#b8860b' }}
               />
               <motion.span
                 animate={menuOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
                 transition={{ duration: 0.15 }}
                 className="block w-4 h-px rounded-full"
-                style={{ background: menuOpen ? '#b8860b' : 'rgba(120,90,60,0.6)' }}
+                style={{ background: '#b8860b' }}
               />
               <motion.span
                 animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
                 transition={{ duration: 0.2 }}
                 className="block w-4 h-px rounded-full"
-                style={{ background: menuOpen ? '#b8860b' : 'rgba(120,90,60,0.6)' }}
+                style={{ background: '#b8860b' }}
               />
             </motion.button>
 

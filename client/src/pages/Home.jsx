@@ -138,27 +138,13 @@ export default function Home() {
 
   return (
     <div className="min-h-screen pt-safe" style={{ background: 'var(--bg-base)' }}>
-      {/* Date — centered between nav logo and hamburger */}
-      <div className="text-center pt-4 pb-1">
-        <p
-          style={{
-            color: '#7a5c3e',
-            fontFamily: "'DM Sans', system-ui, sans-serif",
-            fontSize: '15px',
-            margin: 0,
-          }}
-        >
-          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-        </p>
-      </div>
-
-      {/* Chanting Day + You Are — centered, compact */}
-      <div className="text-center" style={{ padding: '4px 0 6px' }}>
+      {/* Chanting Day X • You Are Y — centered, compact */}
+      <div className="text-center" style={{ padding: '10px 0 4px' }}>
         <p
           style={{
             color: '#5a3e1b',
             fontFamily: "'Cormorant Garamond', Georgia, serif",
-            fontSize: '17px',
+            fontSize: '20px',
             fontWeight: 600,
             margin: 0,
             lineHeight: 1.4,
@@ -167,11 +153,11 @@ export default function Home() {
           {currentStreak > 0 ? (
             <>
               Chanting Day {currentStreak}
-              <span style={{ color: '#b8860b', margin: '0 6px' }}>·</span>
-              <span style={{ color: '#6B2FA0' }}>You Are {inspirationWord}</span>
+              <span style={{ color: '#b8860b', margin: '0 8px' }}>&bull;</span>
+              <span style={{ color: '#FF13F0' }}>You Are {inspirationWord}</span>
             </>
           ) : (
-            <span style={{ color: '#6B2FA0' }}>You Are {inspirationWord}</span>
+            <span style={{ color: '#FF13F0' }}>You Are {inspirationWord}</span>
           )}
         </p>
       </div>
