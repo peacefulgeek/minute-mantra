@@ -2,9 +2,46 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MantraCard from '../components/MantraCard';
 import Timer from '../components/Timer';
-import StreakFlame from '../components/StreakFlame';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
+
+// Inspirational words that cycle incrementally by day_of_year
+const INSPIRATIONAL_WORDS = [
+  'Beautiful', 'Unlimited', 'Loved', 'Wonderful', 'Divine', 'Radiant',
+  'Worthy', 'Powerful', 'Brave', 'Graceful', 'Abundant', 'Magnetic',
+  'Sacred', 'Luminous', 'Fearless', 'Whole', 'Vibrant', 'Resilient',
+  'Blessed', 'Boundless', 'Majestic', 'Sovereign', 'Infinite', 'Joyful',
+  'Brilliant', 'Gentle', 'Fierce', 'Harmonious', 'Timeless', 'Glorious',
+  'Cherished', 'Awakened', 'Unstoppable', 'Magnificent', 'Serene',
+  'Courageous', 'Inspired', 'Liberated', 'Grateful', 'Compassionate',
+  'Triumphant', 'Precious', 'Noble', 'Creative', 'Empowered', 'Authentic',
+  'Purposeful', 'Peaceful', 'Dazzling', 'Unshakable', 'Tender', 'Visionary',
+  'Grounded', 'Expansive', 'Enchanting', 'Soulful', 'Devoted', 'Flourishing',
+  'Stellar', 'Miraculous', 'Resplendent', 'Effulgent', 'Profound',
+  'Deeply Rooted', 'Wide Open', 'Ever-Growing', 'Light-Filled', 'Spirit-Led',
+  'Wildly Free', 'Fully Alive', 'Divinely Guided', 'Heart-Centered',
+  'Soul-Rich', 'Born Ready', 'Forever Becoming', 'Pure Light', 'Deeply Enough',
+];
+
+function getDayOfYear() {
+  const now = new Date();
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz, month: 'numeric', day: 'numeric', year: 'numeric',
+  });
+  const parts = formatter.formatToParts(now);
+  const month = parseInt(parts.find(p => p.type === 'month').value);
+  const day = parseInt(parts.find(p => p.type === 'day').value);
+  const year = parseInt(parts.find(p => p.type === 'year').value);
+  const start = Date.UTC(year, 0, 0);
+  const date = Date.UTC(year, month - 1, day);
+  return Math.floor((date - start) / 86400000);
+}
+
+function getInspirationWord() {
+  const dayOfYear = getDayOfYear();
+  return INSPIRATIONAL_WORDS[(dayOfYear - 1) % INSPIRATIONAL_WORDS.length];
+}
 
 export default function Home() {
   const { user } = useAuth();
@@ -37,7 +74,6 @@ export default function Home() {
         applyTradition(data.mantra?.tradition);
         setError(null);
       } else if (res.status === 401 && retryCount.current < 3) {
-        // Auth cookie might not be set yet after magic link verify — retry
         retryCount.current += 1;
         setTimeout(fetchToday, 1000);
         return;
@@ -97,25 +133,47 @@ export default function Home() {
     setTimeout(() => setView('card'), 3000);
   }
 
+  const currentStreak = streak?.current_streak || 0;
+  const inspirationWord = getInspirationWord();
+
   return (
     <div className="min-h-screen pt-safe" style={{ background: 'var(--bg-base)' }}>
-      {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-6 pb-2">
-        <div>
-          <h1
-            className="text-2xl"
-            style={{ color: '#3d2b1f', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
-          >
-            Minute Mantra
-          </h1>
-          <p
-            className="text-sm mt-0.5"
-            style={{ color: '#7a5c3e', fontFamily: "'DM Sans', system-ui, sans-serif" }}
-          >
-            {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-          </p>
-        </div>
-        {streak && <StreakFlame streak={streak.current_streak} />}
+      {/* Date — centered between nav logo and hamburger */}
+      <div className="text-center pt-4 pb-1">
+        <p
+          style={{
+            color: '#7a5c3e',
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontSize: '15px',
+            margin: 0,
+          }}
+        >
+          {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+        </p>
+      </div>
+
+      {/* Chanting Day + You Are — centered, compact */}
+      <div className="text-center" style={{ padding: '4px 0 6px' }}>
+        <p
+          style={{
+            color: '#5a3e1b',
+            fontFamily: "'Cormorant Garamond', Georgia, serif",
+            fontSize: '17px',
+            fontWeight: 600,
+            margin: 0,
+            lineHeight: 1.4,
+          }}
+        >
+          {currentStreak > 0 ? (
+            <>
+              Chanting Day {currentStreak}
+              <span style={{ color: '#b8860b', margin: '0 6px' }}>·</span>
+              <span style={{ color: '#6B2FA0' }}>You Are {inspirationWord}</span>
+            </>
+          ) : (
+            <span style={{ color: '#6B2FA0' }}>You Are {inspirationWord}</span>
+          )}
+        </p>
       </div>
 
       {/* Error state */}
@@ -168,7 +226,7 @@ export default function Home() {
           </p>
           {streak && (
             <p className="text-base mt-1" style={{ color: '#7a5c3e', fontFamily: "'DM Sans', sans-serif" }}>
-              {streak.current_streak} day streak
+              Chanting Day {streak.current_streak}
             </p>
           )}
         </div>
