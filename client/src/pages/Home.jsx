@@ -139,7 +139,7 @@ export default function Home() {
   return (
     <div className="min-h-screen pt-safe" style={{ background: 'var(--bg-base)' }}>
       {/* Chanting Day X • You Are Y — centered, compact */}
-      <div className="text-center" style={{ padding: '10px 0 4px' }}>
+      <div className="text-center" style={{ padding: '14px 0 4px' }}>
         <p
           style={{
             color: '#5a3e1b',
