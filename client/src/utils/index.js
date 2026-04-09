@@ -18,10 +18,10 @@ export function getDayOfYear(timezone = Intl.DateTimeFormat().resolvedOptions().
   const month = parseInt(parts.find(p => p.type === 'month').value);
   const day = parseInt(parts.find(p => p.type === 'day').value);
   const year = parseInt(parts.find(p => p.type === 'year').value);
-  const start = new Date(year, 0, 0);
-  const date = new Date(year, month - 1, day);
-  const diff = date - start;
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
+  // Use Date.UTC to avoid DST bugs — pure arithmetic, no timezone shifts
+  const start = Date.UTC(year, 0, 0);
+  const date = Date.UTC(year, month - 1, day);
+  return Math.floor((date - start) / 86400000);
 }
 
 /**
