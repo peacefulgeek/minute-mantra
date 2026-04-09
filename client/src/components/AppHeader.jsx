@@ -56,7 +56,7 @@ export default function AppHeader() {
         <Link to={user ? '/home' : '/'} className="flex items-center gap-2 no-underline">
           <span className="text-xl" style={{ color: '#b8860b' }}>ॐ</span>
           <span className="tracking-widest font-light"
-            style={{ fontFamily: 'Georgia, serif', letterSpacing: '0.15em', color: '#7a6050', fontSize: '13px' }}>
+            style={{ fontFamily: 'Georgia, serif', letterSpacing: '0.15em', color: '#7a6050', fontSize: '14px' }}>
             MINUTE MANTRA
           </span>
         </Link>
@@ -66,7 +66,7 @@ export default function AppHeader() {
             <span
               style={{
                 fontFamily: "'DM Sans', system-ui, sans-serif",
-                fontSize: '14px',
+                fontSize: '15px',
                 color: '#a07850',
                 whiteSpace: 'nowrap',
               }}
