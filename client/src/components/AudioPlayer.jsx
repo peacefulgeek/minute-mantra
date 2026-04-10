@@ -56,9 +56,9 @@ export default function AudioPlayer({ src, phonetic, autoPlay = false }) {
         onClick={toggle}
         className="flex items-center gap-2 px-5 py-2.5 rounded-full font-sans text-sm"
         style={{
-          background: playing ? '#b8860b' : 'rgba(184,134,11,0.08)',
+          background: playing ? '#d4922a' : 'rgba(212,146,42,0.08)',
           color: playing ? '#ffffff' : '#5a3e1b',
-          border: '1px solid rgba(184,134,11,0.2)',
+          border: '1px solid rgba(212,146,42,0.2)',
           transition: 'all 0.2s',
         }}
       >

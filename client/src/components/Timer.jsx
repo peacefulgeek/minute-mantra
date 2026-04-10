@@ -224,11 +224,11 @@ export default function Timer({ mantra, onComplete }) {
           onClick={startChanting}
           className="w-full max-w-xs py-4 rounded-2xl text-lg tracking-wide"
           style={{
-            background: 'linear-gradient(135deg, #b8860b, #d4a017)',
+            background: 'linear-gradient(135deg, #d4922a, #e8a832)',
             color: '#ffffff',
             fontFamily: "'DM Sans', system-ui, sans-serif",
             fontWeight: 600,
-            boxShadow: '0 4px 20px rgba(184,134,11,0.3)',
+            boxShadow: '0 4px 20px rgba(212,146,42,0.3)',
           }}
         >
           Begin Chanting

@@ -74,7 +74,7 @@ export default function Onboarding() {
           height: '96px',
           borderRadius: '20px',
           marginBottom: '28px',
-          boxShadow: '0 4px 24px rgba(184,134,11,0.15)',
+          boxShadow: '0 4px 24px rgba(212,146,42,0.15)',
         }}
       />
 
@@ -88,7 +88,7 @@ export default function Onboarding() {
             style={{
               width: i === step ? '24px' : '6px',
               height: '6px',
-              background: i <= step ? '#b8860b' : 'rgba(184,134,11,0.25)',
+              background: i <= step ? '#d4922a' : 'rgba(212,146,42,0.25)',
               transition: 'width 0.3s, background 0.3s',
             }}
           />
@@ -132,7 +132,7 @@ export default function Onboarding() {
         onClick={next}
         className="w-full max-w-xs py-4 rounded-full"
         style={{
-          background: 'linear-gradient(135deg, #b8860b, #d4a017)',
+          background: 'linear-gradient(135deg, #d4922a, #e8a832)',
           color: '#ffffff',
           fontFamily: "'DM Sans', system-ui, sans-serif",
           fontSize: '15px',
@@ -140,7 +140,7 @@ export default function Onboarding() {
           letterSpacing: '0.1em',
           border: 'none',
           cursor: 'pointer',
-          boxShadow: '0 4px 20px rgba(184,134,11,0.3)',
+          boxShadow: '0 4px 20px rgba(212,146,42,0.3)',
         }}
       >
         {step < STEPS.length - 1 ? 'CONTINUE' : 'BEGIN MY PRACTICE'}

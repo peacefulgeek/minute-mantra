@@ -14,7 +14,7 @@ function getHeatColor(intensity) {
   const colors = [
     'rgba(255,255,255,0.05)', // 0 - empty
     '#8B6914',                 // 1 - warm amber
-    '#B8860B',                 // 2 - gold
+    '#D4922A',                 // 2 - gold
     '#D4A017',                 // 3 - bright gold
     '#FFD700',                 // 4 - deep gold
   ];

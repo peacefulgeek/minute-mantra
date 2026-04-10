@@ -196,7 +196,7 @@ export default function Library() {
           <button
             onClick={() => navigate('/settings/subscription')}
             className="px-6 py-3 rounded-xl font-sans text-sm font-semibold"
-            style={{ background: 'linear-gradient(135deg, #b8860b, #d4a017)', color: '#fff', border: 'none', boxShadow: '0 4px 16px rgba(184,134,11,0.3)' }}
+            style={{ background: 'linear-gradient(135deg, #d4922a, #e8a832)', color: '#fff', border: 'none', boxShadow: '0 4px 16px rgba(212,146,42,0.3)' }}
           >
             Unlock with Platinum
           </button>
@@ -255,11 +255,11 @@ export default function Library() {
             className="flex items-center gap-1.5 px-3.5 py-2 rounded-full whitespace-nowrap font-sans text-xs font-medium transition-all"
             style={{
               background: activeCategory === cat
-                ? 'linear-gradient(135deg, #b8860b, #d4a017)'
+                ? 'linear-gradient(135deg, #d4922a, #e8a832)'
                 : 'var(--bg-card)',
               color: activeCategory === cat ? '#fff' : 'var(--text-secondary)',
               border: `1px solid ${activeCategory === cat ? 'transparent' : 'var(--border-color)'}`,
-              boxShadow: activeCategory === cat ? '0 2px 8px rgba(184,134,11,0.25)' : 'none',
+              boxShadow: activeCategory === cat ? '0 2px 8px rgba(212,146,42,0.25)' : 'none',
             }}
           >
             <span>{CATEGORY_ICONS[cat]}</span>
@@ -295,7 +295,7 @@ export default function Library() {
                 style={{
                   background: 'var(--bg-card)',
                   border: `1px solid ${isExpanded ? 'var(--text-accent)' : 'var(--border-color)'}`,
-                  boxShadow: isExpanded ? '0 4px 20px rgba(184,134,11,0.12)' : 'none',
+                  boxShadow: isExpanded ? '0 4px 20px rgba(212,146,42,0.12)' : 'none',
                 }}
               >
                 {/* Card header — always visible */}
@@ -401,7 +401,7 @@ export default function Library() {
                       onClick={() => navigate(`/mantra/${mantra.id}`)}
                       className="w-full py-2.5 rounded-lg font-sans text-sm font-semibold"
                       style={{
-                        background: 'linear-gradient(135deg, #b8860b, #d4a017)',
+                        background: 'linear-gradient(135deg, #d4922a, #e8a832)',
                         color: '#fff',
                         border: 'none',
                       }}

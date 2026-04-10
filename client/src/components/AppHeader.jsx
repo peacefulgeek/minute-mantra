@@ -48,7 +48,7 @@ export default function AppHeader() {
         background: 'rgba(253,248,240,0.92)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderBottom: '1px solid rgba(184,134,11,0.12)',
+        borderBottom: '1px solid rgba(212,146,42,0.12)',
       }}
     >
       {/* Left: Logo + Date */}
@@ -62,7 +62,7 @@ export default function AppHeader() {
         </Link>
         {user && (
           <>
-            <span style={{ color: 'rgba(184,134,11,0.3)', fontSize: '14px' }}>|</span>
+            <span style={{ color: 'rgba(212,146,42,0.3)', fontSize: '14px' }}>|</span>
             <span
               style={{
                 fontFamily: "'DM Sans', system-ui, sans-serif",
@@ -87,10 +87,10 @@ export default function AppHeader() {
             onClick={() => navigate('/enter')}
             className="px-5 py-2 rounded-full text-xs tracking-widest font-medium"
             style={{
-              background: 'linear-gradient(135deg, #b8860b, #d4a017)',
+              background: 'linear-gradient(135deg, #d4922a, #e8a832)',
               color: '#5a3e28',
               fontFamily: 'system-ui, sans-serif',
-              boxShadow: '0 0 16px rgba(184,134,11,0.25)',
+              boxShadow: '0 0 16px rgba(212,146,42,0.25)',
             }}
           >
             ENTER
@@ -104,8 +104,8 @@ export default function AppHeader() {
               onClick={() => setMenuOpen(o => !o)}
               className="flex flex-col justify-center items-center w-9 h-9 rounded-full gap-1.5"
               style={{
-                background: menuOpen ? 'rgba(184,134,11,0.15)' : 'rgba(160,120,80,0.08)',
-                border: '1.5px solid #b8860b',
+                background: menuOpen ? 'rgba(212,146,42,0.15)' : 'rgba(160,120,80,0.08)',
+                border: '1.5px solid #d4922a',
                 transition: 'all 0.2s',
               }}
               aria-label="Menu"
@@ -114,19 +114,19 @@ export default function AppHeader() {
                 animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
                 transition={{ duration: 0.2 }}
                 className="block w-4 h-px rounded-full"
-                style={{ background: '#b8860b' }}
+                style={{ background: '#d4922a' }}
               />
               <motion.span
                 animate={menuOpen ? { opacity: 0, scaleX: 0 } : { opacity: 1, scaleX: 1 }}
                 transition={{ duration: 0.15 }}
                 className="block w-4 h-px rounded-full"
-                style={{ background: '#b8860b' }}
+                style={{ background: '#d4922a' }}
               />
               <motion.span
                 animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
                 transition={{ duration: 0.2 }}
                 className="block w-4 h-px rounded-full"
-                style={{ background: '#b8860b' }}
+                style={{ background: '#d4922a' }}
               />
             </motion.button>
 
@@ -142,17 +142,17 @@ export default function AppHeader() {
                   style={{
                     width: 240,
                     background: 'rgba(253,248,240,0.98)',
-                    border: '1px solid rgba(184,134,11,0.2)',
-                    boxShadow: '0 20px 60px rgba(0,0,0,0.08), 0 0 0 1px rgba(184,134,11,0.1)',
+                    border: '1px solid rgba(212,146,42,0.2)',
+                    boxShadow: '0 20px 60px rgba(0,0,0,0.08), 0 0 0 1px rgba(212,146,42,0.1)',
                     backdropFilter: 'blur(20px)',
                   }}
                 >
                   {/* User info */}
-                  <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(184,134,11,0.1)' }}>
+                  <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(212,146,42,0.1)' }}>
                     <p className="text-xs mb-0.5" style={{ fontFamily: 'system-ui, sans-serif', color: '#a07850' }}>Signed in as</p>
                     <p className="text-sm truncate" style={{ fontFamily: 'system-ui, sans-serif', color: '#5a3e28' }}>{user.email}</p>
                     {user.subscription_tier === 'platinum' && (
-                      <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs" style={{ background: 'rgba(184,134,11,0.2)', color: '#b8860b', fontFamily: 'system-ui, sans-serif' }}>
+                      <span className="inline-block mt-1 px-2 py-0.5 rounded-full text-xs" style={{ background: 'rgba(212,146,42,0.2)', color: '#d4922a', fontFamily: 'system-ui, sans-serif' }}>
                         Platinum
                       </span>
                     )}
@@ -164,7 +164,7 @@ export default function AppHeader() {
                     <MenuItem to="/history" icon="📅" label="History" />
                     <MenuItem to="/favorites" icon="♡" label="Favorites" />
 
-                    <div className="mx-3 my-1 h-px" style={{ background: 'rgba(184,134,11,0.1)' }} />
+                    <div className="mx-3 my-1 h-px" style={{ background: 'rgba(212,146,42,0.1)' }} />
 
                     <MenuItem to="/settings" icon="⚙" label="Settings" />
                     <MenuItem to="/settings/profile" icon="👤" label="Profile" />
@@ -173,18 +173,18 @@ export default function AppHeader() {
 
                     {isAdmin && (
                       <>
-                        <div className="mx-3 my-1 h-px" style={{ background: 'rgba(184,134,11,0.2)' }} />
+                        <div className="mx-3 my-1 h-px" style={{ background: 'rgba(212,146,42,0.2)' }} />
                         <MenuItem to="/admin" icon="⚡" label="Admin Panel" gold />
                       </>
                     )}
 
-                    <div className="mx-3 my-1 h-px" style={{ background: 'rgba(184,134,11,0.1)' }} />
+                    <div className="mx-3 my-1 h-px" style={{ background: 'rgba(212,146,42,0.1)' }} />
 
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors"
                       style={{ fontFamily: 'system-ui, sans-serif' }}
-                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(184,134,11,0.06)'}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(212,146,42,0.06)'}
                       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                     >
                       <span className="text-sm opacity-50">↩</span>
@@ -210,18 +210,18 @@ function MenuItem({ to, icon, label, gold }) {
       to={to}
       className="flex items-center gap-3 px-4 py-2.5 transition-colors no-underline"
       style={{
-        background: isActive ? 'rgba(184,134,11,0.1)' : 'transparent',
+        background: isActive ? 'rgba(212,146,42,0.1)' : 'transparent',
         fontFamily: 'system-ui, sans-serif',
       }}
-      onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(184,134,11,0.06)'; }}
+      onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(212,146,42,0.06)'; }}
       onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}
     >
       <span className="text-sm w-5 text-center opacity-60">{icon}</span>
-      <span className="text-sm" style={{ color: gold ? '#b8860b' : isActive ? '#5a3e28' : '#7a6050' }}>
+      <span className="text-sm" style={{ color: gold ? '#d4922a' : isActive ? '#5a3e28' : '#7a6050' }}>
         {label}
       </span>
       {isActive && (
-        <span className="ml-auto w-1 h-1 rounded-full" style={{ background: '#b8860b' }} />
+        <span className="ml-auto w-1 h-1 rounded-full" style={{ background: '#d4922a' }} />
       )}
     </Link>
   );

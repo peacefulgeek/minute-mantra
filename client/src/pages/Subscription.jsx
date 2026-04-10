@@ -80,7 +80,7 @@ export default function Subscription() {
         <div>
           <div
             className="rounded-xl p-5 mb-6 text-center"
-            style={{ background: 'rgba(184,134,11,0.1)', border: '1px solid var(--border-color)' }}
+            style={{ background: 'rgba(212,146,42,0.1)', border: '1px solid var(--border-color)' }}
           >
             <p className="font-serif text-xl mb-1" style={{ color: 'var(--text-accent)' }}>✦ Platinum</p>
             <p className="font-sans text-sm" style={{ color: 'var(--text-secondary)' }}>

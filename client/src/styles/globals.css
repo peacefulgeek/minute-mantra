@@ -5,19 +5,19 @@
 @tailwind utilities;
 
 :root {
-  /* Default: Vedic Solar / Gold */
-  --tradition-primary: #b8860b;
-  --tradition-secondary: #ff8f00;
-  --tradition-accent: #fff3cd;
-  --geometry-stroke: #b8860b;
+  /* Default: Warm Amber (harmonized with logo palette) */
+  --tradition-primary: #d4922a;
+  --tradition-secondary: #e8a832;
+  --tradition-accent: #fff5e0;
+  --geometry-stroke: #d4922a;
   --geometry-fill: transparent;
-  --geometry-glow: rgba(184, 134, 11, 0.4);
+  --geometry-glow: rgba(212, 146, 42, 0.4);
   --bg-base: #fdf8f0;
-  --bg-card: rgba(0, 0, 0, 0.04);
+  --bg-card: rgba(0, 0, 0, 0.035);
   --text-primary: #3d2b1f;
-  --text-secondary: #9a8c7e;
-  --text-accent: #b8860b;
-  --border-color: rgba(184, 134, 11, 0.2);
+  --text-secondary: #8a7b6d;
+  --text-accent: #d4922a;
+  --border-color: rgba(212, 146, 42, 0.18);
   --transition-theme: 0.5s ease;
 }
 
@@ -127,11 +127,11 @@ body {
 /* Light mode */
 @media (prefers-color-scheme: light) {
   :root {
-    --bg-base: #f5f0e1;
-    --bg-card: rgba(0, 0, 0, 0.04);
-    --text-primary: #1a1a2e;
-    --text-secondary: #5a4e42;
-    --border-color: rgba(184, 134, 11, 0.25);
+    --bg-base: #fdf8f0;
+    --bg-card: rgba(0, 0, 0, 0.035);
+    --text-primary: #3d2b1f;
+    --text-secondary: #8a7b6d;
+    --border-color: rgba(212, 146, 42, 0.2);
   }
   body {
     background-color: var(--bg-base);

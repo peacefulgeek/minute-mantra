@@ -59,7 +59,7 @@ export default function Favorites() {
       {!isPremium && favorites.length >= 5 && (
         <div
           className="rounded-xl p-4 mb-4 text-center"
-          style={{ background: 'rgba(184,134,11,0.1)', border: '1px solid var(--border-color)' }}
+          style={{ background: 'rgba(212,146,42,0.1)', border: '1px solid var(--border-color)' }}
         >
           <p className="font-sans text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>
             Free users can save up to 5 favorites.

@@ -49,16 +49,16 @@ export default function MagicLinkVerify() {
       {/* Sacred geometry background — Flower of Life */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
         <svg viewBox="0 0 500 500" className="w-full max-w-3xl">
-          <circle cx="250" cy="250" r="80" fill="none" stroke="#c8860a" strokeWidth="1.5" />
+          <circle cx="250" cy="250" r="80" fill="none" stroke="#d4922a" strokeWidth="1.5" />
           {[0,60,120,180,240,300].map((deg,i) => {
             const rad = deg * Math.PI / 180;
-            return <circle key={i} cx={250 + 80*Math.cos(rad)} cy={250 + 80*Math.sin(rad)} r="80" fill="none" stroke="#c8860a" strokeWidth="1.5" />;
+            return <circle key={i} cx={250 + 80*Math.cos(rad)} cy={250 + 80*Math.sin(rad)} r="80" fill="none" stroke="#d4922a" strokeWidth="1.5" />;
           })}
           {[0,60,120,180,240,300].map((deg,i) => {
             const rad = deg * Math.PI / 180;
-            return <circle key={`o${i}`} cx={250 + 160*Math.cos(rad)} cy={250 + 160*Math.sin(rad)} r="80" fill="none" stroke="#c8860a" strokeWidth="1" />;
+            return <circle key={`o${i}`} cx={250 + 160*Math.cos(rad)} cy={250 + 160*Math.sin(rad)} r="80" fill="none" stroke="#d4922a" strokeWidth="1" />;
           })}
-          <circle cx="250" cy="250" r="240" fill="none" stroke="#c8860a" strokeWidth="1" />
+          <circle cx="250" cy="250" r="240" fill="none" stroke="#d4922a" strokeWidth="1" />
         </svg>
       </div>
 
@@ -73,7 +73,7 @@ export default function MagicLinkVerify() {
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-              style={{ fontSize: 48, marginBottom: 24, color: '#c8860a', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
+              style={{ fontSize: 48, marginBottom: 24, color: '#d4922a', fontFamily: "'Cormorant Garamond', Georgia, serif" }}
             >
               ✦
             </motion.div>
@@ -129,7 +129,7 @@ export default function MagicLinkVerify() {
               whileTap={{ scale: 0.97 }}
               style={{
                 padding: '15px 32px', borderRadius: 50, border: 'none',
-                background: 'linear-gradient(135deg, #c8860a 0%, #e0a020 100%)',
+                background: 'linear-gradient(135deg, #d4922a 0%, #e0a020 100%)',
                 color: '#fff8ee', fontSize: 13, fontWeight: 600, letterSpacing: '0.15em',
                 cursor: 'pointer', fontFamily: "'DM Sans', sans-serif",
                 boxShadow: '0 4px 20px rgba(200,134,10,0.3)',

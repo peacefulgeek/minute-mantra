@@ -39,16 +39,16 @@ export default function Enter() {
       {/* Sacred geometry background — Flower of Life */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.04] pointer-events-none">
         <svg viewBox="0 0 500 500" className="w-full max-w-3xl">
-          <circle cx="250" cy="250" r="80" fill="none" stroke="#c8860a" strokeWidth="1.5" />
+          <circle cx="250" cy="250" r="80" fill="none" stroke="#d4922a" strokeWidth="1.5" />
           {[0,60,120,180,240,300].map((deg,i) => {
             const rad = deg * Math.PI / 180;
-            return <circle key={i} cx={250 + 80*Math.cos(rad)} cy={250 + 80*Math.sin(rad)} r="80" fill="none" stroke="#c8860a" strokeWidth="1.5" />;
+            return <circle key={i} cx={250 + 80*Math.cos(rad)} cy={250 + 80*Math.sin(rad)} r="80" fill="none" stroke="#d4922a" strokeWidth="1.5" />;
           })}
           {[0,60,120,180,240,300].map((deg,i) => {
             const rad = deg * Math.PI / 180;
-            return <circle key={`o${i}`} cx={250 + 160*Math.cos(rad)} cy={250 + 160*Math.sin(rad)} r="80" fill="none" stroke="#c8860a" strokeWidth="1" />;
+            return <circle key={`o${i}`} cx={250 + 160*Math.cos(rad)} cy={250 + 160*Math.sin(rad)} r="80" fill="none" stroke="#d4922a" strokeWidth="1" />;
           })}
-          <circle cx="250" cy="250" r="240" fill="none" stroke="#c8860a" strokeWidth="1" />
+          <circle cx="250" cy="250" r="240" fill="none" stroke="#d4922a" strokeWidth="1" />
         </svg>
       </div>
 
@@ -111,7 +111,7 @@ export default function Enter() {
                     fontSize: 15, outline: 'none', fontFamily: "'DM Sans', sans-serif",
                     transition: 'border-color 0.2s', boxSizing: 'border-box',
                   }}
-                  onFocus={e => e.target.style.borderColor = '#c8860a'}
+                  onFocus={e => e.target.style.borderColor = '#d4922a'}
                   onBlur={e => e.target.style.borderColor = 'rgba(200,134,10,0.25)'}
                 />
 
@@ -126,7 +126,7 @@ export default function Enter() {
                   whileTap={{ scale: loading ? 1 : 0.97 }}
                   style={{
                     width: '100%', padding: '15px 24px', borderRadius: 50, border: 'none',
-                    background: loading ? 'rgba(200,134,10,0.4)' : 'linear-gradient(135deg, #c8860a 0%, #e0a020 100%)',
+                    background: loading ? 'rgba(200,134,10,0.4)' : 'linear-gradient(135deg, #d4922a 0%, #e0a020 100%)',
                     color: '#fff8ee', fontSize: 13, fontWeight: 600, letterSpacing: '0.15em',
                     cursor: loading ? 'wait' : 'pointer', fontFamily: "'DM Sans', sans-serif",
                     boxShadow: loading ? 'none' : '0 4px 20px rgba(200,134,10,0.3)',
@@ -166,7 +166,7 @@ export default function Enter() {
               </motion.div>
               <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 28, fontWeight: 400, color: '#3d2b1f', margin: '0 0 12px' }}>Check your inbox</h2>
               <p style={{ color: '#7a5c3e', fontSize: 15, lineHeight: 1.7, marginBottom: 8 }}>We sent a magic link to</p>
-              <p style={{ color: '#c8860a', fontSize: 16, fontWeight: 600, marginBottom: 20 }}>{email}</p>
+              <p style={{ color: '#d4922a', fontSize: 16, fontWeight: 600, marginBottom: 20 }}>{email}</p>
               <p style={{ color: '#b09070', fontSize: 13, lineHeight: 1.7 }}>
                 The link expires in 15 minutes.<br />
                 Check your spam folder if you don't see it.
@@ -175,7 +175,7 @@ export default function Enter() {
               <button
                 onClick={() => { setSent(false); setEmail(''); setError(''); }}
                 style={{ background: 'none', border: 'none', color: '#b09070', fontSize: 13, cursor: 'pointer', fontFamily: "'DM Sans', sans-serif" }}
-                onMouseEnter={e => e.currentTarget.style.color = '#c8860a'}
+                onMouseEnter={e => e.currentTarget.style.color = '#d4922a'}
                 onMouseLeave={e => e.currentTarget.style.color = '#b09070'}
               >
                 Try a different email
