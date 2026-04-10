@@ -149,6 +149,7 @@ async function sendPasswordResetEmail(email, token) {
 }
 
 async function sendMagicLinkEmail(email, magicUrl, isNew) {
+  const appUrl = process.env.APP_URL || 'https://minutemantra.com';
   const subject = isNew
     ? 'Welcome to Minute Mantra — enter your practice'
     : 'Your Minute Mantra magic link';
