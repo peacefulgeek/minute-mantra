@@ -49,7 +49,7 @@ app.use('/api/admin', require('./routes/admin'));
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', version: 'v12-platinum-tier', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', version: 'v13-gold-tier', timestamp: new Date().toISOString() });
 });
 
 // Serve React app in production
@@ -73,8 +73,15 @@ if (process.env.NODE_ENV === 'production') {
 const { query } = require('./config/db');
 (async () => {
   try {
-    await query("ALTER TABLE users MODIFY COLUMN subscription_tier ENUM('free','premium','platinum') DEFAULT 'free'");
+    await query("ALTER TABLE users MODIFY COLUMN subscription_tier ENUM('free','premium','platinum','gold') DEFAULT 'free'");
     await query("ALTER TABLE users MODIFY COLUMN subscription_plan ENUM('monthly','annual','admin_granted','none') DEFAULT 'none'");
+    // Migrate existing platinum users to gold
+    await query("UPDATE users SET subscription_tier = 'gold' WHERE subscription_tier = 'platinum'");
+    // Add free_mantras_used counter for 3-free-then-paywall
+    try {
+      await query("ALTER TABLE users ADD COLUMN free_mantras_used INT DEFAULT 0");
+      console.log('DB migration: free_mantras_used column added');
+    } catch (e) { /* already exists */ }
     // Add role column if it doesn't exist
     try {
       await query("ALTER TABLE users ADD COLUMN role ENUM('user','admin') DEFAULT 'user'");
@@ -96,7 +103,7 @@ const { startScheduler } = require('./services/scheduler');
 startScheduler();
 
 app.listen(PORT, () => {
-  console.log(`Minute Mantra server v12-platinum-tier running on port ${PORT}`);
+  console.log(`Minute Mantra server v13-gold-tier running on port ${PORT}`);
 });
 
 module.exports = app;

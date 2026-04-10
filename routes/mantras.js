@@ -41,9 +41,43 @@ router.get('/today', optionalAuth, async (req, res) => {
       return res.status(404).json({ error: 'No mantra found for today' });
     }
 
+    // Check free tier gating: 3 free mantras, then require Gold
+    if (req.user) {
+      const user = await queryOne(
+        'SELECT subscription_tier, free_mantras_used FROM users WHERE id = ?',
+        [req.user.id]
+      );
+
+      if (user && user.subscription_tier === 'free' && (user.free_mantras_used || 0) >= 3) {
+        // Free limit reached — return minimal info + upgrade flag
+        return res.json({
+          mantra: {
+            id: mantra.id,
+            title: mantra.title,
+            tradition: mantra.tradition,
+            intention: mantra.intention,
+          },
+          day_of_year: dayOfYear,
+          upgrade_required: true,
+          free_mantras_used: user.free_mantras_used,
+          free_limit: 3,
+        });
+      }
+
+      // Increment free_mantras_used for free users (only count unique days)
+      if (user && user.subscription_tier === 'free') {
+        const alreadyCounted = await queryOne(
+          'SELECT id FROM sessions WHERE user_id = ? AND session_date = CURDATE() LIMIT 1',
+          [req.user.id]
+        );
+        if (!alreadyCounted) {
+          await query('UPDATE users SET free_mantras_used = COALESCE(free_mantras_used, 0) + 1 WHERE id = ?', [req.user.id]);
+        }
+      }
+    }
+
     const result = {
       ...mantra,
-      // Always build audio_url from filename for correct CDN path
       audio_url: buildCdnUrl(mantra.audio_filename),
     };
 
@@ -103,8 +137,8 @@ const CATEGORIES = {
 router.get('/library', requireAuth, async (req, res) => {
   try {
     const user = await queryOne('SELECT subscription_tier FROM users WHERE id = ?', [req.user.id]);
-    if (user.subscription_tier !== 'platinum') {
-      return res.status(403).json({ error: 'Platinum subscription required to browse the full library' });
+    if (user.subscription_tier !== 'gold') {
+      return res.status(403).json({ error: 'Gold subscription required to browse the full library' });
     }
 
     const { tradition, intention, category, search: searchTerm, page = 1, limit = 20 } = req.query;
@@ -197,14 +231,14 @@ router.post('/:id/favorite', requireAuth, async (req, res) => {
     }
 
     // Check free tier limit
-    if (user.subscription_tier !== 'platinum') {
+    if (user.subscription_tier !== 'gold') {
       const count = await queryOne(
         'SELECT COUNT(*) as cnt FROM favorites WHERE user_id = ?',
         [userId]
       );
       if (count.cnt >= 5) {
         return res.status(403).json({
-          error: 'Free users can save up to 5 favorites. Upgrade to Platinum for unlimited favorites.',
+          error: 'Free users can save up to 5 favorites. Upgrade to Gold for unlimited favorites.',
           upgrade_required: true,
         });
       }

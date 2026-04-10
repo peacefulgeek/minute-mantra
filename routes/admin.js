@@ -24,7 +24,7 @@ router.get('/stats', async (req, res) => {
   try {
     const [
       totalUsers,
-      platinumUsers,
+      goldUsers,
       activeStreaks,
       sessionsToday,
       emailSubscribers,
@@ -39,14 +39,14 @@ router.get('/stats', async (req, res) => {
       churn30d,
     ] = await Promise.all([
       queryOne('SELECT COUNT(*) as count FROM users'),
-      queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_tier = 'platinum'"),
+      queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_tier = 'gold'"),
       queryOne('SELECT COUNT(*) as count FROM streaks WHERE current_streak > 0'),
       queryOne('SELECT COUNT(*) as count FROM sessions WHERE DATE(completed_at) = CURDATE()'),
       queryOne('SELECT COUNT(*) as count FROM users WHERE email_notifications_enabled = 1'),
       queryOne('SELECT COUNT(*) as count FROM users WHERE push_subscription IS NOT NULL AND push_notifications_enabled = TRUE'),
       queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_plan = 'monthly' AND subscription_status = 'active'"),
       queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_plan = 'annual' AND subscription_status = 'active'"),
-      queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_plan = 'admin_granted' AND subscription_tier = 'platinum'"),
+      queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_plan = 'admin_granted' AND subscription_tier = 'gold'"),
       queryOne("SELECT COUNT(*) as count FROM users WHERE subscription_tier = 'free'"),
       queryOne("SELECT COUNT(*) as count FROM email_logs WHERE sent_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
       queryOne("SELECT COUNT(*) as count FROM users WHERE unsubscribed_at > DATE_SUB(NOW(), INTERVAL 30 DAY)"),
@@ -58,7 +58,7 @@ router.get('/stats', async (req, res) => {
 
     res.json({
       total_users: totalUsers.count,
-      platinum_users: platinumUsers.count,
+      gold_users: goldUsers.count,
       free_users: freeUsers.count,
       active_streaks: activeStreaks.count,
       sessions_today: sessionsToday.count,
@@ -98,11 +98,11 @@ router.get('/users', async (req, res) => {
     } else if (filter === 'paying') {
       whereClause += " AND u.subscription_plan IN ('monthly','annual') AND u.subscription_status = 'active'";
     } else if (filter === 'granted') {
-      whereClause += " AND u.subscription_plan = 'admin_granted' AND u.subscription_tier = 'platinum'";
+      whereClause += " AND u.subscription_plan = 'admin_granted' AND u.subscription_tier = 'gold'";
     } else if (filter === 'canceled') {
       whereClause += " AND u.subscription_status = 'canceled'";
-    } else if (filter === 'platinum') {
-      whereClause += " AND u.subscription_tier = 'platinum'";
+    } else if (filter === 'gold') {
+      whereClause += " AND u.subscription_tier = 'gold'";
     }
 
     params.push(parseInt(limit), offset);
@@ -255,14 +255,14 @@ router.post('/add-user', async (req, res) => {
   }
 });
 
-// POST /api/admin/set-tier — Set user to free or platinum
+// POST /api/admin/set-tier — Set user to free or gold
 // If downgrading a Square-paying user, cancels their Square subscription first
 router.post('/set-tier', async (req, res) => {
   try {
     const { userId, tier } = req.body;
     if (!userId) return res.status(400).json({ error: 'userId is required' });
-    const validTiers = ['free', 'platinum'];
-    if (!validTiers.includes(tier)) return res.status(400).json({ error: 'tier must be free or platinum' });
+    const validTiers = ['free', 'gold'];
+    if (!validTiers.includes(tier)) return res.status(400).json({ error: 'tier must be free or gold' });
 
     // Get current user info
     const currentUser = await queryOne(
@@ -292,12 +292,12 @@ router.post('/set-tier', async (req, res) => {
         [userId]
       );
     } else {
-      // When admin grants platinum, preserve existing plan if it's a real Square plan,
+      // When admin grants gold, preserve existing plan if it's a real Square plan,
       // otherwise mark as admin_granted
       const plan = (currentUser.subscription_plan === 'monthly' || currentUser.subscription_plan === 'annual')
         ? currentUser.subscription_plan : 'admin_granted';
       await query(
-        `UPDATE users SET subscription_tier = 'platinum', subscription_plan = ?,
+        `UPDATE users SET subscription_tier = 'gold', subscription_plan = ?,
          subscription_status = 'active', updated_at = NOW() WHERE id = ?`,
         [plan, userId]
       );
@@ -439,7 +439,7 @@ router.post('/update-square-pricing', async (req, res) => {
         type: 'SUBSCRIPTION_PLAN_VARIATION',
         id: '#monthly-108',
         subscriptionPlanVariationData: {
-          name: 'Platinum Monthly - $1.08/mo',
+          name: 'Gold Monthly - $1.08/mo',
           phases: [{
             cadence: 'MONTHLY',
             ordinal: BigInt(0),
@@ -462,7 +462,7 @@ router.post('/update-square-pricing', async (req, res) => {
         type: 'SUBSCRIPTION_PLAN_VARIATION',
         id: '#annual-988',
         subscriptionPlanVariationData: {
-          name: 'Platinum Annual - $9.88/yr',
+          name: 'Gold Annual - $9.88/yr',
           phases: [{
             cadence: 'ANNUAL',
             ordinal: BigInt(0),

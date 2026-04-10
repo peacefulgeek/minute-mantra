@@ -17,7 +17,7 @@ const USER_FILTERS = [
 function getUserCategory(u) {
   if (u.subscription_plan === 'monthly' && u.subscription_status === 'active') return 'paying_monthly';
   if (u.subscription_plan === 'annual' && u.subscription_status === 'active') return 'paying_annual';
-  if (u.subscription_plan === 'admin_granted' && u.subscription_tier === 'platinum') return 'granted';
+  if (u.subscription_plan === 'admin_granted' && u.subscription_tier === 'gold') return 'granted';
   if (u.subscription_status === 'canceled') return 'canceled';
   if (u.subscription_status === 'past_due') return 'past_due';
   return 'free';
@@ -41,8 +41,8 @@ function getCategoryBadge(category) {
 }
 
 function getTierBadge(tier) {
-  if (tier === 'platinum') {
-    return { label: 'Platinum', bg: 'rgba(184,134,11,0.12)', color: '#b8860b' };
+  if (tier === 'gold') {
+    return { label: 'Gold', bg: 'rgba(184,134,11,0.12)', color: '#b8860b' };
   }
   return { label: 'Free', bg: 'rgba(0,0,0,0.04)', color: '#9a8c7e' };
 }
@@ -121,7 +121,7 @@ export default function Admin() {
       const res = await fetch('/api/admin/add-user', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: newEmail, tier: newTier, plan: newTier === 'platinum' ? 'admin_granted' : 'none' }),
+        body: JSON.stringify({ email: newEmail, tier: newTier, plan: newTier === 'gold' ? 'admin_granted' : 'none' }),
       });
       const data = await res.json();
       if (data.ok) { setNewEmail(''); setShowAddUser(false); fetchUsers(); fetchStats(); }
@@ -130,27 +130,27 @@ export default function Admin() {
     setActionLoading(null);
   }
 
-  async function grantPlatinum(userId) {
-    if (!confirm('Grant this user free Platinum access?')) return;
+  async function grantGold(userId) {
+    if (!confirm('Grant this user free Gold access?')) return;
     setActionLoading(userId);
     try {
       await fetch('/api/admin/set-tier', {
         method: 'POST', credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId, tier: 'platinum' }),
+        body: JSON.stringify({ userId, tier: 'gold' }),
       });
       fetchUsers();
       fetchStats();
-    } catch (e) { alert('Failed to grant platinum'); }
+    } catch (e) { alert('Failed to grant gold'); }
     setActionLoading(null);
   }
 
-  async function revokePlatinum(userId, category) {
+  async function revokeGold(userId, category) {
     if (category === 'paying_monthly' || category === 'paying_annual') {
       alert('This user has an active Square subscription. They must cancel through their account or via the Square dashboard.');
       return;
     }
-    if (!confirm('Revoke this user\'s Platinum access and set to Free?')) return;
+    if (!confirm('Revoke this user\'s Gold access and set to Free?')) return;
     setActionLoading(userId);
     try {
       await fetch('/api/admin/set-tier', {
@@ -160,7 +160,7 @@ export default function Admin() {
       });
       fetchUsers();
       fetchStats();
-    } catch (e) { alert('Failed to revoke platinum'); }
+    } catch (e) { alert('Failed to revoke gold'); }
     setActionLoading(null);
   }
 
@@ -235,7 +235,7 @@ export default function Admin() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <StatCard label="Total Users" value={stats.total_users?.toLocaleString() || '—'} />
                   <StatCard label="Free Users" value={stats.free_users?.toLocaleString() || '—'} />
-                  <StatCard label="Platinum Total" value={stats.platinum_users?.toLocaleString() || '—'} gold />
+                  <StatCard label="Gold Total" value={stats.gold_users?.toLocaleString() || '—'} gold />
                   <StatCard label="Active Streaks" value={stats.active_streaks?.toLocaleString() || '—'} />
                 </div>
 
@@ -346,7 +346,7 @@ export default function Admin() {
                       style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', color: 'var(--text-primary)' }}
                     >
                       <option value="free">Free</option>
-                      <option value="platinum">Platinum (Admin Granted)</option>
+                      <option value="gold">Gold (Admin Granted)</option>
                     </select>
                   </div>
                   <button
@@ -408,19 +408,19 @@ export default function Admin() {
                         <td className="px-4 py-3 text-xs" style={{ color: 'var(--text-secondary)' }}>{new Date(u.created_at).toLocaleDateString()}</td>
                         <td className="px-4 py-3">
                           <div className="flex gap-1.5 flex-wrap">
-                            {u.subscription_tier !== 'platinum' && (
+                            {u.subscription_tier !== 'gold' && (
                               <button
-                                onClick={() => grantPlatinum(u.id)}
+                                onClick={() => grantGold(u.id)}
                                 disabled={actionLoading === u.id}
                                 className="px-2.5 py-1 rounded-lg text-xs whitespace-nowrap font-medium"
                                 style={{ background: 'rgba(184,134,11,0.1)', color: '#b8860b', border: '1px solid rgba(184,134,11,0.2)' }}
                               >
-                                Grant Platinum
+                                Grant Gold
                               </button>
                             )}
                             {isGranted && (
                               <button
-                                onClick={() => revokePlatinum(u.id, category)}
+                                onClick={() => revokeGold(u.id, category)}
                                 disabled={actionLoading === u.id}
                                 className="px-2.5 py-1 rounded-lg text-xs whitespace-nowrap"
                                 style={{ background: 'var(--bg-card)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}

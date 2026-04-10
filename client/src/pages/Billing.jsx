@@ -16,7 +16,7 @@ export default function Billing() {
         <h1 className="font-serif text-xl" style={{ color: 'var(--text-primary)' }}>Billing</h1>
       </div>
 
-      {user?.subscription_tier !== 'platinum' ? (
+      {user?.subscription_tier !== 'gold' ? (
         <div className="text-center py-16">
           <p className="font-serif text-lg mb-4" style={{ color: 'var(--text-primary)' }}>No active subscription</p>
           <button
@@ -24,7 +24,7 @@ export default function Billing() {
             className="px-6 py-3 rounded-xl font-serif"
             style={{ background: 'var(--text-accent)', color: 'var(--bg-base)' }}
           >
-            Upgrade to Platinum
+            Upgrade to Gold
           </button>
         </div>
       ) : (

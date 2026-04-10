@@ -55,6 +55,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [sessionDone, setSessionDone] = useState(false);
   const [error, setError] = useState(null);
+  const [upgradeRequired, setUpgradeRequired] = useState(false);
   const retryCount = useRef(0);
 
   useEffect(() => {
@@ -69,6 +70,12 @@ export default function Home() {
       });
       if (res.ok) {
         const data = await res.json();
+        if (data.upgrade_required) {
+          setUpgradeRequired(true);
+          setMantra(data.mantra);
+          setLoading(false);
+          return;
+        }
         setMantra(data.mantra);
         setIsFavorited(data.mantra?.is_favorited || false);
         applyTradition(data.mantra?.tradition);
@@ -181,8 +188,34 @@ export default function Home() {
         </div>
       )}
 
+      {/* Upgrade paywall — shown after 3 free mantras */}
+      {upgradeRequired && (
+        <div className="px-6 py-12 text-center" style={{ maxWidth: 440, margin: '0 auto' }}>
+          <div className="rounded-2xl p-8" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>✨</div>
+            <h2 className="font-serif text-xl mb-2" style={{ color: 'var(--text-primary)' }}>Your 3 Free Mantras Are Complete</h2>
+            <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              You've experienced the power of daily mantra practice. Upgrade to <strong style={{ color: '#b8860b' }}>Gold</strong> for unlimited mantras, the full library, extended timers, and more.
+            </p>
+            <button
+              onClick={() => navigate('/settings/subscription')}
+              className="px-8 py-3 rounded-full text-sm font-medium"
+              style={{
+                background: 'linear-gradient(135deg, #b8860b, #d4a017)',
+                color: '#ffffff',
+                border: 'none',
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Upgrade to Gold
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Content */}
-      {!error && view === 'card' && (
+      {!error && !upgradeRequired && view === 'card' && (
         <MantraCard
           mantra={mantra}
           onBeginChanting={() => setView('timer')}

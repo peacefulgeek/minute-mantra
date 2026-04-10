@@ -13,8 +13,9 @@ const FREE_FEATURES = [
   '"Go Deeper" links to PaulWagner.com',
 ];
 
-const PLATINUM_FEATURES = [
+const GOLD_FEATURES = [
   'Everything in Free',
+  'Unlimited daily mantras',
   'Extended timers (2, 5, 10 minutes)',
   'Mala counter (108 beads)',
   'Unlimited favorites',
@@ -25,7 +26,7 @@ const PLATINUM_FEATURES = [
 export default function Subscription() {
   const { user, refetch } = useAuth();
   const navigate = useNavigate();
-  const isPlatinum = user?.subscription_tier === 'platinum';
+  const isGold = user?.subscription_tier === 'gold';
   const [plan, setPlan] = useState('annual');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -52,14 +53,14 @@ export default function Subscription() {
   }
 
   async function handleCancel() {
-    if (!confirm('Cancel your subscription? You\'ll keep Platinum access until the end of your billing period.')) return;
+    if (!confirm('Cancel your subscription? You\'ll keep Gold access until the end of your billing period.')) return;
     setLoading(true);
     try {
       const res = await fetch('/api/subscriptions/cancel', { method: 'POST', credentials: 'include' });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       await refetch();
-      alert(`Subscription canceled. Platinum access continues until ${data.effective_date || 'end of period'}.`);
+      alert(`Subscription canceled. Gold access continues until ${data.effective_date || 'end of period'}.`);
     } catch (e) {
       setError(e.message);
     }
@@ -75,14 +76,14 @@ export default function Subscription() {
         <h1 className="font-serif text-xl" style={{ color: 'var(--text-primary)' }}>Subscription</h1>
       </div>
 
-      {isPlatinum ? (
-        /* Platinum user view */
+      {isGold ? (
+        /* Gold user view */
         <div>
           <div
             className="rounded-xl p-5 mb-6 text-center"
             style={{ background: 'rgba(184,134,11,0.1)', border: '1px solid var(--border-color)' }}
           >
-            <p className="font-serif text-xl mb-1" style={{ color: 'var(--text-accent)' }}>✦ Platinum</p>
+            <p className="font-serif text-xl mb-1" style={{ color: 'var(--text-accent)' }}>✦ Gold</p>
             <p className="font-sans text-sm" style={{ color: 'var(--text-secondary)' }}>
               Plan: {user?.subscription_plan === 'annual' ? 'Annual ($9.88/yr)' : user?.subscription_plan === 'admin_granted' ? 'Granted by admin' : 'Monthly ($1.08/mo)'}
             </p>
@@ -92,7 +93,7 @@ export default function Subscription() {
           </div>
 
           <div className="flex flex-col gap-3">
-            {PLATINUM_FEATURES.map(f => (
+            {GOLD_FEATURES.map(f => (
               <div key={f} className="flex items-center gap-2">
                 <Check size={16} style={{ color: 'var(--text-accent)', flexShrink: 0 }} />
                 <span className="font-sans text-sm" style={{ color: 'var(--text-primary)' }}>{f}</span>
@@ -115,7 +116,7 @@ export default function Subscription() {
         /* Upgrade view — opens Square checkout in new tab */
         <div>
           <p className="font-serif text-lg mb-6 text-center" style={{ color: 'var(--text-primary)' }}>
-            Upgrade to Platinum
+            Upgrade to Gold
           </p>
 
           {/* Plan selector */}
@@ -154,7 +155,7 @@ export default function Subscription() {
 
           {/* Features */}
           <div className="flex flex-col gap-2 mb-6">
-            {PLATINUM_FEATURES.map(f => (
+            {GOLD_FEATURES.map(f => (
               <div key={f} className="flex items-center gap-2">
                 <Check size={14} style={{ color: 'var(--text-accent)', flexShrink: 0 }} />
                 <span className="font-sans text-sm" style={{ color: 'var(--text-secondary)' }}>{f}</span>

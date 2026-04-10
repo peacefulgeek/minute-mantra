@@ -64,7 +64,7 @@ async function handleSubscriptionCreated(subscription) {
 
   const plan = determinePlan(subscription);
   await query(
-    `UPDATE users SET subscription_tier = 'platinum', subscription_status = 'active',
+    `UPDATE users SET subscription_tier = 'gold', subscription_status = 'active',
      subscription_plan = ?, updated_at = NOW() WHERE id = ?`,
     [plan, user.id]
   );
@@ -80,10 +80,10 @@ async function handleSubscriptionUpdated(subscription) {
     : 'none';
 
   if (status === 'active') {
-    // Subscription is active — ensure all fields reflect platinum
+    // Subscription is active — ensure all fields reflect gold
     const plan = determinePlan(subscription);
     await query(
-      `UPDATE users SET subscription_tier = 'platinum', subscription_status = 'active',
+      `UPDATE users SET subscription_tier = 'gold', subscription_status = 'active',
        subscription_plan = ?, updated_at = NOW() WHERE id = ?`,
       [plan, user.id]
     );
@@ -119,7 +119,7 @@ async function handlePaymentFailed(invoice) {
   const user = await queryOne('SELECT id FROM users WHERE square_subscription_id = ?', [invoice.subscription_id]);
   if (!user) return;
 
-  // Keep platinum access but flag as past_due so admin can see
+  // Keep gold access but flag as past_due so admin can see
   await query(
     `UPDATE users SET subscription_status = 'past_due', updated_at = NOW() WHERE id = ?`,
     [user.id]

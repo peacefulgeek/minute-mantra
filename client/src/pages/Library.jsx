@@ -97,7 +97,7 @@ export default function Library() {
   const [playingId, setPlayingId] = useState(null);
   const audioRef = useRef(null);
   const searchTimeout = useRef(null);
-  const isPlatinum = user?.subscription_tier === 'platinum';
+  const isGold = user?.subscription_tier === 'gold';
 
   const fetchLibrary = useCallback(async (p = 1, cat = activeCategory, q = search) => {
     setLoading(true);
@@ -182,8 +182,8 @@ export default function Library() {
     }
   }
 
-  // Non-platinum gate
-  if (!isPlatinum) {
+  // Non-gold gate
+  if (!isGold) {
     return (
       <div className="min-h-screen pt-safe px-4 py-6">
         <h1 className="font-serif text-2xl mb-6 text-center" style={{ color: '#FF13F0' }}>Mantra Library</h1>
@@ -198,7 +198,7 @@ export default function Library() {
             className="px-6 py-3 rounded-xl font-sans text-sm font-semibold"
             style={{ background: 'linear-gradient(135deg, #b8860b, #d4a017)', color: '#fff', border: 'none', boxShadow: '0 4px 16px rgba(184,134,11,0.3)' }}
           >
-            Unlock with Platinum
+            Unlock with Gold
           </button>
         </div>
       </div>

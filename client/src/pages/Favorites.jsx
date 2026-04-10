@@ -14,7 +14,7 @@ export default function Favorites() {
   const navigate = useNavigate();
   const [favorites, setFavorites] = useState([]);
   const [loading, setLoading] = useState(true);
-  const isPremium = user?.subscription_tier === 'platinum';
+  const isPremium = user?.subscription_tier === 'gold';
 
   useEffect(() => {
     fetchFavorites();

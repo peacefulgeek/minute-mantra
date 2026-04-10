@@ -34,7 +34,7 @@ router.post('/create', requireAuth, async (req, res) => {
 
     await query(
       'UPDATE users SET square_customer_id = ?, square_subscription_id = ?, subscription_tier = ?, subscription_status = ?, subscription_plan = ? WHERE id = ?',
-      [result.customerId, result.subscriptionId, 'platinum', 'active', plan, req.user.id]
+      [result.customerId, result.subscriptionId, 'gold', 'active', plan, req.user.id]
     );
 
     res.json({ message: 'Subscription created successfully', subscription: result });

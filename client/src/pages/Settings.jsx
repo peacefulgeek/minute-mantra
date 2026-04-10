@@ -46,7 +46,7 @@ export default function Settings() {
             {user?.display_name || user?.email}
           </p>
           <p className="font-sans text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-            {user?.subscription_tier === 'platinum' ? '✦ Platinum' : 'Free plan'}
+            {user?.subscription_tier === 'gold' ? '✦ Gold' : 'Free plan'}
           </p>
         </div>
       </div>
