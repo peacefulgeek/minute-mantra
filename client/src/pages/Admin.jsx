@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
-import AppHeader from '../components/AppHeader';
+// AppHeader is provided by the layout, not needed here
 
 const TABS = ['Overview', 'Users', 'Mantras', 'Revenue', 'Emails'];
 
@@ -196,7 +196,7 @@ export default function Admin() {
 
   return (
     <div className="min-h-screen pt-safe" style={{ background: 'var(--bg-base)', color: 'var(--text-primary)' }}>
-      <AppHeader />
+
 
       <div className="pt-16 max-w-5xl mx-auto px-4 py-8 pb-24">
         {/* Page title */}

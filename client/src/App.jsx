@@ -1,33 +1,31 @@
-import React, { Suspense, lazy } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import AppHeader from './components/AppHeader';
 import BottomNav from './components/BottomNav';
-import ErrorBoundary from './components/ErrorBoundary';
 
-// Lazy load pages
-const Landing = lazy(() => import('./pages/Landing'));
-const Enter = lazy(() => import('./pages/Enter'));
-const MagicLinkVerify = lazy(() => import('./pages/MagicLinkVerify'));
-const Home = lazy(() => import('./pages/Home'));
-const History = lazy(() => import('./pages/History'));
-const Favorites = lazy(() => import('./pages/Favorites'));
-const MantraDetail = lazy(() => import('./pages/MantraDetail'));
-const Settings = lazy(() => import('./pages/Settings'));
-const Profile = lazy(() => import('./pages/Profile'));
-const Subscription = lazy(() => import('./pages/Subscription'));
-const Billing = lazy(() => import('./pages/Billing'));
-const About = lazy(() => import('./pages/About'));
-const Privacy = lazy(() => import('./pages/Privacy'));
-const Terms = lazy(() => import('./pages/Terms'));
-const Onboarding = lazy(() => import('./pages/Onboarding'));
-const Admin = lazy(() => import('./pages/Admin'));
-const Library = lazy(() => import('./pages/Library'));
+// Eager imports — no lazy loading, no chunk failures, no blank pages
+import Landing from './pages/Landing';
+import Enter from './pages/Enter';
+import MagicLinkVerify from './pages/MagicLinkVerify';
+import Home from './pages/Home';
+import History from './pages/History';
+import Favorites from './pages/Favorites';
+import MantraDetail from './pages/MantraDetail';
+import Settings from './pages/Settings';
+import Profile from './pages/Profile';
+import Subscription from './pages/Subscription';
+import Billing from './pages/Billing';
+import About from './pages/About';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+import Onboarding from './pages/Onboarding';
+import Admin from './pages/Admin';
+import Library from './pages/Library';
 
 // Pages that have their own full-screen layout (no shared header/nav)
 const STANDALONE_PATHS = ['/enter', '/auth/verify', '/onboarding'];
-const LANDING_PATH = '/';
 
 function LoadingScreen() {
   return (
@@ -80,49 +78,42 @@ function AppLayout() {
         className="flex-1 overflow-y-auto"
         style={{ paddingTop: showHeader ? '56px' : '0', paddingBottom: showBottomNav ? '72px' : '0' }}
       >
-        <ErrorBoundary>
-        <Suspense fallback={<LoadingScreen />}>
-          <Routes>
-            {/* ── PUBLIC ── */}
-            {/* Landing page — shown to logged-out users at / */}
-            <Route path="/" element={user ? <Navigate to="/home" replace /> : <Landing />} />
+        <Routes>
+          {/* ── PUBLIC ── */}
+          <Route path="/" element={user ? <Navigate to="/home" replace /> : <Landing />} />
+          <Route path="/enter" element={user ? <Navigate to="/home" replace /> : <Enter />} />
+          <Route path="/auth/verify" element={<MagicLinkVerify />} />
 
-            {/* Magic link auth */}
-            <Route path="/enter" element={user ? <Navigate to="/home" replace /> : <Enter />} />
-            <Route path="/auth/verify" element={<MagicLinkVerify />} />
+          {/* Static pages */}
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
 
-            {/* Static pages */}
-            <Route path="/about" element={<About />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
+          {/* ── ONBOARDING ── */}
+          <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
 
-            {/* ── ONBOARDING ── */}
-            <Route path="/onboarding" element={<ProtectedRoute><Onboarding /></ProtectedRoute>} />
+          {/* ── APP (protected) ── */}
+          <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+          <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+          <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+          <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
+          <Route path="/mantra/:id" element={<ProtectedRoute><MantraDetail /></ProtectedRoute>} />
 
-            {/* ── APP (protected) ── */}
-            <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-            <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
-            <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
-            <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
-            <Route path="/mantra/:id" element={<ProtectedRoute><MantraDetail /></ProtectedRoute>} />
+          {/* Settings */}
+          <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/settings/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/settings/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
+          <Route path="/settings/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
+          <Route path="/settings/notifications" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          <Route path="/settings/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
 
-            {/* Settings */}
-            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-            <Route path="/settings/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/settings/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
-            <Route path="/settings/billing" element={<ProtectedRoute><Billing /></ProtectedRoute>} />
-            <Route path="/settings/notifications" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-            <Route path="/settings/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+          {/* ── ADMIN ── */}
+          <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
+          <Route path="/admin/*" element={<AdminRoute><Admin /></AdminRoute>} />
 
-            {/* ── ADMIN ── */}
-            <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
-            <Route path="/admin/*" element={<AdminRoute><Admin /></AdminRoute>} />
-
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to={user ? '/home' : '/'} replace />} />
-          </Routes>
-        </Suspense>
-        </ErrorBoundary>
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to={user ? '/home' : '/'} replace />} />
+        </Routes>
       </main>
 
       {showBottomNav && <BottomNav />}
