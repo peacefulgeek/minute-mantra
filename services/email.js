@@ -128,7 +128,7 @@ async function sendPasswordResetEmail(email, token) {
     <tr><td align="center" style="padding:40px 20px;">
       <table width="480" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#fffaf3;border-radius:16px;border:1px solid rgba(184,134,11,0.15);overflow:hidden;">
         <tr><td style="padding:40px;text-align:center;">
-          <img src="https://minute-mantra.b-cdn.net/icons/icon-192.png" alt="Minute Mantra" width="48" height="48" style="display:block;margin:0 auto 16px;border-radius:10px;">
+          <img src="${appUrl}/icon-192.png" alt="Minute Mantra" width="48" height="48" style="display:block;margin:0 auto 16px;border-radius:10px;">
           <h2 style="margin:0 0 16px;font-family:Georgia,serif;font-size:22px;color:#5a3e28;font-weight:normal;">Reset Your Password</h2>
           <p style="margin:0 0 28px;font-size:15px;color:#7a6050;line-height:1.6;">Click the link below to reset your password. This link expires in 1 hour.</p>
           <a href="${resetUrl}" style="display:inline-block;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fffaf3;text-decoration:none;padding:14px 32px;border-radius:30px;font-family:Georgia,serif;font-size:16px;font-weight:bold;">Reset Password</a>
@@ -170,7 +170,7 @@ async function sendMagicLinkEmail(email, magicUrl, isNew) {
     <tr><td align="center" style="padding:40px 20px;">
       <table width="480" cellpadding="0" cellspacing="0" style="max-width:480px;background-color:#fffaf3;border-radius:16px;border:1px solid rgba(184,134,11,0.15);overflow:hidden;">
         <tr><td style="padding:48px 40px;text-align:center;">
-          <img src="https://minute-mantra.b-cdn.net/icons/icon-192.png" alt="Minute Mantra" width="56" height="56" style="display:block;margin:0 auto 16px;border-radius:12px;">
+          <img src="${appUrl}/icon-192.png" alt="Minute Mantra" width="56" height="56" style="display:block;margin:0 auto 16px;border-radius:12px;">
           <h2 style="margin:0 0 8px;font-family:Georgia,serif;font-size:24px;color:#5a3e28;font-weight:normal;">${headline}</h2>
           <p style="margin:0 0 32px;font-size:15px;color:#7a6050;line-height:1.7;">${body}</p>
           <a href="${magicUrl}" style="display:inline-block;background:linear-gradient(135deg,#b8860b,#d4a017);color:#fffaf3;text-decoration:none;padding:16px 40px;border-radius:50px;font-family:Georgia,serif;font-size:15px;font-weight:bold;letter-spacing:0.1em;">ENTER YOUR PRACTICE</a>

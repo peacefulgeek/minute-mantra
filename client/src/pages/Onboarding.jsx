@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const STEPS = [
@@ -23,6 +23,8 @@ const STEPS = [
 export default function Onboarding() {
   const navigate = useNavigate();
   const [step, setStep] = useState(0);
+  const touchStartX = useRef(null);
+  const touchStartY = useRef(null);
 
   function next() {
     if (step < STEPS.length - 1) {
@@ -32,19 +34,57 @@ export default function Onboarding() {
     }
   }
 
+  function prev() {
+    if (step > 0) setStep(s => s - 1);
+  }
+
+  const handleTouchStart = useCallback((e) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback((e) => {
+    if (touchStartX.current === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX.current;
+    const dy = e.changedTouches[0].clientY - touchStartY.current;
+    // Only trigger if horizontal swipe is dominant and > 50px
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      if (dx < 0) next();   // swipe left → next
+      else prev();          // swipe right → prev
+    }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  }, [step]);
+
   const current = STEPS[step];
 
   return (
     <div
       className="fixed inset-0 flex flex-col items-center justify-center px-6"
       style={{ background: 'var(--bg-base, #fdf8f0)' }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
+      {/* Large logo above dots */}
+      <img
+        src="/icon-192.png"
+        alt="Minute Mantra"
+        style={{
+          width: '96px',
+          height: '96px',
+          borderRadius: '20px',
+          marginBottom: '28px',
+          boxShadow: '0 4px 24px rgba(184,134,11,0.15)',
+        }}
+      />
+
       {/* Progress dots */}
       <div className="flex gap-2 mb-10">
         {STEPS.map((_, i) => (
           <div
             key={i}
-            className="rounded-full"
+            className="rounded-full cursor-pointer"
+            onClick={() => setStep(i)}
             style={{
               width: i === step ? '24px' : '6px',
               height: '6px',
@@ -55,8 +95,14 @@ export default function Onboarding() {
         ))}
       </div>
 
-      {/* Text - centered */}
-      <div className="text-center max-w-md mb-10">
+      {/* Text - centered with slide animation */}
+      <div
+        className="text-center max-w-md mb-10"
+        key={step}
+        style={{
+          animation: 'fadeSlideIn 0.35s ease-out',
+        }}
+      >
         <h2
           className="mb-4"
           style={{
@@ -99,6 +145,29 @@ export default function Onboarding() {
       >
         {step < STEPS.length - 1 ? 'CONTINUE' : 'BEGIN MY PRACTICE'}
       </button>
+
+      {/* Swipe hint on first screen */}
+      {step === 0 && (
+        <p
+          style={{
+            marginTop: '20px',
+            fontFamily: "'DM Sans', system-ui, sans-serif",
+            fontSize: '12px',
+            color: 'rgba(154,140,126,0.6)',
+            letterSpacing: '0.05em',
+          }}
+        >
+          swipe or tap to continue
+        </p>
+      )}
+
+      {/* Inline keyframes for fade-slide animation */}
+      <style>{`
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateX(20px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+      `}</style>
     </div>
   );
 }
