@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MantraCard from '../components/MantraCard';
 import Timer from '../components/Timer';
+import UpgradeModal from '../components/UpgradeModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -219,51 +220,13 @@ export default function Home() {
         </div>
       )}
 
-      {/* Upgrade paywall — shown after 3 free mantras */}
-      {upgradeRequired && (
-        <div className="px-6 py-12 text-center" style={{ maxWidth: 440, margin: '0 auto' }}>
-          <div className="rounded-2xl p-8" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>✨</div>
-            <h2 className="font-serif text-xl mb-2" style={{ color: 'var(--text-primary)' }}>Your 3 Free Mantras Are Complete</h2>
-
-            {/* Progress dots on paywall too */}
-            <div className="flex items-center justify-center gap-2 mb-4">
-              {Array.from({ length: freeLimit }).map((_, i) => (
-                <div
-                  key={i}
-                  style={{
-                    width: 12,
-                    height: 12,
-                    borderRadius: '50%',
-                    background: 'linear-gradient(135deg, #b8860b, #d4a017)',
-                    boxShadow: '0 0 6px rgba(184,134,11,0.4)',
-                  }}
-                />
-              ))}
-              <span style={{ fontSize: 12, color: 'var(--text-secondary)', marginLeft: 4, fontFamily: "'DM Sans', sans-serif" }}>
-                3 of 3 complete
-              </span>
-            </div>
-
-            <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-              You've experienced the power of daily mantra practice. Upgrade to <strong style={{ color: '#b8860b' }}>Gold</strong> for unlimited mantras, the full library, extended timers, and more.
-            </p>
-            <button
-              onClick={() => navigate('/settings/subscription')}
-              className="px-8 py-3 rounded-full text-sm font-medium"
-              style={{
-                background: 'linear-gradient(135deg, #b8860b, #d4a017)',
-                color: '#ffffff',
-                border: 'none',
-                fontWeight: 600,
-                cursor: 'pointer',
-              }}
-            >
-              Upgrade to Gold
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Upgrade modal — shown after 3 free mantras */}
+      <UpgradeModal
+        open={upgradeRequired}
+        onClose={() => setUpgradeRequired(false)}
+        freeUsed={freeUsed || freeLimit}
+        freeLimit={freeLimit}
+      />
 
       {/* Content */}
       {!error && !upgradeRequired && view === 'card' && (
