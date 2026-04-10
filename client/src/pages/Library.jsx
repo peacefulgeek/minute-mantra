@@ -210,10 +210,10 @@ export default function Library() {
   return (
     <div className="min-h-screen pt-safe px-4 py-6 pb-24">
       {/* Header */}
-      <div className="mb-5">
+      <div className="mb-5" style={{ paddingTop: '12px' }}>
         <h1 className="font-serif text-2xl text-center" style={{ color: '#FF13F0' }}>Mantra Library</h1>
-        <p className="font-sans text-xs mt-1 text-center" style={{ color: 'var(--text-secondary)' }}>
-          {total} mantras{activeCategory ? ` in ${activeCategory}` : ''}
+        <p className="font-sans mt-1 text-center" style={{ color: 'var(--text-secondary)', fontSize: '14px' }}>
+          {total} Mantras{activeCategory ? ` in ${activeCategory}` : ''}
         </p>
       </div>
 
