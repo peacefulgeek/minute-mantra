@@ -186,7 +186,7 @@ export default function Library() {
   if (!isPlatinum) {
     return (
       <div className="min-h-screen pt-safe px-4 py-6">
-        <h1 className="font-serif text-2xl mb-6" style={{ color: 'var(--text-accent)' }}>Mantra Library</h1>
+        <h1 className="font-serif text-2xl mb-6 text-center" style={{ color: '#FF13F0' }}>Mantra Library</h1>
         <div className="rounded-2xl p-8 text-center" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)' }}>
           <div className="text-4xl mb-4">📚</div>
           <p className="font-serif text-lg mb-2" style={{ color: 'var(--text-primary)' }}>365 Sacred Mantras</p>
@@ -211,8 +211,8 @@ export default function Library() {
     <div className="min-h-screen pt-safe px-4 py-6 pb-24">
       {/* Header */}
       <div className="mb-5">
-        <h1 className="font-serif text-2xl" style={{ color: 'var(--text-accent)' }}>Mantra Library</h1>
-        <p className="font-sans text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+        <h1 className="font-serif text-2xl text-center" style={{ color: '#FF13F0' }}>Mantra Library</h1>
+        <p className="font-sans text-xs mt-1 text-center" style={{ color: 'var(--text-secondary)' }}>
           {total} mantras{activeCategory ? ` in ${activeCategory}` : ''}
         </p>
       </div>
