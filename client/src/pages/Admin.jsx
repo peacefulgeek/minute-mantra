@@ -164,6 +164,23 @@ export default function Admin() {
     setActionLoading(null);
   }
 
+  async function setRole(userId, email, role) {
+    const action = role === 'admin' ? 'Make Admin' : 'Remove Admin';
+    if (!confirm(`${action} for ${email}?`)) return;
+    setActionLoading(userId);
+    try {
+      const res = await fetch('/api/admin/set-role', {
+        method: 'POST', credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, role }),
+      });
+      const data = await res.json();
+      if (data.ok) { fetchUsers(); }
+      else alert(data.error || `Failed to ${action.toLowerCase()}`);
+    } catch (e) { alert(`Failed to ${action.toLowerCase()}`); }
+    setActionLoading(null);
+  }
+
   async function deleteUser(userId, email) {
     if (!confirm(`Delete user ${email}? This cannot be undone.`)) return;
     setActionLoading(userId);
@@ -361,14 +378,17 @@ export default function Admin() {
                     const tierBadge = getTierBadge(u.subscription_tier);
                     const isPaying = category === 'paying_monthly' || category === 'paying_annual';
                     const isGranted = category === 'granted';
-                    const isAdminUser = u.email === 'paul@creativelab.tv';
+                    const isAdminUser = u.role === 'admin' || u.email === 'paul@creativelab.tv';
+                    const isSuperAdmin = u.email === 'paul@creativelab.tv';
 
                     return (
                       <tr key={u.id || i} style={{ borderBottom: '1px solid var(--border-color)' }}>
                         <td className="px-4 py-3">
                           <span style={{ color: 'var(--text-primary)' }}>{u.email}</span>
                           {isAdminUser && (
-                            <span className="ml-2 text-xs px-1.5 py-0.5 rounded font-medium" style={{ background: 'rgba(184,134,11,0.12)', color: '#b8860b' }}>admin</span>
+                            <span className="ml-2 text-xs px-1.5 py-0.5 rounded font-medium" style={{ background: 'rgba(184,134,11,0.12)', color: '#b8860b' }}>
+                              {isSuperAdmin ? 'super-admin' : 'admin'}
+                            </span>
                           )}
                         </td>
                         <td className="px-4 py-3">
@@ -413,7 +433,28 @@ export default function Admin() {
                                 Square Sub
                               </span>
                             )}
+                            {/* Admin role buttons */}
                             {!isAdminUser && (
+                              <button
+                                onClick={() => setRole(u.id, u.email, 'admin')}
+                                disabled={actionLoading === u.id}
+                                className="px-2.5 py-1 rounded-lg text-xs whitespace-nowrap font-medium"
+                                style={{ background: 'rgba(139,92,246,0.1)', color: '#7c3aed', border: '1px solid rgba(139,92,246,0.2)' }}
+                              >
+                                Make Admin
+                              </button>
+                            )}
+                            {isAdminUser && !isSuperAdmin && (
+                              <button
+                                onClick={() => setRole(u.id, u.email, 'user')}
+                                disabled={actionLoading === u.id}
+                                className="px-2.5 py-1 rounded-lg text-xs whitespace-nowrap"
+                                style={{ background: 'rgba(139,92,246,0.06)', color: '#7c3aed', border: '1px solid rgba(139,92,246,0.12)' }}
+                              >
+                                Remove Admin
+                              </button>
+                            )}
+                            {!isSuperAdmin && (
                               <button
                                 onClick={() => deleteUser(u.id, u.email)}
                                 disabled={actionLoading === u.id}

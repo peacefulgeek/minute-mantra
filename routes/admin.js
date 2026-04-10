@@ -5,11 +5,16 @@ const { requireAuth } = require('../middleware/auth');
 
 // Admin guard middleware
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'paul@creativelab.tv';
-function requireAdmin(req, res, next) {
-  if (!req.user || (req.user.role !== 'admin' && req.user.email !== ADMIN_EMAIL)) {
-    return res.status(403).json({ error: 'Admin access required' });
-  }
-  next();
+async function requireAdmin(req, res, next) {
+  if (!req.user) return res.status(403).json({ error: 'Admin access required' });
+  // Check JWT role OR email fallback OR DB role column
+  if (req.user.role === 'admin' || req.user.email === ADMIN_EMAIL) return next();
+  // Also check DB in case JWT was issued before admin grant
+  try {
+    const dbUser = await queryOne('SELECT role FROM users WHERE id = ?', [req.user.id]);
+    if (dbUser && dbUser.role === 'admin') return next();
+  } catch (e) { /* ignore */ }
+  return res.status(403).json({ error: 'Admin access required' });
 }
 
 router.use(requireAuth, requireAdmin);
@@ -103,7 +108,7 @@ router.get('/users', async (req, res) => {
     params.push(parseInt(limit), offset);
 
     const users = await query(
-      `SELECT u.id, u.email, u.display_name, u.subscription_tier, u.subscription_status,
+      `SELECT u.id, u.email, u.display_name, u.role, u.subscription_tier, u.subscription_status,
               u.subscription_plan, u.square_subscription_id,
               u.email_notifications_enabled, u.push_notifications_enabled,
               u.created_at, u.timezone,
@@ -303,6 +308,30 @@ router.post('/set-tier', async (req, res) => {
   } catch (err) {
     console.error('Admin set-tier error:', err);
     res.status(500).json({ error: 'Failed to set user tier' });
+  }
+});
+
+// POST /api/admin/set-role — Make or remove admin
+router.post('/set-role', async (req, res) => {
+  try {
+    const { userId, role } = req.body;
+    if (!userId) return res.status(400).json({ error: 'userId is required' });
+    if (!['admin', 'user'].includes(role)) return res.status(400).json({ error: 'role must be admin or user' });
+
+    const targetUser = await queryOne('SELECT id, email, role FROM users WHERE id = ?', [userId]);
+    if (!targetUser) return res.status(404).json({ error: 'User not found' });
+
+    // Cannot demote the super-admin
+    if (role === 'user' && targetUser.email === ADMIN_EMAIL) {
+      return res.status(403).json({ error: 'Cannot remove admin from the super-admin account' });
+    }
+
+    await query('UPDATE users SET role = ?, updated_at = NOW() WHERE id = ?', [role, userId]);
+    const updated = await queryOne('SELECT id, email, role FROM users WHERE id = ?', [userId]);
+    res.json({ ok: true, user: updated });
+  } catch (err) {
+    console.error('Admin set-role error:', err);
+    res.status(500).json({ error: 'Failed to set role' });
   }
 });
 

@@ -75,7 +75,16 @@ const { query } = require('./config/db');
   try {
     await query("ALTER TABLE users MODIFY COLUMN subscription_tier ENUM('free','premium','platinum') DEFAULT 'free'");
     await query("ALTER TABLE users MODIFY COLUMN subscription_plan ENUM('monthly','annual','admin_granted','none') DEFAULT 'none'");
-    console.log('DB migration: subscription_tier and subscription_plan ENUMs updated');
+    // Add role column if it doesn't exist
+    try {
+      await query("ALTER TABLE users ADD COLUMN role ENUM('user','admin') DEFAULT 'user'");
+      console.log('DB migration: role column added');
+    } catch (e) {
+      // Column already exists — ignore
+    }
+    // Ensure paul@creativelab.tv is always admin in DB
+    await query("UPDATE users SET role = 'admin' WHERE email = 'paul@creativelab.tv'");
+    console.log('DB migration: subscription ENUMs and role column updated');
   } catch (err) {
     // Ignore if already migrated or table doesn't exist yet
     console.log('DB migration note:', err.message);

@@ -31,7 +31,7 @@ function issueJwt(user) {
     {
       id: user.id,
       email: user.email,
-      role: user.email === ADMIN_EMAIL ? 'admin' : 'user',
+      role: user.role === 'admin' || user.email === ADMIN_EMAIL ? 'admin' : 'user',
     },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRY || '7d' }
@@ -90,7 +90,7 @@ router.get('/magic-link/verify', async (req, res) => {
     if (!token) return res.status(400).json({ error: 'Token required' });
 
     const user = await queryOne(
-      `SELECT id, email, display_name, subscription_tier, subscription_status, subscription_plan,
+      `SELECT id, email, display_name, role, subscription_tier, subscription_status, subscription_plan,
               email_notifications_enabled, push_notifications_enabled, newsletter_opted_in,
               timezone, notification_time, magic_link_expires_at
        FROM users WHERE magic_link_token = ?`,
@@ -128,7 +128,7 @@ router.get('/magic-link/verify', async (req, res) => {
         newsletter_opted_in: user.newsletter_opted_in,
         timezone: user.timezone,
         notification_time: user.notification_time,
-        role: user.email === ADMIN_EMAIL ? 'admin' : 'user',
+        role: user.role === 'admin' || user.email === ADMIN_EMAIL ? 'admin' : 'user',
       },
     });
   } catch (err) {
@@ -151,7 +151,7 @@ router.post('/logout', (req, res) => {
 router.get('/me', requireAuth, async (req, res) => {
   try {
     const user = await queryOne(
-      `SELECT id, email, display_name, timezone, subscription_tier, subscription_status,
+      `SELECT id, email, display_name, role, timezone, subscription_tier, subscription_status,
               subscription_plan, email_notifications_enabled, push_notifications_enabled,
               newsletter_opted_in, notification_time, created_at
        FROM users WHERE id = ?`,
@@ -161,7 +161,7 @@ router.get('/me', requireAuth, async (req, res) => {
     res.json({
       user: {
         ...user,
-        role: user.email === ADMIN_EMAIL ? 'admin' : 'user',
+        role: user.role === 'admin' || user.email === ADMIN_EMAIL ? 'admin' : 'user',
       },
     });
   } catch (err) {
