@@ -265,14 +265,14 @@ export default function MantraCard({ mantra, onBeginChanting, onFavoriteToggle, 
             onClick={onBeginChanting}
             className="flex-1 py-3.5 rounded-xl tracking-wide"
             style={{
-              background: 'linear-gradient(135deg, #d4922a, #e8a832)',
+              background: 'linear-gradient(135deg, #b8860b, #d4a017)',
               color: '#ffffff',
               fontFamily: "'DM Sans', system-ui, sans-serif",
               fontWeight: 700,
               fontSize: '18px',
               letterSpacing: '0.05em',
               border: 'none',
-              boxShadow: '0 4px 16px rgba(212,146,42,0.3)',
+              boxShadow: '0 4px 16px rgba(184,134,11,0.3)',
             }}
           >
             Begin Chanting

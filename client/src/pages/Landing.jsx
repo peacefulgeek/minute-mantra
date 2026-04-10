@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // ─── Design: Warm Sacred Luminous ────────────────────────────────────────────
-// Palette: cream #fdf8f0, ivory #faf3e6, amber gold #d4922a, warm brown #2d1f0a
+// Palette: cream #fdf8f0, ivory #faf3e6, amber gold #C9943A, warm brown #2d1f0a
 // Typography: Cormorant Garamond (display) + DM Sans (body)
 // Login route: /enter (magic link)
 
@@ -126,7 +126,7 @@ const FAQS = [
 
 // ─── Sacred Geometry SVG Components ──────────────────────────────────────────
 
-function SeedOfLife({ size = 80, color = '#d4922a' }) {
+function SeedOfLife({ size = 80, color = '#C9943A' }) {
   const r = size * 0.28;
   const cx = size / 2, cy = size / 2;
   const circles = [
@@ -147,7 +147,7 @@ function SeedOfLife({ size = 80, color = '#d4922a' }) {
   );
 }
 
-function FlowerOfLife({ size = 80, color = '#d4922a' }) {
+function FlowerOfLife({ size = 80, color = '#C9943A' }) {
   const r = size * 0.18;
   const cx = size / 2, cy = size / 2;
   const centers = [[cx, cy]];
@@ -175,7 +175,7 @@ function FlowerOfLife({ size = 80, color = '#d4922a' }) {
   );
 }
 
-function LotusGeometry({ size = 80, color = '#d4922a' }) {
+function LotusGeometry({ size = 80, color = '#C9943A' }) {
   const cx = size / 2, cy = size / 2;
   const petals = 8;
   const pr = size * 0.32;
@@ -196,7 +196,7 @@ function LotusGeometry({ size = 80, color = '#d4922a' }) {
   );
 }
 
-function SriYantra({ size = 80, color = '#d4922a' }) {
+function SriYantra({ size = 80, color = '#C9943A' }) {
   const cx = size / 2, cy = size / 2;
   const s = size * 0.42;
   const triangles = [
@@ -245,17 +245,17 @@ function PhoneMockup() {
       <div style={{ padding: '14px 20px 8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <span style={{ fontSize: 11, color: '#8a6a3a', fontFamily: 'DM Sans, sans-serif', fontWeight: 500 }}>9:41</span>
         <div style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
-          {[3, 4, 5].map(h => <div key={h} style={{ width: 3, height: h, background: '#d4922a', borderRadius: 1, opacity: 0.7 }} />)}
-          <div style={{ width: 14, height: 7, border: '1.5px solid #d4922a', borderRadius: 2, marginLeft: 3, opacity: 0.7, position: 'relative' }}>
-            <div style={{ position: 'absolute', left: 1, top: 1, right: 2, bottom: 1, background: '#d4922a', borderRadius: 1 }} />
+          {[3, 4, 5].map(h => <div key={h} style={{ width: 3, height: h, background: '#C9943A', borderRadius: 1, opacity: 0.7 }} />)}
+          <div style={{ width: 14, height: 7, border: '1.5px solid #C9943A', borderRadius: 2, marginLeft: 3, opacity: 0.7, position: 'relative' }}>
+            <div style={{ position: 'absolute', left: 1, top: 1, right: 2, bottom: 1, background: '#C9943A', borderRadius: 1 }} />
           </div>
         </div>
       </div>
 
       {/* App header */}
       <div style={{ padding: '4px 20px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(201,148,58,0.12)' }}>
-        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><img src="/logo-transparent.png" alt="" style={{ width: 18, height: 18 }} /><span style={{ fontSize: 11, letterSpacing: '0.12em', color: '#d4922a', fontFamily: 'DM Sans, sans-serif', fontWeight: 600 }}>MINUTE MANTRA</span></span>
-        <span style={{ fontSize: 13 }}>🔥 <span style={{ fontSize: 11, color: '#d4922a', fontWeight: 600 }}>47</span></span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}><img src="/logo-transparent.png" alt="" style={{ width: 18, height: 18 }} /><span style={{ fontSize: 11, letterSpacing: '0.12em', color: '#C9943A', fontFamily: 'DM Sans, sans-serif', fontWeight: 600 }}>MINUTE MANTRA</span></span>
+        <span style={{ fontSize: 13 }}>🔥 <span style={{ fontSize: 11, color: '#C9943A', fontWeight: 600 }}>47</span></span>
       </div>
 
       {/* Date */}
@@ -271,7 +271,7 @@ function PhoneMockup() {
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}
             style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: 9, letterSpacing: '0.1em', color: '#d4922a', border: '1px solid rgba(201,148,58,0.4)', borderRadius: 4, padding: '2px 7px', fontFamily: 'DM Sans, sans-serif', fontWeight: 600 }}>
+            <span style={{ fontSize: 9, letterSpacing: '0.1em', color: '#C9943A', border: '1px solid rgba(201,148,58,0.4)', borderRadius: 4, padding: '2px 7px', fontFamily: 'DM Sans, sans-serif', fontWeight: 600 }}>
               {m.tradition}
             </span>
             <span style={{ fontSize: 9, letterSpacing: '0.08em', color: '#8a6a3a', background: 'rgba(201,148,58,0.1)', borderRadius: 4, padding: '2px 7px', fontFamily: 'DM Sans, sans-serif' }}>
@@ -306,7 +306,7 @@ function PhoneMockup() {
 
       {/* Geometry */}
       <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0' }}>
-        <SeedOfLife size={56} color="#d4922a" />
+        <SeedOfLife size={56} color="#C9943A" />
       </div>
 
       {/* Meaning */}
@@ -328,7 +328,7 @@ function PhoneMockup() {
           background: 'rgba(201,148,58,0.1)',
           border: '1px solid rgba(201,148,58,0.3)',
           borderRadius: 8, fontSize: 10,
-          color: '#d4922a', fontFamily: 'DM Sans, sans-serif',
+          color: '#C9943A', fontFamily: 'DM Sans, sans-serif',
           fontWeight: 500, letterSpacing: '0.06em',
           marginBottom: 8, cursor: 'default',
         }}>
@@ -336,7 +336,7 @@ function PhoneMockup() {
         </button>
         <button style={{
           width: '100%', padding: '10px 0',
-          background: 'linear-gradient(135deg, #d4922a 0%, #a8762a 100%)',
+          background: 'linear-gradient(135deg, #C9943A 0%, #a8762a 100%)',
           border: 'none', borderRadius: 10,
           fontSize: 11, color: '#ffffff',
           fontFamily: 'DM Sans, sans-serif',
@@ -388,7 +388,7 @@ function FaqItem({ q, a }) {
           flexShrink: 0, width: 28, height: 28,
           border: '1.5px solid rgba(201,148,58,0.5)',
           borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center',
-          color: '#d4922a', fontSize: 16, fontWeight: 300,
+          color: '#C9943A', fontSize: 16, fontWeight: 300,
           transition: 'transform 0.3s ease',
           transform: open ? 'rotate(45deg)' : 'rotate(0deg)',
         }}>
@@ -446,7 +446,7 @@ export default function Landing() {
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const gold = '#d4922a';
+  const gold = '#C9943A';
   const cream = '#fdf8f0';
   const ivory = '#faf3e6';
   const warmBrown = '#2d1f0a';
@@ -583,8 +583,8 @@ export default function Landing() {
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="hero-grid" width="60" height="60" patternUnits="userSpaceOnUse">
-                <circle cx="30" cy="30" r="28" fill="none" stroke="#d4922a" strokeWidth="0.5" />
-                <circle cx="30" cy="30" r="14" fill="none" stroke="#d4922a" strokeWidth="0.5" />
+                <circle cx="30" cy="30" r="28" fill="none" stroke="#C9943A" strokeWidth="0.5" />
+                <circle cx="30" cy="30" r="14" fill="none" stroke="#C9943A" strokeWidth="0.5" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#hero-grid)" />

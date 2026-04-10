@@ -30,7 +30,7 @@ function getCategoryBadge(category) {
     case 'paying_annual':
       return { label: 'Annual', bg: 'rgba(59,130,246,0.1)', color: '#2563eb' };
     case 'granted':
-      return { label: 'Granted', bg: 'rgba(212,146,42,0.12)', color: '#d4922a' };
+      return { label: 'Granted', bg: 'rgba(184,134,11,0.12)', color: '#b8860b' };
     case 'canceled':
       return { label: 'Canceled', bg: 'rgba(220,38,38,0.08)', color: '#dc2626' };
     case 'past_due':
@@ -42,7 +42,7 @@ function getCategoryBadge(category) {
 
 function getTierBadge(tier) {
   if (tier === 'platinum') {
-    return { label: 'Platinum', bg: 'rgba(212,146,42,0.12)', color: '#d4922a' };
+    return { label: 'Platinum', bg: 'rgba(184,134,11,0.12)', color: '#b8860b' };
   }
   return { label: 'Free', bg: 'rgba(0,0,0,0.04)', color: '#9a8c7e' };
 }
@@ -196,8 +196,8 @@ export default function Admin() {
               onClick={() => { setTab(t); setPage(1); setSearch(''); }}
               className="px-4 py-2 rounded-full text-sm whitespace-nowrap transition-all font-sans"
               style={{
-                background: tab === t ? 'rgba(212,146,42,0.12)' : 'var(--bg-card)',
-                border: `1px solid ${tab === t ? 'rgba(212,146,42,0.3)' : 'var(--border-color)'}`,
+                background: tab === t ? 'rgba(184,134,11,0.12)' : 'var(--bg-card)',
+                border: `1px solid ${tab === t ? 'rgba(184,134,11,0.3)' : 'var(--border-color)'}`,
                 color: tab === t ? 'var(--text-accent)' : 'var(--text-secondary)',
                 fontWeight: tab === t ? 600 : 400,
               }}
@@ -299,7 +299,7 @@ export default function Admin() {
               <button
                 onClick={() => setShowAddUser(!showAddUser)}
                 className="px-4 py-2.5 rounded-xl text-sm whitespace-nowrap font-sans font-medium"
-                style={{ background: 'rgba(212,146,42,0.1)', border: '1px solid rgba(212,146,42,0.25)', color: '#d4922a' }}
+                style={{ background: 'rgba(184,134,11,0.1)', border: '1px solid rgba(184,134,11,0.25)', color: '#b8860b' }}
               >
                 + Add User
               </button>
@@ -307,7 +307,7 @@ export default function Admin() {
 
             {/* Add user form */}
             {showAddUser && (
-              <div className="rounded-2xl p-5 mb-5" style={{ background: 'rgba(212,146,42,0.04)', border: '1px solid rgba(212,146,42,0.15)' }}>
+              <div className="rounded-2xl p-5 mb-5" style={{ background: 'rgba(184,134,11,0.04)', border: '1px solid rgba(184,134,11,0.15)' }}>
                 <h4 className="text-sm font-sans mb-3" style={{ color: 'var(--text-secondary)' }}>Add New User</h4>
                 <div className="flex gap-3 items-end flex-wrap">
                   <div className="flex-1 min-w-[200px]">
@@ -336,7 +336,7 @@ export default function Admin() {
                     onClick={addUser}
                     disabled={actionLoading === 'add'}
                     className="px-5 py-2.5 rounded-xl text-sm font-sans font-medium"
-                    style={{ background: 'linear-gradient(135deg, #d4922a, #e8a832)', color: '#fffaf3' }}
+                    style={{ background: 'linear-gradient(135deg, #b8860b, #d4a017)', color: '#fffaf3' }}
                   >
                     {actionLoading === 'add' ? 'Adding...' : 'Add'}
                   </button>
@@ -368,7 +368,7 @@ export default function Admin() {
                         <td className="px-4 py-3">
                           <span style={{ color: 'var(--text-primary)' }}>{u.email}</span>
                           {isAdminUser && (
-                            <span className="ml-2 text-xs px-1.5 py-0.5 rounded font-medium" style={{ background: 'rgba(212,146,42,0.12)', color: '#d4922a' }}>admin</span>
+                            <span className="ml-2 text-xs px-1.5 py-0.5 rounded font-medium" style={{ background: 'rgba(184,134,11,0.12)', color: '#b8860b' }}>admin</span>
                           )}
                         </td>
                         <td className="px-4 py-3">
@@ -393,7 +393,7 @@ export default function Admin() {
                                 onClick={() => grantPlatinum(u.id)}
                                 disabled={actionLoading === u.id}
                                 className="px-2.5 py-1 rounded-lg text-xs whitespace-nowrap font-medium"
-                                style={{ background: 'rgba(212,146,42,0.1)', color: '#d4922a', border: '1px solid rgba(212,146,42,0.2)' }}
+                                style={{ background: 'rgba(184,134,11,0.1)', color: '#b8860b', border: '1px solid rgba(184,134,11,0.2)' }}
                               >
                                 Grant Platinum
                               </button>
@@ -481,7 +481,7 @@ export default function Admin() {
                       <td className="px-4 py-3" style={{ color: 'var(--text-primary)' }}>{m.transliteration}</td>
                       <td className="px-4 py-3">
                         <span className="px-2 py-0.5 rounded-full text-xs"
-                          style={{ background: 'rgba(212,146,42,0.08)', color: '#d4922a' }}>
+                          style={{ background: 'rgba(184,134,11,0.08)', color: '#b8860b' }}>
                           {m.tradition?.replace('_', ' ')}
                         </span>
                       </td>
@@ -565,7 +565,7 @@ export default function Admin() {
                   </div>
                   <button onClick={runMorningCron}
                     className="px-4 py-2 rounded-xl text-sm font-sans font-medium"
-                    style={{ background: 'rgba(212,146,42,0.1)', border: '1px solid rgba(212,146,42,0.25)', color: '#d4922a' }}>
+                    style={{ background: 'rgba(184,134,11,0.1)', border: '1px solid rgba(184,134,11,0.25)', color: '#b8860b' }}>
                     Send Now
                   </button>
                 </div>
@@ -576,7 +576,7 @@ export default function Admin() {
                   </div>
                   <button onClick={sendTestNotification}
                     className="px-4 py-2 rounded-xl text-sm font-sans font-medium"
-                    style={{ background: 'rgba(212,146,42,0.1)', border: '1px solid rgba(212,146,42,0.25)', color: '#d4922a' }}>
+                    style={{ background: 'rgba(184,134,11,0.1)', border: '1px solid rgba(184,134,11,0.25)', color: '#b8860b' }}>
                     Send Test
                   </button>
                 </div>
@@ -620,11 +620,11 @@ function StatCard({ label, value, gold }) {
       animate={{ opacity: 1, y: 0 }}
       className="rounded-2xl p-5"
       style={{
-        background: gold ? 'rgba(212,146,42,0.06)' : 'var(--bg-card)',
-        border: `1px solid ${gold ? 'rgba(212,146,42,0.2)' : 'var(--border-color)'}`,
+        background: gold ? 'rgba(184,134,11,0.06)' : 'var(--bg-card)',
+        border: `1px solid ${gold ? 'rgba(184,134,11,0.2)' : 'var(--border-color)'}`,
       }}
     >
-      <div className="font-serif text-2xl mb-1" style={{ color: gold ? '#d4922a' : 'var(--text-primary)' }}>{value}</div>
+      <div className="font-serif text-2xl mb-1" style={{ color: gold ? '#b8860b' : 'var(--text-primary)' }}>{value}</div>
       <div className="text-xs font-sans" style={{ color: 'var(--text-secondary)' }}>{label}</div>
     </motion.div>
   );
@@ -639,7 +639,7 @@ function RevenueRow({ label, count, rate }) {
         <p className="text-xs font-sans" style={{ color: 'var(--text-secondary)' }}>{count} subscribers</p>
       </div>
       <div className="text-right">
-        <p className="text-sm font-sans font-medium" style={{ color: '#d4922a' }}>${monthly}/mo</p>
+        <p className="text-sm font-sans font-medium" style={{ color: '#b8860b' }}>${monthly}/mo</p>
       </div>
     </div>
   );

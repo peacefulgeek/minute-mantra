@@ -153,7 +153,7 @@ export default function Home() {
           {currentStreak > 0 ? (
             <>
               Chanting Day {currentStreak}
-              <span style={{ color: '#d4922a', margin: '0 8px' }}>&bull;</span>
+              <span style={{ color: '#b8860b', margin: '0 8px' }}>&bull;</span>
               <span style={{ color: '#FF13F0' }}>You Are {inspirationWord}</span>
             </>
           ) : (
@@ -170,7 +170,7 @@ export default function Home() {
             onClick={() => { setError(null); setLoading(true); retryCount.current = 0; fetchToday(); }}
             className="px-6 py-2 rounded-full text-sm"
             style={{
-              background: 'linear-gradient(135deg, #d4922a, #e8a832)',
+              background: 'linear-gradient(135deg, #b8860b, #d4a017)',
               color: '#ffffff',
               fontWeight: 600,
               border: 'none',
@@ -202,7 +202,7 @@ export default function Home() {
       {sessionDone && view === 'card' && (
         <div
           className="mx-4 mt-2 p-4 rounded-xl text-center animate-fade-in"
-          style={{ background: 'rgba(212,146,42,0.1)', border: '1px solid rgba(212,146,42,0.15)' }}
+          style={{ background: 'rgba(184,134,11,0.1)', border: '1px solid rgba(184,134,11,0.15)' }}
         >
           <p
             className="text-base"

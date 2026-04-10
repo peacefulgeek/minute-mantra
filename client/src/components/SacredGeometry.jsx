@@ -118,7 +118,7 @@ function FlowerOfLife({ progress, size = 280 }) {
             strokeDasharray={circumference}
             strokeDashoffset={dashOffset}
             style={{
-              fill: circleProgress > 0.8 ? `rgba(212,146,42, ${circleProgress * 0.06})` : 'transparent',
+              fill: circleProgress > 0.8 ? `rgba(184,134,11, ${circleProgress * 0.06})` : 'transparent',
               filter: 'url(#glow-flower)',
             }}
           />
@@ -267,7 +267,7 @@ function SriYantra({ progress, size = 280 }) {
             strokeDasharray={perim}
             strokeDashoffset={perim * (1 - triProgress)}
             style={{
-              fill: `rgba(212,146,42,${triProgress * 0.04})`,
+              fill: `rgba(184,134,11,${triProgress * 0.04})`,
               filter: 'url(#glow-sri)',
             }}
           />
@@ -281,7 +281,7 @@ function SriYantra({ progress, size = 280 }) {
           r={size * 0.025 * binduProgress}
           strokeWidth="1.5"
           style={{
-            fill: `rgba(212,146,42,${binduProgress * 0.8})`,
+            fill: `rgba(184,134,11,${binduProgress * 0.8})`,
             filter: 'url(#glow-sri)',
           }}
         />
