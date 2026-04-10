@@ -90,7 +90,19 @@ router.get('/today', optionalAuth, async (req, res) => {
       result.is_favorited = !!fav;
     }
 
-    res.json({ mantra: result, day_of_year: dayOfYear });
+    // Include free tier progress for free users
+    const response = { mantra: result, day_of_year: dayOfYear };
+    if (req.user) {
+      const tierCheck = await queryOne(
+        'SELECT subscription_tier, free_mantras_used FROM users WHERE id = ?',
+        [req.user.id]
+      );
+      if (tierCheck && tierCheck.subscription_tier === 'free') {
+        response.free_mantras_used = tierCheck.free_mantras_used || 0;
+        response.free_limit = 3;
+      }
+    }
+    res.json(response);
   } catch (err) {
     console.error('Get today mantra error:', err);
     res.status(500).json({ error: 'Server error' });

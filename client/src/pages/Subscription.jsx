@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Check } from '@phosphor-icons/react';
 import { useAuth } from '../contexts/AuthContext';
+import Confetti from '../components/Confetti';
 
 const FREE_FEATURES = [
   'Daily mantra + context card',
@@ -30,6 +31,39 @@ export default function Subscription() {
   const [plan, setPlan] = useState('annual');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showConfetti, setShowConfetti] = useState(false);
+  const wasGoldRef = useRef(isGold);
+  const pollRef = useRef(null);
+
+  // Poll for subscription status after checkout (user returns from Square tab)
+  useEffect(() => {
+    function handleFocus() {
+      // When user returns to this tab, start polling for subscription update
+      if (!wasGoldRef.current) {
+        let attempts = 0;
+        pollRef.current = setInterval(async () => {
+          attempts++;
+          await refetch();
+          if (attempts >= 10) clearInterval(pollRef.current);
+        }, 3000);
+      }
+    }
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, [refetch]);
+
+  // Detect upgrade: was not Gold, now is Gold → confetti!
+  useEffect(() => {
+    if (!wasGoldRef.current && isGold) {
+      setShowConfetti(true);
+      if (pollRef.current) clearInterval(pollRef.current);
+      setTimeout(() => setShowConfetti(false), 5000);
+    }
+    wasGoldRef.current = isGold;
+  }, [isGold]);
 
   async function handleSubscribe() {
     setLoading(true);
@@ -69,6 +103,8 @@ export default function Subscription() {
 
   return (
     <div className="min-h-screen pt-safe px-4 py-6">
+      <Confetti active={showConfetti} />
+
       <div className="flex items-center gap-3 mb-6">
         <button onClick={() => navigate('/settings')} style={{ color: 'var(--text-secondary)' }}>
           <ArrowLeft size={22} />
@@ -84,6 +120,11 @@ export default function Subscription() {
             style={{ background: 'rgba(184,134,11,0.1)', border: '1px solid var(--border-color)' }}
           >
             <p className="font-serif text-xl mb-1" style={{ color: 'var(--text-accent)' }}>✦ Gold</p>
+            {showConfetti && (
+              <p className="font-sans text-sm mb-2 animate-pulse" style={{ color: '#FF13F0', fontWeight: 600 }}>
+                Welcome to Gold! 🎉
+              </p>
+            )}
             <p className="font-sans text-sm" style={{ color: 'var(--text-secondary)' }}>
               Plan: {user?.subscription_plan === 'annual' ? 'Annual ($9.88/yr)' : user?.subscription_plan === 'admin_granted' ? 'Granted by admin' : 'Monthly ($1.08/mo)'}
             </p>
