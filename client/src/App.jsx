@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import AppHeader from './components/AppHeader';
 import BottomNav from './components/BottomNav';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Lazy load pages
 const Landing = lazy(() => import('./pages/Landing'));
@@ -79,6 +80,7 @@ function AppLayout() {
         className="flex-1 overflow-y-auto"
         style={{ paddingTop: showHeader ? '56px' : '0', paddingBottom: showBottomNav ? '72px' : '0' }}
       >
+        <ErrorBoundary>
         <Suspense fallback={<LoadingScreen />}>
           <Routes>
             {/* ── PUBLIC ── */}
@@ -120,6 +122,7 @@ function AppLayout() {
             <Route path="*" element={<Navigate to={user ? '/home' : '/'} replace />} />
           </Routes>
         </Suspense>
+        </ErrorBoundary>
       </main>
 
       {showBottomNav && <BottomNav />}

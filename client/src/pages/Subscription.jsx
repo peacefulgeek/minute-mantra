@@ -119,7 +119,7 @@ export default function Subscription() {
             className="rounded-xl p-5 mb-6 text-center"
             style={{ background: 'rgba(184,134,11,0.1)', border: '1px solid var(--border-color)' }}
           >
-            <p className="font-serif text-xl mb-1" style={{ color: 'var(--text-accent)' }}>✦ Gold</p>
+            <p className="font-serif text-xl mb-1" style={{ color: '#b8860b' }}>✦ Gold</p>
             {showConfetti && (
               <p className="font-sans text-sm mb-2 animate-pulse" style={{ color: '#FF13F0', fontWeight: 600 }}>
                 Welcome to Gold! 🎉
@@ -136,7 +136,7 @@ export default function Subscription() {
           <div className="flex flex-col gap-3">
             {GOLD_FEATURES.map(f => (
               <div key={f} className="flex items-center gap-2">
-                <Check size={16} style={{ color: 'var(--text-accent)', flexShrink: 0 }} />
+                <Check size={16} style={{ color: '#b8860b', flexShrink: 0 }} />
                 <span className="font-sans text-sm" style={{ color: 'var(--text-primary)' }}>{f}</span>
               </div>
             ))}
@@ -166,9 +166,9 @@ export default function Subscription() {
               onClick={() => setPlan('monthly')}
               className="flex-1 py-4 rounded-xl text-center"
               style={{
-                background: plan === 'monthly' ? 'var(--text-accent)' : 'var(--bg-card)',
+                background: plan === 'monthly' ? '#b8860b' : 'var(--bg-card)',
                 border: '1px solid var(--border-color)',
-                color: plan === 'monthly' ? 'var(--bg-base)' : 'var(--text-primary)',
+                color: plan === 'monthly' ? '#fff' : 'var(--text-primary)',
               }}
             >
               <p className="font-serif text-lg">$1.08</p>
@@ -178,9 +178,9 @@ export default function Subscription() {
               onClick={() => setPlan('annual')}
               className="flex-1 py-4 rounded-xl text-center relative"
               style={{
-                background: plan === 'annual' ? 'var(--text-accent)' : 'var(--bg-card)',
+                background: plan === 'annual' ? '#b8860b' : 'var(--bg-card)',
                 border: '1px solid var(--border-color)',
-                color: plan === 'annual' ? 'var(--bg-base)' : 'var(--text-primary)',
+                color: plan === 'annual' ? '#fff' : 'var(--text-primary)',
               }}
             >
               <span
@@ -198,7 +198,7 @@ export default function Subscription() {
           <div className="flex flex-col gap-2 mb-6">
             {GOLD_FEATURES.map(f => (
               <div key={f} className="flex items-center gap-2">
-                <Check size={14} style={{ color: 'var(--text-accent)', flexShrink: 0 }} />
+                <Check size={14} style={{ color: '#b8860b', flexShrink: 0 }} />
                 <span className="font-sans text-sm" style={{ color: 'var(--text-secondary)' }}>{f}</span>
               </div>
             ))}
@@ -213,8 +213,8 @@ export default function Subscription() {
             disabled={loading}
             className="w-full py-4 rounded-xl font-serif text-lg tracking-wide"
             style={{
-              background: 'var(--text-accent)',
-              color: 'var(--bg-base)',
+              background: 'linear-gradient(135deg, #b8860b, #d4a017)',
+              color: '#fff',
               opacity: loading ? 0.7 : 1,
             }}
           >

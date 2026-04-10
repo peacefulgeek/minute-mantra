@@ -45,11 +45,11 @@
 [data-tradition="vedic_shakti"] {
   --tradition-primary: #8b1a4a;
   --tradition-secondary: #c2185b;
-  --tradition-accent: #f8bbd0;
-  --geometry-stroke: #f8bbd0;
-  --geometry-glow: rgba(248, 187, 208, 0.4);
-  --text-accent: #f8bbd0;
-  --border-color: rgba(248, 187, 208, 0.2);
+  --tradition-accent: #FF13F0;
+  --geometry-stroke: #FF13F0;
+  --geometry-glow: rgba(255, 19, 240, 0.4);
+  --text-accent: #FF13F0;
+  --border-color: rgba(255, 19, 240, 0.2);
 }
 
 [data-tradition="vedic_ganesha"] {
