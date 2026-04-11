@@ -329,21 +329,62 @@ export default function Timer({ mantra, onComplete }) {
         {/* Simple progress ring */}
         <div className="relative flex items-center justify-center">
           <ProgressRing progress={progress} size={220} />
-          {/* Timer in center (tap to show) */}
-          {showTime && (
-            <div
-              className="absolute inset-0 flex items-center justify-center"
+          {/* Content inside circle */}
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center"
+            style={{ pointerEvents: 'none' }}
+          >
+            {/* You Are Love — centered */}
+            {!showTime && (
+              <span
+                style={{
+                  color: PURPLE,
+                  fontSize: '22px',
+                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  fontWeight: 600,
+                  letterSpacing: '0.5px',
+                }}
+              >
+                You Are Love
+              </span>
+            )}
+            {/* Timer countdown — centered when visible */}
+            {showTime && (
+              <span
+                style={{
+                  color: PURPLE,
+                  fontSize: '36px',
+                  fontFamily: "'Cormorant Garamond', Georgia, serif",
+                  fontWeight: 300,
+                }}
+              >
+                {mins}:{secs.toString().padStart(2, '0')}
+              </span>
+            )}
+          </div>
+          {/* Show Time — at very bottom inside circle */}
+          <div
+            className="absolute flex items-center justify-center"
+            style={{
+              bottom: '18px',
+              left: 0,
+              right: 0,
+              pointerEvents: 'auto',
+            }}
+            onClick={(e) => { e.stopPropagation(); setShowTime(prev => !prev); }}
+          >
+            <span
               style={{
-                color: PURPLE,
-                fontSize: '36px',
-                fontFamily: "'Cormorant Garamond', Georgia, serif",
-                fontWeight: 300,
-                pointerEvents: 'none',
+                color: 'rgba(107,47,160,0.45)',
+                fontSize: '11px',
+                fontFamily: "'DM Sans', sans-serif",
+                letterSpacing: '0.3px',
+                cursor: 'pointer',
               }}
             >
-              {mins}:{secs.toString().padStart(2, '0')}
-            </div>
-          )}
+              {showTime ? 'Hide Time' : 'Show Time'}
+            </span>
+          </div>
         </div>
 
         {/* Mantra audio controls — subtle, bottom area */}
@@ -394,12 +435,7 @@ export default function Timer({ mantra, onComplete }) {
           </div>
         )}
 
-        <p
-          className="mt-4 text-sm"
-          style={{ color: '#7a5c3e', fontFamily: "'DM Sans', sans-serif" }}
-        >
-          Tap to {showTime ? 'hide' : 'show'} time
-        </p>
+
       </div>
     );
   }
