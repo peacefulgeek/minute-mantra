@@ -6,6 +6,12 @@ import { registerRoute } from 'workbox-routing';
 import { CacheFirst, StaleWhileRevalidate, NetworkFirst } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 
+// Force immediate activation — don't wait for old tabs to close
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', event => {
+  event.waitUntil(self.clients.claim());
+});
+
 // Precache all build assets
 precacheAndRoute(self.__WB_MANIFEST);
 cleanupOutdatedCaches();

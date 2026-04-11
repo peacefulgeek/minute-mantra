@@ -49,7 +49,14 @@ app.use('/api/admin', require('./routes/admin'));
 
 // Health check
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', version: 'v13-gold-tier', timestamp: new Date().toISOString() });
+  res.json({ status: 'ok', version: 'v14-auto-update', timestamp: new Date().toISOString() });
+});
+
+// Build version — changes on every deploy, used by PWA auto-update
+const BUILD_VERSION = Date.now().toString(36);
+app.get('/api/version', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.json({ version: BUILD_VERSION });
 });
 
 // Serve React app in production
