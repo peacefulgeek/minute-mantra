@@ -361,7 +361,7 @@ export default function Timer({ mantra, onComplete }) {
               }}
             >
               <span style={{ fontSize: '14px' }}>▶</span>
-              Replay
+              Replay Audio
             </button>
             <button
               onClick={(e) => {
@@ -389,7 +389,7 @@ export default function Timer({ mantra, onComplete }) {
               }}
             >
               <span style={{ fontSize: '14px' }}>🔁</span>
-              {audioRepeat ? 'Repeating' : 'Repeat'}
+              {audioRepeat ? 'Continual ✓' : 'Continual Audio'}
             </button>
           </div>
         )}
