@@ -353,7 +353,7 @@ export default function Timer({ mantra, onComplete }) {
               <span
                 style={{
                   color: PURPLE,
-                  fontSize: '18px',
+                  fontSize: '19px',
                   fontFamily: "'Cormorant Garamond', Georgia, serif",
                   fontWeight: 300,
                   opacity: 0.7,
@@ -377,7 +377,7 @@ export default function Timer({ mantra, onComplete }) {
             <span
               style={{
                 color: 'rgba(107,47,160,0.45)',
-                fontSize: '11px',
+                fontSize: '12px',
                 fontFamily: "'DM Sans', sans-serif",
                 letterSpacing: '0.3px',
                 cursor: 'pointer',
