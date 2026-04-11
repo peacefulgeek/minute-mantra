@@ -332,34 +332,31 @@ export default function Timer({ mantra, onComplete }) {
           {/* Content inside circle */}
           <div
             className="absolute inset-0 flex flex-col items-center justify-center"
-            style={{ pointerEvents: 'none' }}
+            style={{ pointerEvents: 'none', gap: '6px' }}
           >
-            {/* English meaning — centered */}
-            {!showTime && (
-              <span
-                style={{
-                  color: PURPLE,
-                  fontSize: '14px',
-                  fontFamily: "'Cormorant Garamond', Georgia, serif",
-                  fontWeight: 500,
-                  fontStyle: 'italic',
-                  lineHeight: '1.4',
-                  textAlign: 'center',
-                  padding: '0 24px',
-                  maxWidth: '190px',
-                }}
-              >
-                {mantra?.english_translation || 'You Are Love'}
-              </span>
-            )}
-            {/* Timer countdown — centered when visible */}
+            {/* Poetic intention — always visible */}
+            <span
+              style={{
+                color: PURPLE,
+                fontSize: '16px',
+                fontFamily: "'Cormorant Garamond', Georgia, serif",
+                fontWeight: 600,
+                fontStyle: 'italic',
+                textAlign: 'center',
+                letterSpacing: '0.5px',
+              }}
+            >
+              You Are {mantra?.intention || 'Love'}
+            </span>
+            {/* Timer countdown — appears below meaning when visible */}
             {showTime && (
               <span
                 style={{
                   color: PURPLE,
-                  fontSize: '36px',
+                  fontSize: '18px',
                   fontFamily: "'Cormorant Garamond', Georgia, serif",
                   fontWeight: 300,
+                  opacity: 0.7,
                 }}
               >
                 {mins}:{secs.toString().padStart(2, '0')}
