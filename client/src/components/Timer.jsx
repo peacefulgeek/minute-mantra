@@ -334,18 +334,22 @@ export default function Timer({ mantra, onComplete }) {
             className="absolute inset-0 flex flex-col items-center justify-center"
             style={{ pointerEvents: 'none' }}
           >
-            {/* You Are Love — centered */}
+            {/* English meaning — centered */}
             {!showTime && (
               <span
                 style={{
                   color: PURPLE,
-                  fontSize: '22px',
+                  fontSize: '14px',
                   fontFamily: "'Cormorant Garamond', Georgia, serif",
-                  fontWeight: 600,
-                  letterSpacing: '0.5px',
+                  fontWeight: 500,
+                  fontStyle: 'italic',
+                  lineHeight: '1.4',
+                  textAlign: 'center',
+                  padding: '0 24px',
+                  maxWidth: '190px',
                 }}
               >
-                You Are Love
+                {mantra?.english_translation || 'You Are Love'}
               </span>
             )}
             {/* Timer countdown — centered when visible */}
