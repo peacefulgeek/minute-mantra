@@ -16,7 +16,9 @@ export default function Timer({ mantra, onComplete }) {
   const { user } = useAuth();
   const isPremium = user?.subscription_tier === 'gold';
 
-  const [phase, setPhase] = useState('idle'); // idle | chanting | complete
+  const phaseRef = useRef('idle');
+  const [phase, _setPhase] = useState('idle'); // idle | chanting | complete
+  const setPhase = (p) => { phaseRef.current = p; _setPhase(p); };
   const [selectedDuration, setSelectedDuration] = useState(60);
   const [elapsed, setElapsed] = useState(0);
   const [showTime, setShowTime] = useState(false);
@@ -24,10 +26,14 @@ export default function Timer({ mantra, onComplete }) {
   const [malaMode, setMalaMode] = useState(false);
   const [malaCount, setMalaCount] = useState(0);
 
+  const [audioRepeat, setAudioRepeat] = useState(false);
+  const audioRepeatRef = useRef(false);
+
   const intervalRef = useRef(null);
   const bowlLoopRef = useRef(null);
   const bowlStrikeRef = useRef(null);
   const wakeLockRef = useRef(null);
+  const mantraAudioRef = useRef(null);
 
   const progress = Math.min(1, elapsed / selectedDuration);
 
@@ -109,6 +115,8 @@ export default function Timer({ mantra, onComplete }) {
   function handleComplete(duration) {
     setCompleting(true);
     stopBowlLoop();
+    stopMantraAudio();
+    setAudioRepeat(false);
     releaseWakeLock();
     setTimeout(() => playBowlStrike(), 500);
     setTimeout(() => {
@@ -128,6 +136,39 @@ export default function Timer({ mantra, onComplete }) {
     }, 1500);
   }
 
+  function playMantraAudio() {
+    if (!mantra?.audio_url) return;
+    // Stop any currently playing mantra audio
+    if (mantraAudioRef.current) {
+      mantraAudioRef.current.pause();
+      mantraAudioRef.current.currentTime = 0;
+    }
+    mantraAudioRef.current = new Audio(mantra.audio_url);
+    mantraAudioRef.current.volume = 0.85;
+    mantraAudioRef.current.onended = () => {
+      if (audioRepeatRef.current && phaseRef.current === 'chanting') {
+        // Small pause between repeats
+        setTimeout(() => {
+          if (audioRepeatRef.current && phaseRef.current === 'chanting') playMantraAudio();
+        }, 1500);
+      }
+    };
+    mantraAudioRef.current.play().catch(() => {});
+  }
+
+  function stopMantraAudio() {
+    if (mantraAudioRef.current) {
+      mantraAudioRef.current.pause();
+      mantraAudioRef.current.currentTime = 0;
+      mantraAudioRef.current = null;
+    }
+  }
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    audioRepeatRef.current = audioRepeat;
+  }, [audioRepeat]);
+
   function handleScreenTap() {
     if (phase === 'chanting') {
       setShowTime(prev => !prev);
@@ -138,6 +179,7 @@ export default function Timer({ mantra, onComplete }) {
     return () => {
       clearInterval(intervalRef.current);
       stopBowlLoop();
+      stopMantraAudio();
       releaseWakeLock();
     };
   }, []);
@@ -309,8 +351,49 @@ export default function Timer({ mantra, onComplete }) {
           )}
         </div>
 
+        {/* Mantra audio controls — subtle, bottom area */}
+        {mantra?.audio_url && (
+          <div className="mt-6 flex items-center gap-3">
+            <button
+              onClick={(e) => { e.stopPropagation(); playMantraAudio(); }}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm"
+              style={{
+                background: 'rgba(107,47,160,0.08)',
+                color: PURPLE,
+                border: '1px solid rgba(107,47,160,0.15)',
+                fontFamily: "'DM Sans', sans-serif",
+                transition: 'all 0.2s',
+              }}
+            >
+              <span style={{ fontSize: '14px' }}>▶</span>
+              Replay
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const next = !audioRepeat;
+                setAudioRepeat(next);
+                audioRepeatRef.current = next;
+                if (next) playMantraAudio();
+                else stopMantraAudio();
+              }}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm"
+              style={{
+                background: audioRepeat ? PURPLE : 'rgba(107,47,160,0.08)',
+                color: audioRepeat ? '#ffffff' : PURPLE,
+                border: `1px solid ${audioRepeat ? PURPLE : 'rgba(107,47,160,0.15)'}`,
+                fontFamily: "'DM Sans', sans-serif",
+                transition: 'all 0.2s',
+              }}
+            >
+              <span style={{ fontSize: '14px' }}>🔁</span>
+              {audioRepeat ? 'Repeating' : 'Repeat'}
+            </button>
+          </div>
+        )}
+
         <p
-          className="mt-8 text-sm"
+          className="mt-4 text-sm"
           style={{ color: '#7a5c3e', fontFamily: "'DM Sans', sans-serif" }}
         >
           Tap to {showTime ? 'hide' : 'show'} time
