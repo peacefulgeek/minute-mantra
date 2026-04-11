@@ -142,18 +142,13 @@ export default function Timer({ mantra, onComplete }) {
     if (mantraAudioRef.current) {
       mantraAudioRef.current.pause();
       mantraAudioRef.current.currentTime = 0;
+      mantraAudioRef.current = null;
     }
-    mantraAudioRef.current = new Audio(mantra.audio_url);
-    mantraAudioRef.current.volume = 0.85;
-    mantraAudioRef.current.onended = () => {
-      if (audioRepeatRef.current && phaseRef.current === 'chanting') {
-        // Small pause between repeats
-        setTimeout(() => {
-          if (audioRepeatRef.current && phaseRef.current === 'chanting') playMantraAudio();
-        }, 1500);
-      }
-    };
-    mantraAudioRef.current.play().catch(() => {});
+    const audio = new Audio(mantra.audio_url);
+    audio.volume = 0.85;
+    audio.loop = audioRepeatRef.current;
+    mantraAudioRef.current = audio;
+    audio.play().catch(() => {});
   }
 
   function stopMantraAudio() {
@@ -374,8 +369,15 @@ export default function Timer({ mantra, onComplete }) {
                 const next = !audioRepeat;
                 setAudioRepeat(next);
                 audioRepeatRef.current = next;
-                if (next) playMantraAudio();
-                else stopMantraAudio();
+                if (next) {
+                  // Start looping
+                  playMantraAudio();
+                } else {
+                  // Turn off loop but let current play finish
+                  if (mantraAudioRef.current) {
+                    mantraAudioRef.current.loop = false;
+                  }
+                }
               }}
               className="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm"
               style={{
