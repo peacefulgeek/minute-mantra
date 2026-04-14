@@ -136,19 +136,32 @@ export default function Timer({ mantra, onComplete }) {
     }, 1500);
   }
 
+  // Preload mantra audio when entering chanting phase
+  useEffect(() => {
+    if (phase === 'chanting' && mantra?.audio_url && !mantraAudioRef.current) {
+      const audio = new Audio(mantra.audio_url);
+      audio.preload = 'auto';
+      audio.volume = 0.85;
+      mantraAudioRef.current = audio;
+    }
+  }, [phase, mantra?.audio_url]);
+
   function playMantraAudio() {
     if (!mantra?.audio_url) return;
-    // Stop any currently playing mantra audio
+    // Reuse preloaded audio — just reset and play
     if (mantraAudioRef.current) {
       mantraAudioRef.current.pause();
       mantraAudioRef.current.currentTime = 0;
-      mantraAudioRef.current = null;
+      mantraAudioRef.current.loop = audioRepeatRef.current;
+      mantraAudioRef.current.play().catch(() => {});
+    } else {
+      // Fallback: create new if somehow not preloaded
+      const audio = new Audio(mantra.audio_url);
+      audio.volume = 0.85;
+      audio.loop = audioRepeatRef.current;
+      mantraAudioRef.current = audio;
+      audio.play().catch(() => {});
     }
-    const audio = new Audio(mantra.audio_url);
-    audio.volume = 0.85;
-    audio.loop = audioRepeatRef.current;
-    mantraAudioRef.current = audio;
-    audio.play().catch(() => {});
   }
 
   function stopMantraAudio() {
