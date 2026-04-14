@@ -99,6 +99,25 @@ const { query } = require('./config/db');
     // Ensure paul@creativelab.tv is always admin in DB
     await query("UPDATE users SET role = 'admin' WHERE email = 'paul@creativelab.tv'");
     console.log('DB migration: subscription ENUMs and role column updated');
+
+    // One-time migration: update audio_filename to new naming convention (001_Om_Namah_Shivaya_.wav)
+    const [mantras] = await require('./config/db').getPool().query('SELECT id, day_of_year, transliteration FROM mantras ORDER BY day_of_year');
+    let audioUpdated = 0;
+    for (const m of mantras) {
+      const dayStr = String(m.day_of_year).padStart(3, '0');
+      const nameSlug = m.transliteration
+        .replace(/[\u2014\u2013:;,.\'\"\u201C\u201D\u2018\u2019!?()]/g, '')
+        .trim()
+        .substring(0, 20)
+        .replace(/\s+/g, '_')
+        .replace(/_+$/, '');
+      const newFilename = `${dayStr}_${nameSlug}_.wav`;
+      if (m.audio_filename !== newFilename) {
+        await query('UPDATE mantras SET audio_filename = ? WHERE id = ?', [newFilename, m.id]);
+        audioUpdated++;
+      }
+    }
+    if (audioUpdated > 0) console.log(`DB migration: updated ${audioUpdated} audio filenames to new convention`);
   } catch (err) {
     // Ignore if already migrated or table doesn't exist yet
     console.log('DB migration note:', err.message);
