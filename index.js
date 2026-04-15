@@ -46,6 +46,7 @@ app.use('/api/subscriptions', require('./routes/subscriptions'));
 app.use('/api/webhooks', require('./routes/webhooks'));
 app.use('/api/unsubscribe', require('./routes/unsubscribe'));
 app.use('/api/admin', require('./routes/admin'));
+app.use('/api/sprints', require('./routes/sprints'));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -118,6 +119,20 @@ const { query } = require('./config/db');
       }
     }
     if (audioUpdated > 0) console.log(`DB migration: updated ${audioUpdated} audio filenames to new convention`);
+
+    // Create sprints table if it doesn't exist
+    await query(`CREATE TABLE IF NOT EXISTS sprints (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      duration INT NOT NULL,
+      start_date DATE NOT NULL,
+      mantra_order JSON NOT NULL,
+      status ENUM('active','completed','cancelled') DEFAULT 'active',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      INDEX idx_sprints_user_status (user_id, status)
+    )`);
+    console.log('DB migration: sprints table ready');
   } catch (err) {
     // Ignore if already migrated or table doesn't exist yet
     console.log('DB migration note:', err.message);

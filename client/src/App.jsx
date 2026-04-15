@@ -23,6 +23,7 @@ import Terms from './pages/Terms';
 import Onboarding from './pages/Onboarding';
 import Admin from './pages/Admin';
 import Library from './pages/Library';
+import Sprint from './pages/Sprint';
 
 // Pages that have their own full-screen layout (no shared header/nav)
 const STANDALONE_PATHS = ['/enter', '/auth/verify', '/onboarding'];
@@ -98,6 +99,7 @@ function AppLayout() {
           <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
           <Route path="/library" element={<ProtectedRoute><Library /></ProtectedRoute>} />
           <Route path="/mantra/:id" element={<ProtectedRoute><MantraDetail /></ProtectedRoute>} />
+          <Route path="/sprint" element={<ProtectedRoute><Sprint /></ProtectedRoute>} />
 
           {/* Settings */}
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />

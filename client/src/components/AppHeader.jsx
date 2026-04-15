@@ -163,6 +163,7 @@ export default function AppHeader() {
                     <MenuItem to="/home" icon="🏠" label="Home" />
                     <MenuItem to="/history" icon="📅" label="History" />
                     <MenuItem to="/favorites" icon="♡" label="Favorites" />
+                    <MenuItem to="/sprint" icon="🏆" label="Sprint" />
 
                     <div className="mx-3 my-1 h-px" style={{ background: 'rgba(184,134,11,0.1)' }} />
 

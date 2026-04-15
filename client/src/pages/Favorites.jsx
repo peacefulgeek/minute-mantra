@@ -74,6 +74,28 @@ export default function Favorites() {
         </div>
       )}
 
+      {/* Sprint CTA */}
+      {favorites.length > 0 && (
+        <div
+          className="rounded-xl p-4 mb-4 flex items-center justify-between cursor-pointer"
+          onClick={() => navigate('/sprint')}
+          style={{
+            background: 'linear-gradient(135deg, rgba(184,134,11,0.12), rgba(184,134,11,0.06))',
+            border: '1px solid rgba(184,134,11,0.2)',
+          }}
+        >
+          <div>
+            <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '16px', fontWeight: 600, color: '#3d2b1f', margin: 0 }}>
+              Start a Mantra Sprint
+            </p>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0' }}>
+              Deepen your practice with {favorites.length} favorite{favorites.length > 1 ? 's' : ''}
+            </p>
+          </div>
+          <span style={{ fontSize: '20px' }}>&#127942;</span>
+        </div>
+      )}
+
       {favorites.length === 0 ? (
         <div className="text-center py-16">
           <Heart size={48} className="mx-auto mb-4" style={{ color: 'var(--text-secondary)', opacity: 0.4 }} />

@@ -59,6 +59,7 @@ export default function Home() {
   const [upgradeRequired, setUpgradeRequired] = useState(false);
   const [freeUsed, setFreeUsed] = useState(null);
   const [freeLimit, setFreeLimit] = useState(3);
+  const [sprint, setSprint] = useState(null);
   const retryCount = useRef(0);
 
   useEffect(() => {
@@ -86,6 +87,7 @@ export default function Home() {
         setMantra(data.mantra);
         setIsFavorited(data.mantra?.is_favorited || false);
         applyTradition(data.mantra?.tradition);
+        if (data.sprint) setSprint(data.sprint);
         setError(null);
       } else if (res.status === 401 && retryCount.current < 3) {
         retryCount.current += 1;
@@ -152,6 +154,50 @@ export default function Home() {
 
   return (
     <div className="min-h-screen pt-safe" style={{ background: 'var(--bg-base)' }}>
+      {/* Sprint indicator */}
+      {sprint && (
+        <div
+          className="mx-4 mt-3 mb-1 px-4 py-2.5 rounded-xl flex items-center justify-between cursor-pointer"
+          onClick={() => navigate('/sprint')}
+          style={{
+            background: 'linear-gradient(135deg, rgba(184,134,11,0.12), rgba(184,134,11,0.06))',
+            border: '1px solid rgba(184,134,11,0.2)',
+          }}
+        >
+          <div className="flex items-center gap-2">
+            <span style={{ fontSize: '16px' }}>&#127942;</span>
+            <span
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '13px',
+                fontWeight: 600,
+                color: '#5a3e1b',
+              }}
+            >
+              Sprint Day {sprint.sprint_day} of {sprint.duration}
+            </span>
+          </div>
+          <div
+            style={{
+              width: 60,
+              height: 4,
+              borderRadius: 2,
+              background: 'rgba(184,134,11,0.15)',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                width: `${(sprint.sprint_day / sprint.duration) * 100}%`,
+                height: '100%',
+                background: 'linear-gradient(90deg, #b8860b, #d4a017)',
+                borderRadius: 2,
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Chanting Day X • You Are Y — centered, compact */}
       <div className="text-center" style={{ padding: '20px 0 4px' }}>
         <p

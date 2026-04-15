@@ -21,6 +21,22 @@ function getDayOfYear(timezone = 'America/New_York') {
   return Math.floor((date - start) / 86400000);
 }
 
+function getTodayInTimezone(timezone) {
+  try {
+    const now = new Date();
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezone || 'America/New_York',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+    }).formatToParts(now);
+    const y = parts.find(p => p.type === 'year').value;
+    const m = parts.find(p => p.type === 'month').value;
+    const d = parts.find(p => p.type === 'day').value;
+    return `${y}-${m}-${d}`;
+  } catch (e) {
+    return new Date().toISOString().split('T')[0];
+  }
+}
+
 function buildCdnUrl(filename) {
   if (!filename) return null;
   const base = process.env.BUNNY_CDN_BASE_URL || 'https://minute-mantra.b-cdn.net';
@@ -35,6 +51,50 @@ router.get('/today', optionalAuth, async (req, res) => {
       : (req.query.timezone || 'America/New_York');
 
     const dayOfYear = getDayOfYear(timezone);
+
+    // Check for active sprint — override daily mantra if sprint is active
+    let sprintInfo = null;
+    if (req.user) {
+      const sprint = await queryOne(
+        "SELECT * FROM sprints WHERE user_id = ? AND status = 'active' LIMIT 1",
+        [req.user.id]
+      );
+      if (sprint) {
+        const todayStr = getTodayInTimezone(timezone);
+        const startStr = sprint.start_date.toISOString ? sprint.start_date.toISOString().split('T')[0] : String(sprint.start_date).split('T')[0];
+        const diffMs = new Date(todayStr) - new Date(startStr);
+        const sprintDay = Math.floor(diffMs / 86400000) + 1;
+        const mantraOrder = JSON.parse(sprint.mantra_order);
+
+        if (sprintDay > sprint.duration) {
+          // Sprint is over
+          await query("UPDATE sprints SET status = 'completed' WHERE id = ?", [sprint.id]);
+        } else if (sprintDay >= 1) {
+          // Sprint is active — serve sprint mantra
+          const sprintMantraId = mantraOrder[(sprintDay - 1) % mantraOrder.length];
+          const sprintMantra = await queryOne('SELECT * FROM mantras WHERE id = ?', [sprintMantraId]);
+          if (sprintMantra) {
+            sprintInfo = { sprint_day: sprintDay, duration: sprint.duration, sprint_id: sprint.id };
+            // Use sprint mantra instead of daily
+            const result = { ...sprintMantra, audio_url: buildCdnUrl(sprintMantra.audio_filename) };
+            if (req.user) {
+              const fav = await queryOne('SELECT id FROM favorites WHERE user_id = ? AND mantra_id = ?', [req.user.id, sprintMantra.id]);
+              result.is_favorited = !!fav;
+            }
+            const response = { mantra: result, day_of_year: dayOfYear, sprint: sprintInfo };
+            if (req.user) {
+              const tierCheck = await queryOne('SELECT subscription_tier, free_mantras_used FROM users WHERE id = ?', [req.user.id]);
+              if (tierCheck && tierCheck.subscription_tier === 'free') {
+                response.free_mantras_used = tierCheck.free_mantras_used || 0;
+                response.free_limit = 3;
+              }
+            }
+            return res.json(response);
+          }
+        }
+      }
+    }
+
     const mantra = await queryOne('SELECT * FROM mantras WHERE day_of_year = ?', [dayOfYear]);
 
     if (!mantra) {
