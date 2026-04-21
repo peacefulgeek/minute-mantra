@@ -160,9 +160,9 @@ export default function Enter() {
                 initial={{ scale: 0, rotate: -20 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 180, delay: 0.15 }}
-                style={{ fontSize: 52, marginBottom: 20 }}
+                style={{ marginBottom: 20 }}
               >
-                🪷
+                <img src="/logo-transparent.png" alt="Minute Mantra" style={{ width: 80, height: 80, objectFit: 'contain' }} />
               </motion.div>
               <h2 style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: 28, fontWeight: 400, color: '#3d2b1f', margin: '0 0 12px' }}>Check your inbox</h2>
               <p style={{ color: '#7a5c3e', fontSize: 15, lineHeight: 1.7, marginBottom: 8 }}>We sent a magic link to</p>
