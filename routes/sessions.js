@@ -101,7 +101,29 @@ async function updateStreak(userId, today, timezone) {
 router.get('/streak', requireAuth, async (req, res) => {
   try {
     const streak = await queryOne('SELECT * FROM streaks WHERE user_id = ?', [req.user.id]);
-    res.json({ streak: streak || { current_streak: 0, longest_streak: 0, last_session_date: null } });
+    if (!streak) {
+      return res.json({ streak: { current_streak: 0, longest_streak: 0, last_session_date: null } });
+    }
+
+    // Check if streak is stale (last session was NOT today or yesterday)
+    const user = await queryOne('SELECT timezone FROM users WHERE id = ?', [req.user.id]);
+    const tz = user?.timezone || 'America/New_York';
+    const todayStr = getTodayInTimezone(tz);
+    const yesterdayStr = getYesterdayInTimezone(tz);
+    const lastStr = streak.last_session_date
+      ? new Date(streak.last_session_date).toISOString().split('T')[0]
+      : null;
+
+    if (lastStr && lastStr !== todayStr && lastStr !== yesterdayStr && streak.current_streak > 0) {
+      // Streak is broken — reset in DB so it's accurate
+      await query(
+        'UPDATE streaks SET current_streak = 0 WHERE user_id = ?',
+        [req.user.id]
+      );
+      streak.current_streak = 0;
+    }
+
+    res.json({ streak });
   } catch (err) {
     console.error('Get streak error:', err);
     res.status(500).json({ error: 'Server error' });

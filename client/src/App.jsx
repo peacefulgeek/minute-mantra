@@ -98,7 +98,7 @@ function LoadingScreen() {
               textShadow: '0 0 20px rgba(184,134,11,0.2)',
               userSelect: 'none',
             }}>
-              \u0950
+              ॐ
             </span>
           </div>
           {/* Orbiting dots */}

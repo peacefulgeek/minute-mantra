@@ -210,7 +210,7 @@ export default function Home() {
             lineHeight: 1.4,
           }}
         >
-          {currentStreak > 0 ? (
+          {currentStreak > 1 ? (
             <>
               Chanting Day {currentStreak}
               <span style={{ color: '#b8860b', margin: '0 8px' }}>&bull;</span>

@@ -137,7 +137,34 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=Noto+Sans+Devanagari:wght@400;500&family=Noto+Sans+Gurmukhi:wght@400;500&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <div id="root"></div>
+  <div id="root">
+    <!-- Inline loading screen — shows instantly before JS loads, React replaces it on mount -->
+    <div id="preload-screen" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#fdf8f0 0%,#fef3e2 50%,#fdf0e0 100%);z-index:9999">
+      <style>
+        @keyframes plOmPulse{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.08);opacity:1}}
+        @keyframes plRingRotate{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        @keyframes plRingPulse{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:.5;transform:scale(1.04)}}
+        @keyframes plGlow{0%,100%{box-shadow:0 0 30px rgba(184,134,11,.15),0 0 60px rgba(184,134,11,.08)}50%{box-shadow:0 0 50px rgba(184,134,11,.3),0 0 100px rgba(184,134,11,.12)}}
+        @keyframes plDot1{0%{transform:rotate(0deg) translateX(68px) rotate(0deg);opacity:.6}50%{opacity:1}100%{transform:rotate(360deg) translateX(68px) rotate(-360deg);opacity:.6}}
+        @keyframes plDot2{0%{transform:rotate(0deg) translateX(68px) rotate(0deg);opacity:.6}50%{opacity:1}100%{transform:rotate(360deg) translateX(68px) rotate(-360deg);opacity:.6}}
+        @keyframes plDot3{0%{transform:rotate(0deg) translateX(68px) rotate(0deg);opacity:.6}50%{opacity:1}100%{transform:rotate(360deg) translateX(68px) rotate(-360deg);opacity:.6}}
+        @keyframes plFadeIn{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+      </style>
+      <div style="text-align:center;animation:plFadeIn .8s ease-out">
+        <div style="position:relative;width:160px;height:160px;margin:0 auto">
+          <div style="position:absolute;inset:0;border-radius:50%;border:1.5px solid transparent;border-top-color:rgba(184,134,11,.4);border-right-color:rgba(184,134,11,.15);animation:plRingRotate 4s linear infinite"></div>
+          <div style="position:absolute;inset:6px;border-radius:50%;border:1px solid rgba(184,134,11,.12);animation:plRingPulse 3s ease-in-out infinite"></div>
+          <div style="position:absolute;inset:20px;border-radius:50%;background:radial-gradient(circle,rgba(184,134,11,.08) 0%,transparent 70%);animation:plGlow 3s ease-in-out infinite"></div>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;animation:plOmPulse 3s ease-in-out infinite">
+            <span style="font-size:72px;line-height:1;color:#b8860b;font-family:'Noto Sans Devanagari',Georgia,serif;text-shadow:0 0 20px rgba(184,134,11,.2);user-select:none">ॐ</span>
+          </div>
+          <div style="position:absolute;top:50%;left:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:linear-gradient(135deg,#b8860b,#d4a017);animation:plDot1 6s linear infinite"></div>
+          <div style="position:absolute;top:50%;left:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:linear-gradient(135deg,#d4a017,#e6b422);animation:plDot2 8s linear infinite;animation-delay:-2s"></div>
+          <div style="position:absolute;top:50%;left:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:linear-gradient(135deg,#c9941a,#b8860b);animation:plDot3 10s linear infinite;animation-delay:-4s"></div>
+        </div>
+      </div>
+    </div>
+  </div>
   <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
