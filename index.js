@@ -12,6 +12,14 @@ const PORT = process.env.PORT || 3000;
 // Trust Railway's proxy so rate limiter works correctly
 app.set('trust proxy', 1);
 
+// 301 redirect www → non-www
+app.use((req, res, next) => {
+  if (req.hostname === 'www.minutemantra.com') {
+    return res.redirect(301, `https://minutemantra.com${req.originalUrl}`);
+  }
+  next();
+});
+
 // Security & middleware
 app.use(helmet({
   contentSecurityPolicy: {
